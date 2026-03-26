@@ -135,18 +135,22 @@
       input.value = '';
       messages.innerHTML += '<div class="message-jarvis">Jarvis : En train de reflechir...</div>';
       try {
-       const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
+       const response = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://openrouter.ai/api/v1/chat/completions'), {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer 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'
+    'Authorization': 'Bearer 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'
   },
   body: JSON.stringify({
-    inputs: "Tu es Jarvis, assistant IA d'Elio. Tu parles comme Jarvis dans Iron Man. Reponds a : " + texte
+    model: 'mistralai/mistral-7b-instruct:free',
+    messages: [
+      { role: 'system', content: "Tu es Jarvis, assistant IA d'Elio. Tu parles comme Jarvis dans Iron Man." },
+      { role: 'user', content: texte }
+    ]
   })
 });
 const data = await response.json();
-const reponse = data[0].generated_text.split("Reponds a : " + texte).pop().trim();
+const reponse = data.choices[0].message.content;
         const dernierMessage = messages.lastElementChild;
         dernierMessage.innerHTML = 'Jarvis : ' + reponse;
         messages.scrollTop = messages.scrollHeight;
