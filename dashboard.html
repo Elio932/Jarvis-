@@ -205,6 +205,15 @@
 
   <div class="horloge" id="horloge"></div>
   <div class="separateur"></div>
+  <div class="jarvis-section">
+    <div class="jarvis-btn" onclick="activerJarvis()">
+      <div class="jarvis-ring"></div>
+      <div class="jarvis-ring2"></div>
+      <span class="jarvis-icon">🕷️</span>
+      <span class="jarvis-text">ACTIVER JARVIS</span>
+    </div>
+    <p class="jarvis-status" id="jarvis-status">En attente d'activation...</p>
+  </div>
 
   <div class="recherche">
     <form action="https://www.google.com/search" target="_blank">
@@ -271,6 +280,54 @@
   </div>
 
   <script>
+    .jarvis-section { text-align: center; margin: 20px 0; }
+
+    .jarvis-btn {
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      border: 3px solid #ff3333;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: rgba(255,0,0,0.05);
+    }
+
+    .jarvis-btn:hover {
+      box-shadow: 0 0 40px #ff3333, 0 0 80px #ff0000;
+      transform: scale(1.05);
+    }
+
+    .jarvis-ring {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,51,51,0.3);
+      animation: rotate 4s linear infinite;
+    }
+
+    .jarvis-ring2 {
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      border: 1px solid rgba(68,68,255,0.3);
+      animation: rotate 6s linear infinite reverse;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .jarvis-icon { font-size: 3em; }
+    .jarvis-text { font-size: 0.8em; font-weight: bold; color: #ff3333; letter-spacing: 2px; margin-top: 5px; }
+    .jarvis-status { margin-top: 20px; font-size: 1em; color: #4444ff; opacity: 0.8; }
     const canvas = document.querySelector('canvas');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
@@ -356,6 +413,17 @@
       const notif = document.getElementById('notif-save');
       notif.innerHTML = '✅ Sauvegardé !';
       setTimeout(() => notif.innerHTML = '', 2000);
+    }
+    function activerJarvis() {
+      const status = document.getElementById('jarvis-status');
+      status.innerHTML = '⚡ Connexion en cours...';
+      setTimeout(() => {
+        status.innerHTML = '✅ Jarvis en ligne !';
+        setTimeout(() => {
+          window.open('https://claude.ai', '_blank');
+          status.innerHTML = 'En attente d\'activation...';
+        }, 1000);
+      }, 1500);
     }
   </script>
 
