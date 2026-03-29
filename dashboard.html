@@ -71,6 +71,12 @@
     .dossier-contenu { display: none; margin-top: 10px; gap: 10px; justify-content: center; flex-wrap: wrap; }
     .dossier-contenu a { padding: 8px 18px; border: 1px solid #00cfff; border-radius: 10px; color: #00cfff; text-decoration: none; font-size: 0.9em; transition: all 0.3s; }
     .dossier-contenu a:hover { background: #00cfff; color: #0a0a1a; box-shadow: 0 0 15px #00cfff; }
+    .blocnotes { margin-top: 25px; text-align: center; width: 60%; }
+    textarea { width: 100%; height: 150px; background: transparent; border: 2px solid #00cfff; border-radius: 15px; color: #00cfff; font-size: 1em; padding: 15px; resize: vertical; outline: none; font-family: Arial, sans-serif; transition: box-shadow 0.3s; }
+    textarea:focus { box-shadow: 0 0 15px #00cfff; }
+    .blocnotes button { margin-top: 10px; padding: 10px 25px; background: transparent; border: 2px solid #00cfff; border-radius: 15px; color: #00cfff; font-size: 1em; cursor: pointer; transition: all 0.3s; }
+    .blocnotes button:hover { background: #00cfff; color: #0a0a1a; box-shadow: 0 0 20px #00cfff; }
+    #notif-save { margin-left: 10px; font-size: 0.9em; opacity: 0.7; }
   </style>
 </head>
 <body>
@@ -193,7 +199,23 @@
         contenu.style.display = 'none';
       }
     }
-  </script>
+    const notes = document.getElementById('notes');
+    if (localStorage.getItem('notes')) {
+      notes.value = localStorage.getItem('notes');
+    }
 
+    function sauvegarderNotes() {
+      localStorage.setItem('notes', notes.value);
+      const notif = document.getElementById('notif-save');
+      notif.innerHTML = '✅ Sauvegardé !';
+      setTimeout(() => notif.innerHTML = '', 2000);
+    }
+  </script>
+<div class="blocnotes">
+    <h2>📝 Bloc-notes</h2>
+    <textarea id="notes" placeholder="Écris tes notes ici..."></textarea>
+    <button onclick="sauvegarderNotes()">💾 Sauvegarder</button>
+    <span id="notif-save"></span>
+  </div>
 </body>
 </html>
