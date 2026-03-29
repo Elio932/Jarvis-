@@ -2,13 +2,13 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Mon Dashboard</title>
+  <title>Spider Dashboard</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background-color: #0a0008;
-      color: #ff2d2d;
+      background-color: #0d0010;
+      color: #ff3333;
       font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
@@ -24,71 +24,199 @@
       z-index: -1;
     }
 
+    .header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .spider-logo {
+      font-size: 4em;
+      animation: spin 6s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+    }
+
     h1 {
       font-size: 2.5em;
-      text-shadow: 0 0 20px #ff2d2d, 0 0 40px #ff2d2d;
-      margin-bottom: 10px;
+      color: #ff3333;
+      text-shadow: 0 0 20px #ff3333, 0 0 40px #ff0000;
+      margin-bottom: 5px;
       animation: pulse 3s infinite;
     }
 
     @keyframes pulse {
-      0%, 100% { text-shadow: 0 0 20px #ff2d2d, 0 0 40px #ff2d2d; }
-      50% { text-shadow: 0 0 40px #ff2d2d, 0 0 80px #ff2d2d, 0 0 120px #1a0aff; }
+      0%, 100% { text-shadow: 0 0 20px #ff3333, 0 0 40px #ff0000; }
+      50% { text-shadow: 0 0 40px #ff3333, 0 0 80px #ff0000, 0 0 120px #ff0000; }
     }
 
-    p { font-size: 1.8em; opacity: 0.7; margin-bottom: 15px; animation: fadeIn 2s ease-in; color: #4d8aff; }
-    h2 { margin-bottom: 20px; font-size: 1.5em; opacity: 0.8; color: #ff2d2d; }
+    p {
+      font-size: 1.4em;
+      color: #4444ff;
+      opacity: 0.9;
+      margin-bottom: 15px;
+      animation: fadeIn 2s ease-in;
+      text-shadow: 0 0 10px #4444ff;
+    }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 0.7; transform: translateY(0); }
+      to { opacity: 0.9; transform: translateY(0); }
     }
 
-    .horloge { font-size: 3em; font-weight: bold; text-shadow: 0 0 30px #ff2d2d; margin-top: 15px; text-align: center; color: #ff2d2d; }
-    .horloge span { font-size: 0.4em; opacity: 0.7; color: #4d8aff; }
+    h2 {
+      margin-bottom: 20px;
+      font-size: 1.5em;
+      color: #ff3333;
+      text-shadow: 0 0 10px #ff3333;
+      opacity: 0.9;
+    }
 
-    .recherche { margin-top: 30px; }
-    .recherche input { width: 400px; padding: 12px 20px; border-radius: 30px 0 0 30px; border: 2px solid #ff2d2d; background: transparent; color: #ff2d2d; font-size: 1em; outline: none; transition: box-shadow 0.3s; }
-    .recherche input:focus { box-shadow: 0 0 15px #ff2d2d; }
-    .recherche button { padding: 12px 20px; border-radius: 0 30px 30px 0; border: none; background: #ff2d2d; color: #0a0008; font-size: 1em; cursor: pointer; font-weight: bold; transition: all 0.3s; }
-    .recherche button:hover { background: #1a0aff; box-shadow: 0 0 20px #1a0aff; color: white; }
+    .horloge {
+      font-size: 3em;
+      font-weight: bold;
+      color: #ff3333;
+      text-shadow: 0 0 30px #ff3333;
+      margin-top: 15px;
+      text-align: center;
+    }
+    .horloge span { font-size: 0.4em; opacity: 0.7; color: #4444ff; }
+
+    .separateur {
+      width: 60%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #ff3333, #4444ff, transparent);
+      margin: 20px 0;
+    }
+
+    .recherche { margin-top: 10px; }
+    .recherche input {
+      width: 400px;
+      padding: 12px 20px;
+      border-radius: 30px 0 0 30px;
+      border: 2px solid #ff3333;
+      background: rgba(255,0,0,0.05);
+      color: #ff3333;
+      font-size: 1em;
+      outline: none;
+      transition: box-shadow 0.3s;
+    }
+    .recherche input:focus { box-shadow: 0 0 15px #ff3333; }
+    .recherche input::placeholder { color: rgba(255,51,51,0.5); }
+    .recherche button {
+      padding: 12px 20px;
+      border-radius: 0 30px 30px 0;
+      border: none;
+      background: #ff3333;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    .recherche button:hover { background: #ff0000; box-shadow: 0 0 20px #ff3333; }
 
     .sites { margin-top: 25px; text-align: center; }
     .grille { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
-    .grille a { padding: 10px 20px; height: fit-content; align-self: flex-start; border: 2px solid #ff2d2d; border-radius: 15px; color: #ff2d2d; text-decoration: none; font-size: 1em; transition: all 0.3s; }
-    .grille a:hover { background: #ff2d2d; color: #0a0008; box-shadow: 0 0 20px #ff2d2d; transform: translateY(-3px); }
+    .grille a {
+      padding: 10px 20px;
+      height: fit-content;
+      align-self: flex-start;
+      border: 2px solid #ff3333;
+      border-radius: 15px;
+      color: #ff3333;
+      text-decoration: none;
+      font-size: 1em;
+      transition: all 0.3s;
+      background: rgba(255,0,0,0.05);
+    }
+    .grille a:hover { background: #ff3333; color: white; box-shadow: 0 0 20px #ff3333; transform: translateY(-3px); }
 
     .dossiers { margin-top: 25px; text-align: center; width: 100%; }
     .dossier { margin-bottom: 10px; }
-    .dossier-btn { padding: 10px 30px; background: transparent; border: 2px solid #1a0aff; border-radius: 15px; color: #4d8aff; font-size: 1em; cursor: pointer; transition: all 0.3s; }
-    .dossier-btn:hover { background: #1a0aff; color: white; box-shadow: 0 0 20px #1a0aff; transform: translateY(-3px); }
+    .dossier-btn {
+      padding: 10px 30px;
+      background: rgba(255,0,0,0.05);
+      border: 2px solid #ff3333;
+      border-radius: 15px;
+      color: #ff3333;
+      font-size: 1em;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .dossier-btn:hover { background: #ff3333; color: white; box-shadow: 0 0 20px #ff3333; transform: translateY(-3px); }
     .dossier-contenu { display: none; margin-top: 10px; gap: 10px; justify-content: center; flex-wrap: wrap; }
-    .dossier-contenu a { padding: 8px 18px; border: 1px solid #4d8aff; border-radius: 10px; color: #4d8aff; text-decoration: none; font-size: 0.9em; transition: all 0.3s; }
-    .dossier-contenu a:hover { background: #1a0aff; color: white; box-shadow: 0 0 15px #1a0aff; }
+    .dossier-contenu a {
+      padding: 8px 18px;
+      border: 1px solid #4444ff;
+      border-radius: 10px;
+      color: #4444ff;
+      text-decoration: none;
+      font-size: 0.9em;
+      transition: all 0.3s;
+      background: rgba(0,0,255,0.05);
+    }
+    .dossier-contenu a:hover { background: #4444ff; color: white; box-shadow: 0 0 15px #4444ff; }
 
     .blocnotes { margin-top: 25px; text-align: center; width: 60%; }
-    textarea { width: 100%; height: 150px; background: transparent; border: 2px solid #ff2d2d; border-radius: 15px; color: #ff2d2d; font-size: 1em; padding: 15px; resize: vertical; outline: none; font-family: Arial, sans-serif; transition: box-shadow 0.3s; }
-    textarea:focus { box-shadow: 0 0 15px #ff2d2d; }
-    .blocnotes button { margin-top: 10px; padding: 10px 25px; background: transparent; border: 2px solid #ff2d2d; border-radius: 15px; color: #ff2d2d; font-size: 1em; cursor: pointer; transition: all 0.3s; }
-    .blocnotes button:hover { background: #ff2d2d; color: #0a0008; box-shadow: 0 0 20px #ff2d2d; }
+    textarea {
+      width: 100%;
+      height: 150px;
+      background: rgba(255,0,0,0.05);
+      border: 2px solid #ff3333;
+      border-radius: 15px;
+      color: #ff3333;
+      font-size: 1em;
+      padding: 15px;
+      resize: vertical;
+      outline: none;
+      font-family: Arial, sans-serif;
+      transition: box-shadow 0.3s;
+    }
+    textarea:focus { box-shadow: 0 0 15px #ff3333; }
+    textarea::placeholder { color: rgba(255,51,51,0.4); }
+    .blocnotes button {
+      margin-top: 10px;
+      padding: 10px 25px;
+      background: rgba(255,0,0,0.05);
+      border: 2px solid #ff3333;
+      border-radius: 15px;
+      color: #ff3333;
+      font-size: 1em;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .blocnotes button:hover { background: #ff3333; color: white; box-shadow: 0 0 20px #ff3333; }
     #notif-save { margin-left: 10px; font-size: 0.9em; opacity: 0.7; }
   </style>
 </head>
 <body>
 
-  <h1>Bonjour Elio 👋</h1>
-  <p>Hey Elio, I'm Jarvis. What can I do for you?</p>
+  <canvas></canvas>
+
+  <div class="header">
+    <div class="spider-logo">🕷️</div>
+    <h1>Hey Elio !</h1>
+    <p>Avec de grands pouvoirs viennent de grandes responsabilités.</p>
+  </div>
+
   <div class="horloge" id="horloge"></div>
+  <div class="separateur"></div>
 
   <div class="recherche">
     <form action="https://www.google.com/search" target="_blank">
-      <input type="text" name="q" placeholder="🔍 Rechercher sur Google...">
+      <input type="text" name="q" placeholder="🔍 Rechercher...">
       <button type="submit">Chercher</button>
     </form>
   </div>
 
+  <div class="separateur"></div>
+
   <div class="sites">
-    <h2>Mes sites</h2>
+    <h2>🕸️ Mes sites</h2>
     <div class="grille">
       <a href="https://www.youtube.com" target="_blank">▶ YouTube</a>
       <a href="https://music.youtube.com" target="_blank">🎵 YouTube Music</a>
@@ -99,14 +227,16 @@
   </div>
 
   <div class="sites">
-    <h2>Mes mails</h2>
+    <h2>📧 Mes mails</h2>
     <div class="grille">
       <a href="https://mail.google.com" target="_blank">📧 Gmail</a>
     </div>
   </div>
 
+  <div class="separateur"></div>
+
   <div class="dossiers">
-    <h2>Mes dossiers</h2>
+    <h2>🕸️ Mes dossiers</h2>
     <div class="dossier">
       <button class="dossier-btn" onclick="toggleDossier('scolaire')">📚 Scolaire</button>
       <div class="dossier-contenu" id="scolaire">
@@ -131,9 +261,17 @@
     </div>
   </div>
 
+  <div class="separateur"></div>
+
+  <div class="blocnotes">
+    <h2>📝 Bloc-notes</h2>
+    <textarea id="notes" placeholder="Écris tes notes ici..."></textarea>
+    <button onclick="sauvegarderNotes()">💾 Sauvegarder</button>
+    <span id="notif-save"></span>
+  </div>
+
   <script>
-    const canvas = document.createElement('canvas');
-    document.body.appendChild(canvas);
+    const canvas = document.querySelector('canvas');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -143,7 +281,7 @@
       canvas.height = window.innerHeight;
     });
 
-  const particules = [];
+    const particules = [];
     for (let i = 0; i < 80; i++) {
       particules.push({
         x: Math.random() * canvas.width,
@@ -157,13 +295,11 @@
 
     function animerParticules() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
       particules.forEach((p, i) => {
         p.x += p.dx;
         p.y += p.dy;
         if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
         if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
-
         particules.forEach((p2, j) => {
           if (i === j) return;
           const dist = Math.sqrt((p.x - p2.x) ** 2 + (p.y - p2.y) ** 2);
@@ -176,16 +312,15 @@
             ctx.stroke();
           }
         });
-
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(255, 255, 255, ' + p.alpha + ')';
         ctx.fill();
       });
-
       requestAnimationFrame(animerParticules);
     }
     animerParticules();
+
     function majHorloge() {
       const maintenant = new Date();
       const heures = String(maintenant.getHours()).padStart(2, '0');
@@ -210,6 +345,7 @@
         contenu.style.display = 'none';
       }
     }
+
     const notes = document.getElementById('notes');
     if (localStorage.getItem('notes')) {
       notes.value = localStorage.getItem('notes');
@@ -222,11 +358,6 @@
       setTimeout(() => notif.innerHTML = '', 2000);
     }
   </script>
-<div class="blocnotes">
-    <h2>📝 Bloc-notes</h2>
-    <textarea id="notes" placeholder="Écris tes notes ici..."></textarea>
-    <button onclick="sauvegarderNotes()">💾 Sauvegarder</button>
-    <span id="notif-save"></span>
-  </div>
+
 </body>
 </html>
