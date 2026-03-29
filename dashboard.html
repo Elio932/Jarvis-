@@ -14,31 +14,63 @@
       flex-direction: column;
       align-items: center;
       padding: 40px;
+      overflow-x: hidden;
     }
 
-    h1 { font-size: 2.5em; text-shadow: 0 0 20px #00cfff; margin-bottom: 10px; }
-    p { font-size: 1.8em; opacity: 0.7; margin-bottom: 15px; }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      text-shadow: 0 0 20px #00cfff, 0 0 40px #00cfff;
+      margin-bottom: 10px;
+      animation: pulse 3s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { text-shadow: 0 0 20px #00cfff, 0 0 40px #00cfff; }
+      50% { text-shadow: 0 0 40px #00cfff, 0 0 80px #00cfff, 0 0 120px #00cfff; }
+    }
+
+    p { font-size: 1.8em; opacity: 0.7; margin-bottom: 15px; animation: fadeIn 2s ease-in; }
     h2 { margin-bottom: 20px; font-size: 1.5em; opacity: 0.8; }
 
-    .horloge { font-size: 3em; font-weight: bold; text-shadow: 0 0 30px #00cfff; margin-top: 15px; text-align: center; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 0.7; transform: translateY(0); }
+    }
+
+    .horloge {
+      font-size: 3em;
+      font-weight: bold;
+      text-shadow: 0 0 30px #00cfff;
+      margin-top: 15px;
+      text-align: center;
+    }
     .horloge span { font-size: 0.4em; opacity: 0.7; }
 
     .recherche { margin-top: 30px; }
-    .recherche input { width: 400px; padding: 12px 20px; border-radius: 30px 0 0 30px; border: 2px solid #00cfff; background: transparent; color: #00cfff; font-size: 1em; outline: none; }
-    .recherche button { padding: 12px 20px; border-radius: 0 30px 30px 0; border: none; background: #00cfff; color: #0a0a1a; font-size: 1em; cursor: pointer; font-weight: bold; }
+    .recherche input { width: 400px; padding: 12px 20px; border-radius: 30px 0 0 30px; border: 2px solid #00cfff; background: transparent; color: #00cfff; font-size: 1em; outline: none; transition: box-shadow 0.3s; }
+    .recherche input:focus { box-shadow: 0 0 15px #00cfff; }
+    .recherche button { padding: 12px 20px; border-radius: 0 30px 30px 0; border: none; background: #00cfff; color: #0a0a1a; font-size: 1em; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+    .recherche button:hover { background: #00ffff; box-shadow: 0 0 20px #00cfff; }
 
     .sites { margin-top: 25px; text-align: center; }
     .grille { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
     .grille a { padding: 10px 20px; height: fit-content; align-self: flex-start; border: 2px solid #00cfff; border-radius: 15px; color: #00cfff; text-decoration: none; font-size: 1em; transition: all 0.3s; }
-    .grille a:hover { background: #00cfff; color: #0a0a1a; }
+    .grille a:hover { background: #00cfff; color: #0a0a1a; box-shadow: 0 0 20px #00cfff; transform: translateY(-3px); }
 
     .dossiers { margin-top: 25px; text-align: center; width: 100%; }
     .dossier { margin-bottom: 10px; }
     .dossier-btn { padding: 10px 30px; background: transparent; border: 2px solid #00cfff; border-radius: 15px; color: #00cfff; font-size: 1em; cursor: pointer; transition: all 0.3s; }
-    .dossier-btn:hover { background: #00cfff; color: #0a0a1a; }
+    .dossier-btn:hover { background: #00cfff; color: #0a0a1a; box-shadow: 0 0 20px #00cfff; transform: translateY(-3px); }
     .dossier-contenu { display: none; margin-top: 10px; gap: 10px; justify-content: center; flex-wrap: wrap; }
     .dossier-contenu a { padding: 8px 18px; border: 1px solid #00cfff; border-radius: 10px; color: #00cfff; text-decoration: none; font-size: 0.9em; transition: all 0.3s; }
-    .dossier-contenu a:hover { background: #00cfff; color: #0a0a1a; }
+    .dossier-contenu a:hover { background: #00cfff; color: #0a0a1a; box-shadow: 0 0 15px #00cfff; }
   </style>
 </head>
 <body>
@@ -99,6 +131,44 @@
   </div>
 
   <script>
+    const canvas = document.createElement('canvas');
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    const particules = [];
+    for (let i = 0; i < 80; i++) {
+      particules.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 2 + 0.5,
+        dx: (Math.random() - 0.5) * 0.5,
+        dy: (Math.random() - 0.5) * 0.5,
+        alpha: Math.random()
+      });
+    }
+
+    function animerParticules() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particules.forEach(p => {
+        p.x += p.dx;
+        p.y += p.dy;
+        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 207, 255, ' + p.alpha + ')';
+        ctx.fill();
+      });
+      requestAnimationFrame(animerParticules);
+    }
+    animerParticules();
     function majHorloge() {
       const maintenant = new Date();
       const heures = String(maintenant.getHours()).padStart(2, '0');
