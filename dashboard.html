@@ -228,6 +228,15 @@
     .minuteur-presets button:hover { border-color: #ff3333; box-shadow: 0 0 10px #ff3333; }
     .chrono-display { font-size: 3em; font-weight: bold; color: #4444ff; text-shadow: 0 0 20px #4444ff; font-family: monospace; margin: 15px 0; }
     .separateur-outil { width: 60%; height: 1px; background: rgba(255,51,51,0.2); margin: 20px auto; }
+    /* JEUX */
+    .jeu-card { display: flex; flex-direction: column; align-items: center; padding: 20px 15px; border: 2px solid rgba(255,51,51,0.4); border-radius: 15px; color: #ff3333; text-decoration: none; background: rgba(255,0,0,0.03); transition: all 0.4s; position: relative; overflow: hidden; }
+    .jeu-card::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255,51,51,0.2); border-radius: 50%; transform: translate(-50%,-50%); transition: width 0.5s, height 0.5s; }
+    .jeu-card:hover::before { width: 300px; height: 300px; }
+    .jeu-card:hover { border-color: #ff3333; box-shadow: 0 0 25px #ff3333; transform: translateY(-5px) scale(1.03); }
+    .jeu-emoji { font-size: 3em; margin-bottom: 10px; transition: transform 0.3s; }
+    .jeu-card:hover .jeu-emoji { transform: scale(1.2) rotate(10deg); }
+    .jeu-titre { font-size: 1em; font-weight: bold; color: #ff3333; margin-bottom: 5px; }
+    .jeu-desc { font-size: 0.75em; color: #4444ff; opacity: 0.8; }
   </style>
 </head>
 <body>
@@ -335,6 +344,7 @@
     <div class="sidebar-btn" onclick="afficherSection('calendrier', event)">🗓️<span class="sidebar-tooltip">Calendrier</span></div>
     <div class="sidebar-btn" onclick="afficherSection('meteo', event)">🌦️<span class="sidebar-tooltip">Météo</span></div>
     <div class="sidebar-btn" onclick="afficherSection('marvel', event)">⚡<span class="sidebar-tooltip">News Marvel</span></div>
+    <div class="sidebar-btn" onclick="afficherSection('jeux', event)">🎮<span class="sidebar-tooltip">Jeux</span></div>
   </div>
 
   <canvas></canvas>
@@ -519,7 +529,69 @@
         <div class="news-item"><h3>⚡ Avengers : Doomsday — ce qu'on sait</h3><p>Le casting, l'histoire et les connections avec le multivers : tout ce qu'on sait sur le prochain Avengers.</p><div class="news-date">Marvel Universe</div></div>
       </div>
     </div>
+<!-- JEUX -->
+    <div class="section" id="section-jeux">
+      <h2>🎮 Arcade Spider-Man</h2>
+      <div class="separateur"></div>
+      <div id="jeu-message" style="text-align:center;font-size:1.2em;color:#4444ff;min-height:40px;margin-bottom:20px;font-style:italic;transition:all 0.5s;"></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:15px;width:100%">
 
+        <a href="https://poki.com/fr/g/subway-surfers" target="_blank" onclick="afficherMessageJeu('🏃 MISSION LANCÉE — Cours Spider-Man, cours !')" class="jeu-card">
+          <div class="jeu-emoji">🏃</div>
+          <div class="jeu-titre">Subway Surfers</div>
+          <div class="jeu-desc">Course infinie</div>
+        </a>
+
+        <a href="https://poki.com/fr/g/moto-x3m" target="_blank" onclick="afficherMessageJeu('🏍️ MOTEUR DÉMARRÉ — Prêt pour la cascade ?')" class="jeu-card">
+          <div class="jeu-emoji">🏍️</div>
+          <div class="jeu-titre">Moto X3M</div>
+          <div class="jeu-desc">Moto acrobatique</div>
+        </a>
+
+        <a href="https://poki.com/fr/g/drift-hunters" target="_blank" onclick="afficherMessageJeu('🚗 MOTEUR EN ROUTE — À toi les dérapages !')" class="jeu-card">
+          <div class="jeu-emoji">🚗</div>
+          <div class="jeu-titre">Drift Hunters</div>
+          <div class="jeu-desc">Voiture drift</div>
+        </a>
+
+        <a href="https://poki.com/fr/g/2048" target="_blank" onclick="afficherMessageJeu('🧩 CERVEAU ACTIVÉ — Calcule Spider-Man !')" class="jeu-card">
+          <div class="jeu-emoji">🧩</div>
+          <div class="jeu-titre">2048</div>
+          <div class="jeu-desc">Puzzle chiffres</div>
+        </a>
+
+        <a href="https://poki.com/fr/g/cut-the-rope-remastered" target="_blank" onclick="afficherMessageJeu('✂️ TOILE TENDUE — Coupe au bon moment !')" class="jeu-card">
+          <div class="jeu-emoji">✂️</div>
+          <div class="jeu-titre">Cut the Rope</div>
+          <div class="jeu-desc">Puzzle physique</div>
+        </a>
+
+        <a href="https://poki.com/fr/g/chess" target="_blank" onclick="afficherMessageJeu('♟️ STRATÉGIE MAXIMALE — Chaque coup compte !')" class="jeu-card">
+          <div class="jeu-emoji">♟️</div>
+          <div class="jeu-titre">Échecs</div>
+          <div class="jeu-desc">Réflexion pure</div>
+        </a>
+
+        <a href="https://poki.com/fr/g/parking-fury-3d" target="_blank" onclick="afficherMessageJeu('🅿️ AGENT DE STATIONNEMENT — Gare sans rayer !')" class="jeu-card">
+          <div class="jeu-emoji">🅿️</div>
+          <div class="jeu-titre">Parking Fury</div>
+          <div class="jeu-desc">Voiture parking</div>
+        </a>
+
+        <a href="https://poki.com/fr/g/road-fury" target="_blank" onclick="afficherMessageJeu('💥 ROUTE EN FEU — Détruис tout sur ton passage !')" class="jeu-card">
+          <div class="jeu-emoji">💥</div>
+          <div class="jeu-titre">Road Fury</div>
+          <div class="jeu-desc">Voiture combat</div>
+        </a>
+
+        <a href="https://poki.com/fr/g/sudoku" target="_blank" onclick="afficherMessageJeu('🔢 MODE DÉTECTIVE — Trouve tous les chiffres !')" class="jeu-card">
+          <div class="jeu-emoji">🔢</div>
+          <div class="jeu-titre">Sudoku</div>
+          <div class="jeu-desc">Puzzle logique</div>
+        </a>
+
+      </div>
+    </div>
   </div>
 
   <script>
@@ -844,6 +916,18 @@
       }
     }
     document.getElementById('meteo-input').addEventListener('keypress', function(e) { if (e.key === 'Enter') chercherMeteo(); });
+    // JEUX
+    function afficherMessageJeu(msg) {
+      flashLancement();
+      const el = document.getElementById('jeu-message');
+      el.textContent = msg;
+      el.style.color = '#ff3333';
+      el.style.textShadow = '0 0 15px #ff3333';
+      setTimeout(() => {
+        el.style.color = '#4444ff';
+        el.style.textShadow = 'none';
+      }, 2000);
+    }
   </script>
 
 </body>
