@@ -2,74 +2,89 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Spider Dashboard</title>
+  <title>Spider Dashboard V7</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
-    body { background-color: #0d0010; color: #ff3333; font-family: Arial, sans-serif; overflow-x: hidden; display: flex; }
 
-    /* CURSEUR PERSONNALISE */
-    #curseur {
-      position: fixed; pointer-events: none; z-index: 99999;
-      width: 20px; height: 20px; transform: translate(-50%, -50%);
-      transition: transform 0.1s;
+    body {
+      background: radial-gradient(circle at center, #0a0a0f, #000);
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      overflow-x: hidden;
+      display: flex;
     }
+
+    /* SCANLINES */
+    .scanlines::after {
+      content: "";
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0; left: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.03),
+        rgba(255,255,255,0.03) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      pointer-events: none;
+      z-index: 9990;
+    }
+
+    /* GLOW */
+    .glow-red { text-shadow: 0 0 10px #ff003c, 0 0 20px #ff003c; }
+    .glow-blue { text-shadow: 0 0 10px #00f7ff, 0 0 20px #00f7ff; }
+
+    /* CURSEUR */
+    #curseur { position: fixed; pointer-events: none; z-index: 99999; width: 20px; height: 20px; transform: translate(-50%, -50%); }
     #curseur svg { width: 20px; height: 20px; }
-    #curseur-trail {
-      position: fixed; pointer-events: none; z-index: 99998;
-      width: 8px; height: 8px; border-radius: 50%;
-      background: rgba(255,51,51,0.4);
-      transform: translate(-50%, -50%);
-      transition: left 0.1s, top 0.1s;
-    }
+    #curseur-trail { position: fixed; pointer-events: none; z-index: 99998; width: 8px; height: 8px; border-radius: 50%; background: rgba(255,0,60,0.4); transform: translate(-50%, -50%); transition: left 0.1s, top 0.1s; }
 
     canvas { position: fixed; top: 0; left: 0; z-index: -1; }
 
     .spider-mask-bg { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 40vw; opacity: 0.03; z-index: 0; animation: maskPulse 6s infinite; pointer-events: none; user-select: none; }
     @keyframes maskPulse { 0%,100% { opacity: 0.03; } 50% { opacity: 0.06; } }
 
-    /* HUD INFO BAR */
-    #hud-info {
-      position: fixed; top: 8px; right: 50px; z-index: 50;
-      display: none; gap: 20px; align-items: center;
-      font-size: 0.75em; color: #ff3333; opacity: 0.7;
-      font-family: monospace; letter-spacing: 1px;
-    }
-    #hud-info span { text-shadow: 0 0 8px #ff3333; }
-    .batterie-bar { width: 30px; height: 10px; border: 1px solid #ff3333; border-radius: 2px; position: relative; display: inline-block; margin-left: 4px; }
-    .batterie-fill { height: 100%; background: #ff3333; border-radius: 2px; transition: width 0.5s; }
+    /* HUD INFO */
+    #hud-info { position: fixed; top: 8px; right: 50px; z-index: 50; display: none; gap: 20px; align-items: center; font-size: 0.75em; color: #ff003c; opacity: 0.7; font-family: 'Orbitron', monospace; letter-spacing: 1px; }
+    #hud-info span { text-shadow: 0 0 8px #ff003c; }
+    .batterie-bar { width: 30px; height: 10px; border: 1px solid #ff003c; border-radius: 2px; display: inline-block; margin-left: 4px; }
+    .batterie-fill { height: 100%; background: #ff003c; border-radius: 2px; transition: width 0.5s; }
 
     /* ECRANS */
-    #loading-screen, #password-screen, #welcome-screen {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: #0d0010; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; text-align: center;
-    }
+    #loading-screen, #password-screen, #welcome-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #0a0a0f, #000); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
     #loading-screen { z-index: 1000; }
     #password-screen { z-index: 999; display: none; }
     #welcome-screen { z-index: 998; display: none; }
-    #loading-screen h2, #password-screen h2, #welcome-screen h1 { color: #ff3333; text-shadow: 0 0 20px #ff3333; margin: 15px 0; }
-    #loading-screen h2 { font-size: 2em; }
-    #welcome-screen h1 { font-size: 3em; animation: pulse 1s infinite; }
-    #welcome-screen .sub { font-size: 1.3em; color: #4444ff; line-height: 1.8; margin-top: 10px; }
-    #welcome-screen .hint { font-size: 1em; margin-top: 30px; opacity: 0.5; color: #ff3333; }
-    .eclair { position: fixed; top: 0; left: 50%; width: 4px; height: 0; background: linear-gradient(to bottom, #4444ff, #ff3333); box-shadow: 0 0 20px #ff3333; z-index: 1001; transition: height 0.8s ease-in; }
-    .barre-chargement { width: 300px; height: 4px; background: rgba(255,0,0,0.2); border-radius: 10px; overflow: hidden; margin-top: 10px; }
-    .barre-progress { height: 100%; width: 0%; background: linear-gradient(to right, #4444ff, #ff3333); border-radius: 10px; transition: width 1.5s ease; }
-    #loading-text { color: #4444ff; margin-top: 10px; font-size: 0.9em; }
-    #password-screen p { color: #4444ff; margin-bottom: 20px; font-size: 1.2em; }
-    #password-input { padding: 12px 20px; width: 300px; border-radius: 25px; border: 2px solid #ff3333; background: rgba(255,0,0,0.05); color: #ff3333; font-size: 1em; outline: none; text-align: center; margin-top: 10px; cursor: text; }
-    #password-input:focus { box-shadow: 0 0 15px #ff3333; }
-    #password-btn { margin-top: 15px; padding: 10px 30px; background: #ff3333; border: none; border-radius: 25px; color: white; font-size: 1em; cursor: none; font-weight: bold; }
-    #password-error { color: #ff3333; margin-top: 10px; opacity: 0; transition: opacity 0.3s; font-size: 0.9em; }
+    #loading-screen h2 { font-size: 2em; color: #ff003c; text-shadow: 0 0 20px #ff003c; margin: 15px 0; font-family: 'Orbitron', sans-serif; }
+    #welcome-screen h1 { font-size: 3em; color: #ff003c; text-shadow: 0 0 20px #ff003c; animation: pulse 1s infinite; margin: 15px 0; font-family: 'Orbitron', sans-serif; }
+    #welcome-screen .sub { font-size: 1.3em; color: #00f7ff; line-height: 1.8; margin-top: 10px; }
+    #welcome-screen .hint { font-size: 1em; margin-top: 30px; opacity: 0.5; color: #ff003c; }
+    .eclair { position: fixed; top: 0; left: 50%; width: 4px; height: 0; background: linear-gradient(to bottom, #00f7ff, #ff003c); box-shadow: 0 0 20px #ff003c; z-index: 1001; transition: height 0.8s ease-in; }
+    .barre-chargement { width: 300px; height: 4px; background: rgba(255,0,60,0.2); border-radius: 10px; overflow: hidden; margin-top: 10px; }
+    .barre-progress { height: 100%; width: 0%; background: linear-gradient(to right, #001aff, #ff003c); border-radius: 10px; transition: width 1.5s ease; }
+    #loading-text { color: #00f7ff; margin-top: 10px; font-size: 0.9em; font-family: 'Orbitron', sans-serif; }
+    #password-screen p { color: #00f7ff; margin-bottom: 20px; font-size: 1em; }
+    #password-input { padding: 12px 20px; width: 300px; border-radius: 12px; border: 2px solid #ff003c; background: rgba(255,0,60,0.05); color: #ff003c; font-size: 1em; outline: none; text-align: center; margin-top: 10px; cursor: text; font-family: 'Orbitron', sans-serif; box-shadow: 0 0 10px #ff003c; }
+    #password-input:focus { box-shadow: 0 0 20px #00f7ff; }
+    #password-btn { margin-top: 15px; padding: 12px 30px; background: linear-gradient(135deg, #ff003c, #001aff); border: none; border-radius: 12px; color: white; font-size: 1em; cursor: none; font-weight: bold; font-family: 'Orbitron', sans-serif; box-shadow: 0 0 10px #ff003c; transition: all 0.3s; }
+    #password-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px #00f7ff; }
+    #password-error { color: #ff003c; margin-top: 10px; opacity: 0; transition: opacity 0.3s; font-size: 0.9em; }
+
+    /* BTN V7 */
+    .btn-v7 { background: linear-gradient(135deg, #ff003c, #001aff); border: none; padding: 12px 20px; border-radius: 12px; color: white; transition: 0.3s; box-shadow: 0 0 10px #ff003c; cursor: none; font-family: 'Orbitron', sans-serif; font-size: 0.85em; }
+    .btn-v7:hover { transform: scale(1.05); box-shadow: 0 0 20px #00f7ff; }
 
     /* HUD COINS */
-    .hud-bar { position: fixed; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(to right, #ff3333, #4444ff, #ff3333); z-index: 5; animation: hudScan 3s linear infinite; }
+    .hud-bar { position: fixed; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(to right, #ff003c, #00f7ff, #ff003c); z-index: 5; animation: hudScan 3s linear infinite; }
     @keyframes hudScan { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
     .hud-corner { position: fixed; width: 30px; height: 30px; z-index: 5; opacity: 0.5; }
-    .hud-corner-tl { top: 5px; left: 5px; border-top: 2px solid #ff3333; border-left: 2px solid #ff3333; }
-    .hud-corner-tr { top: 5px; right: 5px; border-top: 2px solid #ff3333; border-right: 2px solid #ff3333; }
-    .hud-corner-bl { bottom: 5px; left: 5px; border-bottom: 2px solid #ff3333; border-left: 2px solid #ff3333; }
-    .hud-corner-br { bottom: 5px; right: 5px; border-bottom: 2px solid #ff3333; border-right: 2px solid #ff3333; }
+    .hud-corner-tl { top: 5px; left: 5px; border-top: 2px solid #ff003c; border-left: 2px solid #ff003c; }
+    .hud-corner-tr { top: 5px; right: 5px; border-top: 2px solid #ff003c; border-right: 2px solid #ff003c; }
+    .hud-corner-bl { bottom: 5px; left: 5px; border-bottom: 2px solid #ff003c; border-left: 2px solid #ff003c; }
+    .hud-corner-br { bottom: 5px; right: 5px; border-bottom: 2px solid #ff003c; border-right: 2px solid #ff003c; }
 
     /* TOILES */
     .toile { position: fixed; z-index: 0; opacity: 0.15; pointer-events: none; }
@@ -77,29 +92,27 @@
     .toile-tr { top: 0; right: 0; transform: scaleX(-1); }
 
     /* SIDEBAR */
-    #sidebar { position: fixed; left: 0; top: 0; height: 100%; width: 70px; background: rgba(13,0,16,0.95); border-right: 1px solid rgba(255,51,51,0.3); display: none; flex-direction: column; align-items: center; padding-top: 80px; gap: 10px; z-index: 100; }
-    .sidebar-btn { width: 50px; height: 50px; border-radius: 50%; border: 1px solid rgba(255,51,51,0.4); background: rgba(255,0,0,0.05); display: flex; align-items: center; justify-content: center; font-size: 1.4em; cursor: none; transition: all 0.3s; position: relative; }
-    .sidebar-btn:hover, .sidebar-btn.active { border-color: #ff3333; background: rgba(255,0,0,0.15); box-shadow: 0 0 15px #ff3333; }
-    .sidebar-tooltip { position: absolute; left: 65px; background: rgba(13,0,16,0.95); border: 1px solid #ff3333; border-radius: 8px; padding: 5px 10px; font-size: 0.75em; color: #ff3333; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    #sidebar { position: fixed; left: 0; top: 0; height: 100%; width: 70px; background: rgba(0,0,0,0.95); border-right: 1px solid rgba(255,0,60,0.3); display: none; flex-direction: column; align-items: center; padding-top: 80px; gap: 10px; z-index: 100; }
+    .sidebar-btn { width: 50px; height: 50px; border-radius: 12px; border: 1px solid rgba(255,0,60,0.4); background: rgba(255,0,60,0.05); display: flex; align-items: center; justify-content: center; font-size: 1.4em; cursor: none; transition: all 0.3s; position: relative; }
+    .sidebar-btn:hover, .sidebar-btn.active { border-color: #ff003c; background: rgba(255,0,60,0.15); box-shadow: 0 0 15px #ff003c; }
+    .sidebar-tooltip { position: absolute; left: 65px; background: rgba(0,0,0,0.95); border: 1px solid #ff003c; border-radius: 8px; padding: 5px 10px; font-size: 0.7em; color: #ff003c; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; font-family: 'Orbitron', sans-serif; }
     .sidebar-btn:hover .sidebar-tooltip { opacity: 1; }
 
     /* AVENGERS */
-    #avengers-panel { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(13,0,16,0.9); border: 1px solid rgba(255,51,51,0.3); border-radius: 15px; padding: 15px; width: 170px; max-height: 80vh; overflow-y: auto; display: none; }
-    #avengers-panel h3 { color: #ff3333; font-size: 0.9em; text-align: center; margin-bottom: 10px; letter-spacing: 2px; text-shadow: 0 0 10px #ff3333; }
-    .contact { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255,51,51,0.1); }
+    #avengers-panel { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(0,0,0,0.9); border: 1px solid rgba(255,0,60,0.3); border-radius: 15px; padding: 15px; width: 170px; max-height: 80vh; overflow-y: auto; display: none; }
+    #avengers-panel h3 { color: #ff003c; font-size: 0.8em; text-align: center; margin-bottom: 10px; letter-spacing: 2px; text-shadow: 0 0 10px #ff003c; font-family: 'Orbitron', sans-serif; }
+    .contact { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255,0,60,0.1); }
     .contact:last-child { border-bottom: none; }
-    .contact-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1em; border: 1px solid #ff3333; background: rgba(255,0,0,0.1); flex-shrink: 0; }
+    .contact-avatar { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1em; border: 1px solid #ff003c; background: rgba(255,0,60,0.1); flex-shrink: 0; }
     .contact-info { flex: 1; min-width: 0; }
-    .contact-name { font-size: 0.75em; color: #ff3333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .contact-status { font-size: 0.6em; color: #4444ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .contact-name { font-size: 0.7em; color: #ff003c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Orbitron', sans-serif; }
+    .contact-status { font-size: 0.6em; color: #00f7ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #00ff00; box-shadow: 0 0 5px #00ff00; display: inline-block; margin-right: 3px; }
-    .status-dot.offline { background: #ff3333; box-shadow: 0 0 5px #ff3333; }
+    .status-dot.offline { background: #ff003c; box-shadow: 0 0 5px #ff003c; }
     .status-dot.mission { background: #ffaa00; box-shadow: 0 0 5px #ffaa00; }
 
     /* CONTENU */
     #main-content { display: none; flex-direction: column; align-items: center; width: 100%; padding: 40px 200px 40px 90px; min-height: 100vh; }
-
-    /* ANIMATIONS SECTION */
     .section { display: none; width: 100%; max-width: 800px; flex-direction: column; align-items: center; opacity: 0; transform: translateY(20px); transition: opacity 0.4s ease, transform 0.4s ease; }
     .section.active { display: flex; }
     .section.visible { opacity: 1; transform: translateY(0); }
@@ -107,156 +120,201 @@
     .header { text-align: center; margin-bottom: 10px; }
     .spider-logo { font-size: 4em; animation: spin 6s linear infinite; display: inline-block; }
     @keyframes spin { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
-    h1 { font-size: 2.5em; color: #ff3333; text-shadow: 0 0 20px #ff3333; margin-bottom: 5px; animation: pulse 3s infinite; }
-    @keyframes pulse { 0%,100% { text-shadow: 0 0 20px #ff3333, 0 0 40px #ff0000; } 50% { text-shadow: 0 0 40px #ff3333, 0 0 80px #ff0000, 0 0 120px #ff0000; } }
-    .subtitle { font-size: 1.4em; color: #4444ff; opacity: 0.9; margin-bottom: 15px; text-shadow: 0 0 10px #4444ff; }
-    h2 { margin-bottom: 20px; font-size: 1.5em; color: #ff3333; text-shadow: 0 0 10px #ff3333; opacity: 0.9; }
-    .separateur { width: 80%; height: 1px; background: linear-gradient(to right, transparent, #ff3333, #4444ff, transparent); margin: 20px 0; }
-    .horloge { font-size: 3em; font-weight: bold; color: #ff3333; text-shadow: 0 0 30px #ff3333; margin-top: 15px; text-align: center; }
-    .horloge span { font-size: 0.4em; opacity: 0.7; color: #4444ff; }
+    h1 { font-size: 2.5em; color: #ff003c; text-shadow: 0 0 20px #ff003c; margin-bottom: 5px; animation: pulse 3s infinite; font-family: 'Orbitron', sans-serif; }
+    @keyframes pulse { 0%,100% { text-shadow: 0 0 20px #ff003c, 0 0 40px #ff0000; } 50% { text-shadow: 0 0 40px #ff003c, 0 0 80px #ff0000, 0 0 120px #ff0000; } }
+    .subtitle { font-size: 1.2em; color: #00f7ff; opacity: 0.9; margin-bottom: 15px; text-shadow: 0 0 10px #00f7ff; }
+    h2 { margin-bottom: 20px; font-size: 1.3em; color: #ff003c; text-shadow: 0 0 10px #ff003c; opacity: 0.9; font-family: 'Orbitron', sans-serif; }
+    .separateur { width: 80%; height: 1px; background: linear-gradient(to right, transparent, #ff003c, #00f7ff, transparent); margin: 20px 0; }
+    .horloge { font-size: 3em; font-weight: bold; color: #ff003c; text-shadow: 0 0 30px #ff003c; margin-top: 15px; text-align: center; font-family: 'Orbitron', sans-serif; }
+    .horloge span { font-size: 0.4em; opacity: 0.7; color: #00f7ff; }
 
     /* JARVIS */
     .jarvis-section { text-align: center; margin: 20px 0; position: relative; z-index: 2; width: 100%; }
-    .jarvis-btn { position: relative; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 180px; height: 180px; border-radius: 50%; border: 3px solid #ff3333; cursor: none; transition: all 0.3s; background: rgba(255,0,0,0.05); z-index: 2; }
-    .jarvis-btn:hover { box-shadow: 0 0 40px #ff3333, 0 0 80px #ff0000; transform: scale(1.05); }
-    .jarvis-ring { position: absolute; width: 200px; height: 200px; border-radius: 50%; border: 1px solid rgba(255,51,51,0.3); animation: rotate 4s linear infinite; }
-    .jarvis-ring2 { position: absolute; width: 220px; height: 220px; border-radius: 50%; border: 1px solid rgba(68,68,255,0.3); animation: rotate 6s linear infinite reverse; }
+    .jarvis-btn { position: relative; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 180px; height: 180px; border-radius: 50%; border: 3px solid #ff003c; cursor: none; transition: all 0.3s; background: rgba(255,0,60,0.05); z-index: 2; box-shadow: 0 0 20px #ff003c; }
+    .jarvis-btn:hover { box-shadow: 0 0 40px #ff003c, 0 0 80px #00f7ff; transform: scale(1.05); }
+    .jarvis-ring { position: absolute; width: 200px; height: 200px; border-radius: 50%; border: 1px solid rgba(255,0,60,0.3); animation: rotate 4s linear infinite; }
+    .jarvis-ring2 { position: absolute; width: 220px; height: 220px; border-radius: 50%; border: 1px solid rgba(0,247,255,0.3); animation: rotate 6s linear infinite reverse; }
     @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .jarvis-icon { font-size: 3em; }
-    .jarvis-text { font-size: 0.8em; font-weight: bold; color: #ff3333; letter-spacing: 2px; margin-top: 5px; }
-    .jarvis-status { margin-top: 20px; font-size: 1em; color: #4444ff; opacity: 0.8; }
+    .jarvis-text { font-size: 0.7em; font-weight: bold; color: #ff003c; letter-spacing: 2px; margin-top: 5px; font-family: 'Orbitron', sans-serif; }
+    .jarvis-status { margin-top: 20px; font-size: 0.9em; color: #00f7ff; opacity: 0.8; font-family: 'Orbitron', sans-serif; }
 
     /* EXPLOSION */
     .particule-explosion { position: fixed; width: 8px; height: 8px; border-radius: 50%; pointer-events: none; z-index: 9999; animation: exploser 0.8s ease-out forwards; }
     @keyframes exploser { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; } }
 
-    /* FLASH LANCEMENT SITE */
-    #flash-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,51,51,0.15); z-index: 9998; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    /* FLASH */
+    #flash-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,0,60,0.15); z-index: 9998; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+
+    /* MODE CINEMA */
+    #cinema-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9995; background: black; flex-direction: column; }
+    #cinema-overlay iframe { flex: 1; border: none; }
+    #cinema-close { padding: 10px 20px; background: linear-gradient(135deg, #ff003c, #001aff); border: none; color: white; font-family: 'Orbitron', sans-serif; font-size: 0.9em; cursor: none; position: absolute; top: 10px; right: 10px; border-radius: 10px; z-index: 9996; }
 
     /* RECHERCHE */
     .recherche { margin-top: 10px; width: 100%; display: flex; justify-content: center; }
-    .recherche input { width: 400px; padding: 12px 20px; border-radius: 30px 0 0 30px; border: 2px solid #ff3333; background: rgba(255,0,0,0.05); color: #ff3333; font-size: 1em; outline: none; transition: box-shadow 0.3s; cursor: text; }
-    .recherche input:focus { box-shadow: 0 0 15px #ff3333; }
-    .recherche input::placeholder { color: rgba(255,51,51,0.5); }
-    .recherche button { padding: 12px 20px; border-radius: 0 30px 30px 0; border: none; background: #ff3333; color: white; font-size: 1em; cursor: none; font-weight: bold; }
+    .recherche input { width: 400px; padding: 12px 20px; border-radius: 12px 0 0 12px; border: 2px solid #ff003c; background: rgba(255,0,60,0.05); color: #ff003c; font-size: 0.9em; outline: none; cursor: text; font-family: 'Orbitron', sans-serif; box-shadow: 0 0 10px rgba(255,0,60,0.2); }
+    .recherche input:focus { box-shadow: 0 0 15px #ff003c; }
+    .recherche input::placeholder { color: rgba(255,0,60,0.5); }
+    .recherche button { padding: 12px 20px; border-radius: 0 12px 12px 0; border: none; background: linear-gradient(135deg, #ff003c, #001aff); color: white; font-size: 0.9em; cursor: none; font-weight: bold; font-family: 'Orbitron', sans-serif; box-shadow: 0 0 10px #ff003c; }
 
     /* GRILLES */
     .grille { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-bottom: 15px; }
-    .grille a { padding: 12px 22px; border: 2px solid #ff3333; border-radius: 15px; color: #ff3333; text-decoration: none; font-size: 1em; transition: all 0.4s; background: rgba(255,0,0,0.05); position: relative; overflow: hidden; }
-    .grille a::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255,51,51,0.3); border-radius: 50%; transform: translate(-50%,-50%); transition: width 0.4s, height 0.4s; }
+    .grille a { padding: 12px 22px; border: 2px solid #ff003c; border-radius: 12px; color: #ff003c; text-decoration: none; font-size: 0.85em; transition: all 0.4s; background: rgba(255,0,60,0.05); position: relative; overflow: hidden; font-family: 'Orbitron', sans-serif; box-shadow: 0 0 8px rgba(255,0,60,0.2); }
+    .grille a::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255,0,60,0.3); border-radius: 50%; transform: translate(-50%,-50%); transition: width 0.4s, height 0.4s; }
     .grille a:hover::before { width: 200px; height: 200px; }
-    .grille a:hover { color: white; box-shadow: 0 0 20px #ff3333; transform: translateY(-3px); }
+    .grille a:hover { color: white; box-shadow: 0 0 20px #ff003c; transform: translateY(-3px); }
 
     /* DOSSIERS */
     .dossier { margin-bottom: 10px; width: 100%; text-align: center; }
-    .dossier-btn { padding: 10px 30px; background: rgba(255,0,0,0.05); border: 2px solid #ff3333; border-radius: 15px; color: #ff3333; font-size: 1em; cursor: none; transition: all 0.3s; }
-    .dossier-btn:hover { background: #ff3333; color: white; box-shadow: 0 0 20px #ff3333; }
+    .dossier-btn { padding: 10px 30px; background: rgba(255,0,60,0.05); border: 2px solid #ff003c; border-radius: 12px; color: #ff003c; font-size: 0.85em; cursor: none; transition: all 0.3s; font-family: 'Orbitron', sans-serif; box-shadow: 0 0 8px rgba(255,0,60,0.2); }
+    .dossier-btn:hover { background: linear-gradient(135deg, #ff003c, #001aff); color: white; box-shadow: 0 0 20px #ff003c; }
     .dossier-contenu { display: none; margin-top: 10px; gap: 10px; justify-content: center; flex-wrap: wrap; }
-    .dossier-contenu a { padding: 8px 18px; border: 1px solid #4444ff; border-radius: 10px; color: #4444ff; text-decoration: none; font-size: 0.9em; transition: all 0.3s; background: rgba(0,0,255,0.05); }
-    .dossier-contenu a:hover { background: #4444ff; color: white; box-shadow: 0 0 15px #4444ff; }
+    .dossier-contenu a { padding: 8px 18px; border: 1px solid #00f7ff; border-radius: 10px; color: #00f7ff; text-decoration: none; font-size: 0.8em; transition: all 0.3s; background: rgba(0,247,255,0.05); font-family: 'Orbitron', sans-serif; }
+    .dossier-contenu a:hover { background: #00f7ff; color: black; box-shadow: 0 0 15px #00f7ff; }
 
     /* NOTES */
-    textarea { width: 100%; height: 180px; background: rgba(255,0,0,0.05); border: 2px solid #ff3333; border-radius: 15px; color: #ff3333; font-size: 1em; padding: 15px; resize: vertical; outline: none; font-family: Arial, sans-serif; cursor: text; }
-    textarea:focus { box-shadow: 0 0 15px #ff3333; }
-    textarea::placeholder { color: rgba(255,51,51,0.4); }
-    .save-btn { margin-top: 10px; padding: 10px 25px; background: rgba(255,0,0,0.05); border: 2px solid #ff3333; border-radius: 15px; color: #ff3333; font-size: 1em; cursor: none; transition: all 0.3s; }
-    .save-btn:hover { background: #ff3333; color: white; box-shadow: 0 0 20px #ff3333; }
-    #notif-save { margin-left: 10px; font-size: 0.9em; opacity: 0.7; }
+    textarea { width: 100%; height: 180px; background: rgba(255,0,60,0.05); border: 2px solid #ff003c; border-radius: 12px; color: #ff003c; font-size: 0.9em; padding: 15px; resize: vertical; outline: none; font-family: 'Orbitron', sans-serif; cursor: text; box-shadow: 0 0 10px rgba(255,0,60,0.2); }
+    textarea:focus { box-shadow: 0 0 15px #ff003c; }
+    textarea::placeholder { color: rgba(255,0,60,0.4); }
+    .save-btn { margin-top: 10px; padding: 10px 25px; background: linear-gradient(135deg, #ff003c, #001aff); border: none; border-radius: 12px; color: white; font-size: 0.85em; cursor: none; transition: all 0.3s; font-family: 'Orbitron', sans-serif; box-shadow: 0 0 10px #ff003c; }
+    .save-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px #00f7ff; }
+    #notif-save { margin-left: 10px; font-size: 0.8em; opacity: 0.7; color: #00f7ff; }
 
     /* TODO */
     .todo-input-zone { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
-    .todo-input-zone input { flex: 1; padding: 10px 20px; border-radius: 25px; border: 2px solid #ff3333; background: rgba(255,0,0,0.05); color: #ff3333; font-size: 1em; outline: none; cursor: text; }
-    .todo-input-zone input::placeholder { color: rgba(255,51,51,0.4); }
-    .todo-input-zone button { padding: 10px 20px; background: #ff3333; border: none; border-radius: 25px; color: white; font-size: 1em; cursor: none; font-weight: bold; }
-    .todo-item { display: flex; align-items: center; gap: 10px; padding: 10px 15px; border: 1px solid rgba(255,51,51,0.3); border-radius: 10px; margin-bottom: 8px; background: rgba(255,0,0,0.03); width: 100%; }
-    .todo-item input[type=checkbox] { accent-color: #ff3333; width: 16px; height: 16px; cursor: pointer; }
-    .todo-item span { flex: 1; text-align: left; color: #ff3333; }
+    .todo-input-zone input { flex: 1; padding: 10px 20px; border-radius: 12px; border: 2px solid #ff003c; background: rgba(255,0,60,0.05); color: #ff003c; font-size: 0.85em; outline: none; cursor: text; font-family: 'Orbitron', sans-serif; }
+    .todo-input-zone input::placeholder { color: rgba(255,0,60,0.4); }
+    .todo-input-zone button { padding: 10px 20px; background: linear-gradient(135deg, #ff003c, #001aff); border: none; border-radius: 12px; color: white; font-size: 1em; cursor: none; font-weight: bold; box-shadow: 0 0 10px #ff003c; }
+    .todo-item { display: flex; align-items: center; gap: 10px; padding: 10px 15px; border: 1px solid rgba(255,0,60,0.3); border-radius: 10px; margin-bottom: 8px; background: rgba(255,0,60,0.03); width: 100%; }
+    .todo-item input[type=checkbox] { accent-color: #ff003c; width: 16px; height: 16px; cursor: pointer; }
+    .todo-item span { flex: 1; text-align: left; color: #ff003c; font-family: 'Orbitron', sans-serif; font-size: 0.85em; }
     .todo-item span.done { text-decoration: line-through; opacity: 0.4; }
-    .todo-delete { background: none; border: none; color: #ff3333; cursor: none; opacity: 0.5; }
+    .todo-delete { background: none; border: none; color: #ff003c; cursor: none; opacity: 0.5; }
     .todo-delete:hover { opacity: 1; }
-
-    /* MARVEL NEWS */
-    .marvel-news { width: 100%; }
-    .news-item { padding: 15px; border: 1px solid rgba(255,51,51,0.3); border-radius: 12px; margin-bottom: 10px; background: rgba(255,0,0,0.03); transition: all 0.3s; }
-    .news-item:hover { border-color: #ff3333; box-shadow: 0 0 15px rgba(255,51,51,0.2); }
-    .news-item h3 { color: #ff3333; font-size: 1em; margin-bottom: 5px; }
-    .news-item p { color: #4444ff; font-size: 0.85em; opacity: 0.8; }
-    .news-item .news-date { font-size: 0.75em; opacity: 0.5; color: #ff3333; margin-top: 5px; }
-
-    /* CALENDRIER */
-    .calendrier { width: 100%; }
-    .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .cal-header button { background: transparent; border: 1px solid #ff3333; color: #ff3333; border-radius: 8px; padding: 5px 12px; cursor: none; transition: all 0.3s; font-size: 1em; }
-    .cal-header button:hover { background: #ff3333; color: white; }
-    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; width: 100%; }
-    .cal-day-name { text-align: center; font-size: 0.75em; color: #4444ff; padding: 5px; opacity: 0.8; }
-    .cal-day { text-align: center; padding: 8px 5px; border-radius: 8px; font-size: 0.85em; border: 1px solid transparent; transition: all 0.3s; cursor: none; }
-    .cal-day:hover { border-color: #ff3333; background: rgba(255,0,0,0.1); }
-    .cal-day.today { background: rgba(255,51,51,0.2); border-color: #ff3333; box-shadow: 0 0 10px rgba(255,51,51,0.3); font-weight: bold; }
-    .cal-day.autre-mois { opacity: 0.3; }
-
-    /* METEO */
-    .meteo-widget { width: 100%; border: 1px solid rgba(255,51,51,0.3); border-radius: 15px; padding: 20px; background: rgba(255,0,0,0.03); margin-bottom: 15px; }
-    .meteo-search { display: flex; gap: 10px; margin-bottom: 20px; }
-    .meteo-search input { flex: 1; padding: 10px 20px; border-radius: 25px; border: 2px solid #ff3333; background: rgba(255,0,0,0.05); color: #ff3333; font-size: 1em; outline: none; cursor: text; }
-    .meteo-search input::placeholder { color: rgba(255,51,51,0.4); }
-    .meteo-search button { padding: 10px 20px; background: #ff3333; border: none; border-radius: 25px; color: white; font-size: 1em; cursor: none; font-weight: bold; }
-    .meteo-result { text-align: center; }
-    .meteo-icon { font-size: 4em; margin-bottom: 10px; }
-    .meteo-temp { font-size: 2.5em; font-weight: bold; color: #ff3333; text-shadow: 0 0 20px #ff3333; }
-    .meteo-desc { color: #4444ff; font-size: 1.1em; margin-top: 5px; }
-    .meteo-ville { opacity: 0.6; font-size: 0.9em; margin-top: 5px; }
 
     /* POST-IT */
     .postits { display: flex; flex-wrap: wrap; gap: 15px; width: 100%; margin-top: 10px; }
-    .postit { width: 180px; min-height: 150px; padding: 15px; border-radius: 5px; position: relative; box-shadow: 3px 3px 10px rgba(0,0,0,0.5); transform: rotate(var(--rot)); transition: transform 0.3s; }
+    .postit { width: 180px; min-height: 150px; padding: 15px; border-radius: 10px; position: relative; box-shadow: 3px 3px 15px rgba(0,0,0,0.5); transform: rotate(var(--rot)); transition: transform 0.3s; }
     .postit:hover { transform: rotate(0deg) scale(1.05); z-index: 10; }
     .postit textarea { background: transparent; border: none; width: 100%; height: 100px; resize: none; font-size: 0.9em; color: #0d0010; font-family: Arial, sans-serif; outline: none; cursor: text; }
     .postit-delete { position: absolute; top: 5px; right: 8px; background: none; border: none; cursor: none; opacity: 0.5; font-size: 1em; color: #0d0010; }
     .postit-delete:hover { opacity: 1; }
-    .add-postit { width: 180px; min-height: 150px; border: 2px dashed rgba(255,51,51,0.4); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 2em; color: rgba(255,51,51,0.4); cursor: none; transition: all 0.3s; }
-    .add-postit:hover { border-color: #ff3333; color: #ff3333; box-shadow: 0 0 15px rgba(255,51,51,0.3); }
+    .add-postit { width: 180px; min-height: 150px; border: 2px dashed rgba(255,0,60,0.4); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 2em; color: rgba(255,0,60,0.4); cursor: none; transition: all 0.3s; }
+    .add-postit:hover { border-color: #ff003c; color: #ff003c; box-shadow: 0 0 15px rgba(255,0,60,0.3); }
 
     /* MINUTEUR */
     .minuteur { width: 100%; text-align: center; }
-    .minuteur-display { font-size: 5em; font-weight: bold; color: #ff3333; text-shadow: 0 0 30px #ff3333; font-family: monospace; margin: 20px 0; }
+    .minuteur-display { font-size: 5em; font-weight: bold; color: #ff003c; text-shadow: 0 0 30px #ff003c; font-family: 'Orbitron', monospace; margin: 20px 0; }
     .minuteur-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
-    .minuteur-btns button { padding: 10px 20px; background: transparent; border: 2px solid #ff3333; border-radius: 15px; color: #ff3333; font-size: 1em; cursor: none; transition: all 0.3s; }
-    .minuteur-btns button:hover { background: #ff3333; color: white; box-shadow: 0 0 15px #ff3333; }
+    .minuteur-btns button { padding: 10px 20px; background: transparent; border: 2px solid #ff003c; border-radius: 12px; color: #ff003c; font-size: 0.85em; cursor: none; transition: all 0.3s; font-family: 'Orbitron', sans-serif; }
+    .minuteur-btns button:hover { background: linear-gradient(135deg, #ff003c, #001aff); color: white; box-shadow: 0 0 15px #ff003c; }
     .minuteur-presets { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-    .minuteur-presets button { padding: 8px 15px; background: rgba(255,0,0,0.05); border: 1px solid rgba(255,51,51,0.4); border-radius: 10px; color: #ff3333; font-size: 0.85em; cursor: none; transition: all 0.3s; }
-    .minuteur-presets button:hover { border-color: #ff3333; box-shadow: 0 0 10px #ff3333; }
-    .chrono-display { font-size: 3em; font-weight: bold; color: #4444ff; text-shadow: 0 0 20px #4444ff; font-family: monospace; margin: 15px 0; }
-    .separateur-outil { width: 60%; height: 1px; background: rgba(255,51,51,0.2); margin: 20px auto; }
+    .minuteur-presets button { padding: 8px 15px; background: rgba(255,0,60,0.05); border: 1px solid rgba(255,0,60,0.4); border-radius: 10px; color: #ff003c; font-size: 0.75em; cursor: none; transition: all 0.3s; font-family: 'Orbitron', sans-serif; }
+    .minuteur-presets button:hover { border-color: #ff003c; box-shadow: 0 0 10px #ff003c; }
+    .chrono-display { font-size: 3em; font-weight: bold; color: #00f7ff; text-shadow: 0 0 20px #00f7ff; font-family: 'Orbitron', monospace; margin: 15px 0; }
+    .separateur-outil { width: 60%; height: 1px; background: rgba(255,0,60,0.2); margin: 20px auto; }
+
+    /* CALENDRIER */
+    .calendrier { width: 100%; }
+    .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .cal-header button { background: transparent; border: 1px solid #ff003c; color: #ff003c; border-radius: 8px; padding: 5px 12px; cursor: none; transition: all 0.3s; font-size: 1em; font-family: 'Orbitron', sans-serif; }
+    .cal-header button:hover { background: linear-gradient(135deg, #ff003c, #001aff); color: white; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; width: 100%; }
+    .cal-day-name { text-align: center; font-size: 0.7em; color: #00f7ff; padding: 5px; opacity: 0.8; font-family: 'Orbitron', sans-serif; }
+    .cal-day { text-align: center; padding: 8px 5px; border-radius: 8px; font-size: 0.8em; border: 1px solid transparent; transition: all 0.3s; cursor: none; font-family: 'Orbitron', sans-serif; }
+    .cal-day:hover { border-color: #ff003c; background: rgba(255,0,60,0.1); }
+    .cal-day.today { background: rgba(255,0,60,0.2); border-color: #ff003c; box-shadow: 0 0 10px rgba(255,0,60,0.3); font-weight: bold; }
+    .cal-day.autre-mois { opacity: 0.3; }
+
+    /* METEO */
+    .meteo-widget { width: 100%; border: 1px solid rgba(255,0,60,0.3); border-radius: 15px; padding: 20px; background: rgba(255,0,60,0.03); margin-bottom: 15px; }
+    .meteo-search { display: flex; gap: 10px; margin-bottom: 20px; }
+    .meteo-search input { flex: 1; padding: 10px 20px; border-radius: 12px; border: 2px solid #ff003c; background: rgba(255,0,60,0.05); color: #ff003c; font-size: 0.85em; outline: none; cursor: text; font-family: 'Orbitron', sans-serif; }
+    .meteo-search input::placeholder { color: rgba(255,0,60,0.4); }
+    .meteo-search button { padding: 10px 20px; background: linear-gradient(135deg, #ff003c, #001aff); border: none; border-radius: 12px; color: white; font-size: 0.85em; cursor: none; font-weight: bold; font-family: 'Orbitron', sans-serif; }
+    .meteo-result { text-align: center; }
+    .meteo-icon { font-size: 4em; margin-bottom: 10px; }
+    .meteo-temp { font-size: 2.5em; font-weight: bold; color: #ff003c; text-shadow: 0 0 20px #ff003c; font-family: 'Orbitron', sans-serif; }
+    .meteo-desc { color: #00f7ff; font-size: 1em; margin-top: 5px; }
+    .meteo-ville { opacity: 0.6; font-size: 0.85em; margin-top: 5px; }
+
+    /* NEWS MARVEL */
+    .marvel-news { width: 100%; }
+    .news-item { padding: 15px; border: 1px solid rgba(255,0,60,0.3); border-radius: 12px; margin-bottom: 10px; background: rgba(255,0,60,0.03); transition: all 0.3s; }
+    .news-item:hover { border-color: #ff003c; box-shadow: 0 0 15px rgba(255,0,60,0.2); }
+    .news-item h3 { color: #ff003c; font-size: 0.9em; margin-bottom: 5px; font-family: 'Orbitron', sans-serif; }
+    .news-item p { color: #00f7ff; font-size: 0.8em; opacity: 0.8; }
+    .news-item .news-date { font-size: 0.7em; opacity: 0.5; color: #ff003c; margin-top: 5px; }
+
     /* JEUX */
-    .jeu-card { display: flex; flex-direction: column; align-items: center; padding: 20px 15px; border: 2px solid rgba(255,51,51,0.4); border-radius: 15px; color: #ff3333; text-decoration: none; background: rgba(255,0,0,0.03); transition: all 0.4s; position: relative; overflow: hidden; }
-    .jeu-card::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255,51,51,0.2); border-radius: 50%; transform: translate(-50%,-50%); transition: width 0.5s, height 0.5s; }
+    #jeu-message { text-align:center; font-size:1em; color:#00f7ff; min-height:40px; margin-bottom:20px; font-style:italic; transition:all 0.5s; font-family:'Orbitron',sans-serif; }
+    .jeux-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%; }
+    .jeu-card { display: flex; flex-direction: column; align-items: center; padding: 20px 15px; border: 2px solid rgba(255,0,60,0.4); border-radius: 15px; color: #ff003c; text-decoration: none; background: rgba(255,0,60,0.03); transition: all 0.4s; position: relative; overflow: hidden; }
+    .jeu-card::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255,0,60,0.2); border-radius: 50%; transform: translate(-50%,-50%); transition: width 0.5s, height 0.5s; }
     .jeu-card:hover::before { width: 300px; height: 300px; }
-    .jeu-card:hover { border-color: #ff3333; box-shadow: 0 0 25px #ff3333; transform: translateY(-5px) scale(1.03); }
+    .jeu-card:hover { border-color: #ff003c; box-shadow: 0 0 25px #ff003c; transform: translateY(-5px) scale(1.03); }
     .jeu-emoji { font-size: 3em; margin-bottom: 10px; transition: transform 0.3s; }
     .jeu-card:hover .jeu-emoji { transform: scale(1.2) rotate(10deg); }
-    .jeu-titre { font-size: 1em; font-weight: bold; color: #ff3333; margin-bottom: 5px; }
-    .jeu-desc { font-size: 0.75em; color: #4444ff; opacity: 0.8; }
+    .jeu-titre { font-size: 0.85em; font-weight: bold; color: #ff003c; margin-bottom: 5px; font-family: 'Orbitron', sans-serif; text-align: center; }
+    .jeu-desc { font-size: 0.7em; color: #00f7ff; opacity: 0.8; font-family: 'Orbitron', sans-serif; }
+
+    /* EASTER EGG */
+    #easter-egg-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 99997; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    #easter-egg-overlay h2 { font-size: 3em; color: #ff003c; text-shadow: 0 0 30px #ff003c; font-family: 'Orbitron', sans-serif; animation: pulse 1s infinite; }
+    #easter-egg-overlay p { color: #00f7ff; font-size: 1.2em; margin-top: 20px; font-family: 'Orbitron', sans-serif; }
+    #easter-egg-close { margin-top: 30px; padding: 12px 25px; background: linear-gradient(135deg, #ff003c, #001aff); border: none; border-radius: 12px; color: white; font-family: 'Orbitron', sans-serif; font-size: 1em; cursor: none; }
+
+    /* LECTEUR MUSIQUE */
+    .music-player { width: 100%; border: 1px solid rgba(255,0,60,0.3); border-radius: 15px; padding: 20px; background: rgba(255,0,60,0.03); }
+    .music-search { display: flex; gap: 10px; margin-bottom: 15px; }
+    .music-search input { flex: 1; padding: 10px 20px; border-radius: 12px; border: 2px solid #ff003c; background: rgba(255,0,60,0.05); color: #ff003c; font-size: 0.85em; outline: none; cursor: text; font-family: 'Orbitron', sans-serif; }
+    .music-search input::placeholder { color: rgba(255,0,60,0.4); }
+    .music-search button { padding: 10px 20px; background: linear-gradient(135deg, #ff003c, #001aff); border: none; border-radius: 12px; color: white; font-size: 0.85em; cursor: none; font-family: 'Orbitron', sans-serif; }
+    #music-frame { width: 100%; height: 200px; border-radius: 12px; border: none; display: none; margin-top: 10px; }
+    .music-suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .music-tag { padding: 6px 12px; border: 1px solid rgba(255,0,60,0.4); border-radius: 20px; color: #ff003c; font-size: 0.7em; cursor: none; font-family: 'Orbitron', sans-serif; transition: all 0.3s; }
+    .music-tag:hover { background: #ff003c; color: white; box-shadow: 0 0 10px #ff003c; }
+
+    @media (max-width: 768px) {
+      .btn-v7 { width: 100%; margin-bottom: 10px; }
+      canvas { display: none; }
+      #main-content { padding: 20px 20px 20px 80px; }
+      .jeux-grid { grid-template-columns: repeat(2, 1fr); }
+    }
   </style>
 </head>
-<body>
+<body class="scanlines">
 
-  <!-- CURSEUR -->
   <div id="curseur">
-    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="10" cy="10" r="3" fill="#ff3333"/>
-      <line x1="10" y1="0" x2="10" y2="7" stroke="#ff3333" stroke-width="1"/>
-      <line x1="10" y1="13" x2="10" y2="20" stroke="#ff3333" stroke-width="1"/>
-      <line x1="0" y1="10" x2="7" y2="10" stroke="#ff3333" stroke-width="1"/>
-      <line x1="13" y1="10" x2="20" y2="10" stroke="#ff3333" stroke-width="1"/>
-      <line x1="2" y1="2" x2="6" y2="6" stroke="rgba(255,51,51,0.5)" stroke-width="0.8"/>
-      <line x1="14" y1="14" x2="18" y2="18" stroke="rgba(255,51,51,0.5)" stroke-width="0.8"/>
-      <line x1="18" y1="2" x2="14" y2="6" stroke="rgba(255,51,51,0.5)" stroke-width="0.8"/>
-      <line x1="6" y1="14" x2="2" y2="18" stroke="rgba(255,51,51,0.5)" stroke-width="0.8"/>
+    <svg viewBox="0 0 20 20" fill="none">
+      <circle cx="10" cy="10" r="3" fill="#ff003c"/>
+      <line x1="10" y1="0" x2="10" y2="7" stroke="#ff003c" stroke-width="1"/>
+      <line x1="10" y1="13" x2="10" y2="20" stroke="#ff003c" stroke-width="1"/>
+      <line x1="0" y1="10" x2="7" y2="10" stroke="#ff003c" stroke-width="1"/>
+      <line x1="13" y1="10" x2="20" y2="10" stroke="#ff003c" stroke-width="1"/>
+      <line x1="2" y1="2" x2="6" y2="6" stroke="rgba(255,0,60,0.5)" stroke-width="0.8"/>
+      <line x1="14" y1="14" x2="18" y2="18" stroke="rgba(255,0,60,0.5)" stroke-width="0.8"/>
+      <line x1="18" y1="2" x2="14" y2="6" stroke="rgba(255,0,60,0.5)" stroke-width="0.8"/>
+      <line x1="6" y1="14" x2="2" y2="18" stroke="rgba(255,0,60,0.5)" stroke-width="0.8"/>
     </svg>
   </div>
   <div id="curseur-trail"></div>
   <div id="flash-overlay"></div>
+
+  <!-- MODE CINEMA -->
+  <div id="cinema-overlay">
+    <button id="cinema-close" onclick="fermerCinema()">✕ FERMER</button>
+    <iframe id="cinema-frame" src="" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>
+  </div>
+
+  <!-- EASTER EGG -->
+  <div id="easter-egg-overlay">
+    <div style="font-size:5em;animation:spin 2s linear infinite;display:inline-block">🕷️</div>
+    <h2>NIVEAU SECRET DÉBLOQUÉ !</h2>
+    <p>Tu as trouvé l'easter egg, Spider-Elio !<br>🕸️ With great power comes great responsibility 🕸️</p>
+    <button id="easter-egg-close" onclick="fermerEasterEgg()">RETOUR AU DASHBOARD</button>
+  </div>
 
   <div class="hud-bar"></div>
   <div class="hud-corner hud-corner-tl"></div>
@@ -264,7 +322,6 @@
   <div class="hud-corner hud-corner-bl"></div>
   <div class="hud-corner hud-corner-br"></div>
 
-  <!-- HUD INFO -->
   <div id="hud-info">
     <span id="hud-heure">00:00</span>
     <span>|</span>
@@ -293,14 +350,14 @@
 
   <div id="loading-screen">
     <div style="font-size:5em;animation:spin 2s linear infinite;display:inline-block">🕷️</div>
-    <h2>SPIDER DASHBOARD</h2>
+    <h2>SPIDER DASHBOARD V7</h2>
     <div class="barre-chargement"><div class="barre-progress" id="barre-progress"></div></div>
-    <p id="loading-text" style="color:#4444ff;margin-top:10px">Initialisation du système...</p>
+    <p id="loading-text">Initialisation du système...</p>
   </div>
 
   <div id="password-screen">
     <div style="font-size:4em">🕷️</div>
-    <h2>ACCÈS RESTREINT</h2>
+    <h2 style="font-family:'Orbitron',sans-serif;color:#ff003c;text-shadow:0 0 20px #ff003c;margin:15px 0">ACCÈS RESTREINT</h2>
     <p>Identifiez-vous, Spider-Man</p>
     <input type="password" id="password-input" placeholder="Mot de passe...">
     <button id="password-btn" onclick="verifierMdp()">ACCÉDER</button>
@@ -310,8 +367,8 @@
   <div id="welcome-screen">
     <div style="font-size:5em;animation:spin 2s linear infinite;display:inline-block">🕷️</div>
     <h1>Bienvenue, Spider-Elio !</h1>
-    <p class="sub">La ville ne dort jamais.<br>Et toi non plus, héros. 🕸️<br>Ton quartier général est prêt.</p>
-    <p class="hint" style="margin-top:30px;opacity:0.5;font-size:1em">Chargement de votre mission...</p>
+    <p class="sub">La ville ne dort jamais.<br>Et toi non plus, héros. 🕸️<br>Ton quartier général V7 est prêt.</p>
+    <p class="hint">Chargement de votre mission...</p>
   </div>
 
   <div id="avengers-panel">
@@ -343,8 +400,9 @@
     <div class="sidebar-btn" onclick="afficherSection('minuteur', event)">⏱️<span class="sidebar-tooltip">Minuteur</span></div>
     <div class="sidebar-btn" onclick="afficherSection('calendrier', event)">🗓️<span class="sidebar-tooltip">Calendrier</span></div>
     <div class="sidebar-btn" onclick="afficherSection('meteo', event)">🌦️<span class="sidebar-tooltip">Météo</span></div>
-    <div class="sidebar-btn" onclick="afficherSection('marvel', event)">⚡<span class="sidebar-tooltip">News Marvel</span></div>
+    <div class="sidebar-btn" onclick="afficherSection('musique', event)">🎵<span class="sidebar-tooltip">Musique</span></div>
     <div class="sidebar-btn" onclick="afficherSection('jeux', event)">🎮<span class="sidebar-tooltip">Jeux</span></div>
+    <div class="sidebar-btn" onclick="afficherSection('marvel', event)">⚡<span class="sidebar-tooltip">News Marvel</span></div>
   </div>
 
   <canvas></canvas>
@@ -355,8 +413,8 @@
     <div class="section active" id="section-accueil">
       <div class="header">
         <div class="spider-logo">🕷️</div>
-        <h1>Hey Elio !</h1>
-        <p class="subtitle" id="citation-spider">Avec de grands pouvoirs viennent de grandes responsabilités.</p>
+        <h1 class="glow-red">Hey Elio !</h1>
+        <p class="subtitle glow-blue">Avec de grands pouvoirs viennent de grandes responsabilités.</p>
       </div>
       <div class="horloge" id="horloge"></div>
       <div class="separateur"></div>
@@ -370,10 +428,14 @@
         <p class="jarvis-status" id="jarvis-status">En attente d'activation...</p>
       </div>
       <div class="separateur"></div>
+      <div style="display:flex;gap:15px;justify-content:center;flex-wrap:wrap;margin-bottom:15px">
+        <button class="btn-v7" onclick="ouvrirCinema()">🎬 MODE CINÉMA</button>
+        <button class="btn-v7" onclick="activerEasterEgg()">🕷️ ???</button>
+      </div>
       <div class="recherche">
         <form action="https://www.google.com/search" target="_blank">
           <input type="text" name="q" placeholder="🔍 Rechercher sur Google...">
-          <button type="submit">Chercher</button>
+          <button type="submit">GO</button>
         </form>
       </div>
       <div class="separateur"></div>
@@ -387,7 +449,7 @@
 
     <!-- SITES -->
     <div class="section" id="section-sites">
-      <h2>🕸️ Mes sites</h2>
+      <h2 class="glow-red">🕸️ Mes sites</h2>
       <div class="separateur"></div>
       <div class="grille">
         <a href="https://www.youtube.com" target="_blank" onclick="flashLancement()">▶ YouTube</a>
@@ -396,13 +458,13 @@
         <a href="https://purestream.cc" target="_blank" onclick="flashLancement()">🎥 Film</a>
         <a href="https://www.aucollege84.vaucluse.fr" target="_blank" onclick="flashLancement()">🏫 ENT</a>
         <a href="https://mail.google.com" target="_blank" onclick="flashLancement()">📧 Gmail</a>
-        <a href="https://chatgpt.com/" target="_blank" onclick="flashLancement()">🤖 jarvis</a>
+        <a href="https://chatgpt.com/" target="_blank" onclick="flashLancement()">🤖 Jarvis</a>
       </div>
     </div>
 
     <!-- DOSSIERS -->
     <div class="section" id="section-dossiers">
-      <h2>🕸️ Mes dossiers</h2>
+      <h2 class="glow-red">🕸️ Mes dossiers</h2>
       <div class="separateur"></div>
       <div class="dossier">
         <button class="dossier-btn" onclick="toggleDossier('scolaire')">📚 Scolaire</button>
@@ -430,7 +492,7 @@
 
     <!-- DEVOIRS -->
     <div class="section" id="section-devoirs">
-      <h2>📋 Mes devoirs</h2>
+      <h2 class="glow-red">📋 Mes devoirs</h2>
       <div class="separateur"></div>
       <div class="todo-input-zone">
         <input type="text" id="todo-input" placeholder="Ajouter un devoir...">
@@ -441,7 +503,7 @@
 
     <!-- NOTES -->
     <div class="section" id="section-notes">
-      <h2>📝 Bloc-notes</h2>
+      <h2 class="glow-red">📝 Bloc-notes</h2>
       <div class="separateur"></div>
       <textarea id="notes" placeholder="Écris tes notes ici..."></textarea>
       <div style="margin-top:10px">
@@ -452,19 +514,19 @@
 
     <!-- POST-ITS -->
     <div class="section" id="section-postits">
-      <h2>🗒️ Post-its</h2>
+      <h2 class="glow-red">🗒️ Post-its</h2>
       <div class="separateur"></div>
       <div class="postits" id="postits-container"></div>
     </div>
 
     <!-- MINUTEUR -->
     <div class="section" id="section-minuteur">
-      <h2>⏱️ Minuteur & Chronomètre</h2>
+      <h2 class="glow-red">⏱️ Minuteur & Chronomètre</h2>
       <div class="separateur"></div>
       <div class="minuteur">
         <div class="minuteur-display" id="minuteur-display">00:00</div>
         <div class="minuteur-btns">
-          <button onclick="demarrerMinuteur()">▶ Démarrer</button>
+          <button onclick="demarrerMinuteur()">▶ Start</button>
           <button onclick="pauseMinuteur()">⏸ Pause</button>
           <button onclick="resetMinuteur()">↺ Reset</button>
         </div>
@@ -477,10 +539,10 @@
           <button onclick="setMinuteur(30)">30 min</button>
         </div>
         <div class="separateur-outil"></div>
-        <h2>⏱️ Chronomètre</h2>
+        <h2 class="glow-blue">⏱️ Chronomètre</h2>
         <div class="chrono-display" id="chrono-display">00:00:00</div>
         <div class="minuteur-btns">
-          <button onclick="demarrerChrono()">▶ Démarrer</button>
+          <button onclick="demarrerChrono()">▶ Start</button>
           <button onclick="pauseChrono()">⏸ Pause</button>
           <button onclick="resetChrono()">↺ Reset</button>
         </div>
@@ -489,7 +551,7 @@
 
     <!-- CALENDRIER -->
     <div class="section" id="section-calendrier">
-      <h2>🗓️ Calendrier</h2>
+      <h2 class="glow-red">🗓️ Calendrier</h2>
       <div class="separateur"></div>
       <div class="calendrier">
         <div class="cal-header">
@@ -503,7 +565,7 @@
 
     <!-- METEO -->
     <div class="section" id="section-meteo">
-      <h2>🌦️ Météo</h2>
+      <h2 class="glow-red">🌦️ Météo</h2>
       <div class="separateur"></div>
       <div class="meteo-widget">
         <div class="meteo-search">
@@ -511,32 +573,40 @@
           <button onclick="chercherMeteo()">Chercher</button>
         </div>
         <div class="meteo-result" id="meteo-result">
-          <p style="color:#4444ff;opacity:0.6">Entrez une ville pour voir la météo</p>
+          <p style="color:#00f7ff;opacity:0.6">Entrez une ville pour voir la météo</p>
         </div>
       </div>
     </div>
 
-    <!-- MARVEL NEWS -->
-    <div class="section" id="section-marvel">
-      <h2>⚡ News Marvel</h2>
+    <!-- MUSIQUE -->
+    <div class="section" id="section-musique">
+      <h2 class="glow-red">🎵 Lecteur YouTube</h2>
       <div class="separateur"></div>
-      <div class="marvel-news">
-        <div class="news-item"><h3>🕷️ Spider-Man : Nouveau costume confirmé</h3><p>Marvel Studios a confirmé l'apparition d'un nouveau costume pour Peter Parker dans le prochain film.</p><div class="news-date">Marvel Universe</div></div>
-        <div class="news-item"><h3>🔨 Thor : Love and Thunder 2 en développement</h3><p>Taika Waititi aurait été approché pour réaliser une suite de Thor Love and Thunder.</p><div class="news-date">Marvel Studios</div></div>
-        <div class="news-item"><h3>💚 World War Hulk : Le projet avance</h3><p>Des sources confirment que Marvel travaille activement sur l'adaptation de World War Hulk.</p><div class="news-date">Marvel News</div></div>
-        <div class="news-item"><h3>🌮 Deadpool rejoint les Avengers ?</h3><p>Après Deadpool & Wolverine, le Mercenaire bavard pourrait apparaître dans Avengers : Doomsday.</p><div class="news-date">Marvel Rumeurs</div></div>
-        <div class="news-item"><h3>🔮 Doctor Strange 3 officiellement annoncé</h3><p>Marvel a confirmé le développement d'un troisième volet pour le Sorcier Suprême.</p><div class="news-date">Marvel Studios</div></div>
-        <div class="news-item"><h3>⚡ Avengers : Doomsday — ce qu'on sait</h3><p>Le casting, l'histoire et les connections avec le multivers : tout ce qu'on sait sur le prochain Avengers.</p><div class="news-date">Marvel Universe</div></div>
+      <div class="music-player">
+        <div class="music-search">
+          <input type="text" id="music-input" placeholder="Colle un lien YouTube...">
+          <button onclick="lancerMusique()">▶ Lancer</button>
+        </div>
+        <iframe id="music-frame" allowfullscreen allow="autoplay"></iframe>
+        <div style="margin-top:15px">
+          <p style="color:#00f7ff;font-size:0.8em;margin-bottom:10px;font-family:'Orbitron',sans-serif;">Suggestions rapides :</p>
+          <div class="music-suggestions">
+            <div class="music-tag" onclick="lancerMusiqueDirecte('https://www.youtube.com/embed/dQw4w9WgXcQ')">🎵 Rick Roll</div>
+            <div class="music-tag" onclick="lancerMusiqueDirecte('https://www.youtube.com/embed/Z0GFRcFm-aY')">🕷️ Spider-Man Theme</div>
+            <div class="music-tag" onclick="lancerMusiqueDirecte('https://www.youtube.com/embed/JGwWNGJdvx8')">🎸 Epic Music</div>
+            <div class="music-tag" onclick="lancerMusiqueDirecte('https://www.youtube.com/embed/60ItHLz5WEA')">🌙 LoFi</div>
+          </div>
+        </div>
       </div>
     </div>
-<!-- JEUX -->
-    <div class="section" id="section-jeux">
-      <h2>🎮 Arcade Spider-Man</h2>
-      <div class="separateur"></div>
-      <div id="jeu-message" style="text-align:center;font-size:1.2em;color:#4444ff;min-height:40px;margin-bottom:20px;font-style:italic;transition:all 0.5s;"></div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:15px;width:100%">
 
-        <a href="https://poki.com/fr/g/subway-surfers" target="_blank" onclick="afficherMessageJeu('🏃 MISSION LANCÉE — Cours Spider-Man, cours !')" class="jeu-card">
+    <!-- JEUX -->
+    <div class="section" id="section-jeux">
+      <h2 class="glow-red">🎮 Arcade Spider-Man</h2>
+      <div class="separateur"></div>
+      <div id="jeu-message"></div>
+      <div class="jeux-grid">
+         <a href="https://poki.com/fr/g/subway-surfers" target="_blank" onclick="afficherMessageJeu('🏃 MISSION LANCÉE — Cours Spider-Man, cours !')" class="jeu-card">
           <div class="jeu-emoji">🏃</div>
           <div class="jeu-titre">Subway Surfers</div>
           <div class="jeu-desc">Course infinie</div>
@@ -580,11 +650,25 @@
         <a href="https://poki.com/fr/g/blocky-blast-puzzle" target="_blank" onclick="afficherMessageJeu('a toi de jouer')" class="jeu-card">
         <div class="jeu-emoji">🟦🟥🟪</div>
           <div class="jeu-titre">block blast</div>
-         <div class="jeu-desc">quel score ferras tu?</div>
-        </a>
-        
+         <div class="jeu-desc">quel score ferras tu?</div>        
+</a>
       </div>
     </div>
+
+    <!-- MARVEL NEWS -->
+    <div class="section" id="section-marvel">
+      <h2 class="glow-red">⚡ News Marvel</h2>
+      <div class="separateur"></div>
+      <div class="marvel-news">
+        <div class="news-item"><h3>🕷️ Spider-Man : Nouveau costume confirmé</h3><p>Marvel Studios a confirmé l'apparition d'un nouveau costume pour Peter Parker dans le prochain film.</p><div class="news-date">Marvel Universe</div></div>
+        <div class="news-item"><h3>🔨 Thor : Love and Thunder 2 en développement</h3><p>Taika Waititi aurait été approché pour réaliser une suite de Thor Love and Thunder.</p><div class="news-date">Marvel Studios</div></div>
+        <div class="news-item"><h3>💚 World War Hulk : Le projet avance</h3><p>Des sources confirment que Marvel travaille activement sur l'adaptation de World War Hulk.</p><div class="news-date">Marvel News</div></div>
+        <div class="news-item"><h3>🌮 Deadpool rejoint les Avengers ?</h3><p>Après Deadpool & Wolverine, le Mercenaire bavard pourrait apparaître dans Avengers : Doomsday.</p><div class="news-date">Marvel Rumeurs</div></div>
+        <div class="news-item"><h3>🔮 Doctor Strange 3 officiellement annoncé</h3><p>Marvel a confirmé le développement d'un troisième volet pour le Sorcier Suprême.</p><div class="news-date">Marvel Studios</div></div>
+        <div class="news-item"><h3>⚡ Avengers : Doomsday — ce qu'on sait</h3><p>Le casting, l'histoire et les connections avec le multivers : tout ce qu'on sait sur le prochain Avengers.</p><div class="news-date">Marvel Universe</div></div>
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -596,10 +680,7 @@
     document.addEventListener('mousemove', (e) => {
       curseur.style.left = e.clientX + 'px';
       curseur.style.top = e.clientY + 'px';
-      setTimeout(() => {
-        trail.style.left = e.clientX + 'px';
-        trail.style.top = e.clientY + 'px';
-      }, 80);
+      setTimeout(() => { trail.style.left = e.clientX + 'px'; trail.style.top = e.clientY + 'px'; }, 80);
     });
 
     // CHARGEMENT
@@ -607,14 +688,12 @@
       const barre = document.getElementById('barre-progress');
       const texte = document.getElementById('loading-text');
       const eclair = document.getElementById('eclair');
-      const messages = ['Initialisation du système...', 'Connexion aux serveurs...', 'Chargement des données...', 'Bienvenue, Spider-Man !'];
+      const messages = ['Initialisation du système...', 'Connexion aux serveurs...', 'Chargement V7...', 'Bienvenue, Spider-Man !'];
       let i = 0;
       eclair.style.height = '100vh';
       setTimeout(() => { eclair.style.opacity = '0'; }, 900);
       barre.style.width = '100%';
-      const interval = setInterval(() => {
-        if (i < messages.length) { texte.textContent = messages[i]; i++; }
-      }, 400);
+      const interval = setInterval(() => { if (i < messages.length) { texte.textContent = messages[i]; i++; } }, 400);
       setTimeout(() => {
         clearInterval(interval);
         document.getElementById('loading-screen').style.display = 'none';
@@ -635,10 +714,7 @@
           document.getElementById('sidebar').style.display = 'flex';
           document.getElementById('avengers-panel').style.display = 'block';
           document.getElementById('hud-info').style.display = 'flex';
-          setTimeout(() => {
-            const s = document.getElementById('section-accueil');
-            s.classList.add('visible');
-          }, 50);
+          setTimeout(() => { document.getElementById('section-accueil').classList.add('visible'); }, 50);
         }, 3000);
       } else {
         error.style.opacity = '1';
@@ -648,11 +724,9 @@
     }
     document.addEventListener('keypress', function(e) { if (e.key === 'Enter') verifierMdp(); });
 
-    // SECTIONS AVEC ANIMATION
+    // SECTIONS
     function afficherSection(nom, e) {
-      document.querySelectorAll('.section').forEach(s => {
-        s.classList.remove('active', 'visible');
-      });
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active', 'visible'));
       document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
       const section = document.getElementById('section-' + nom);
       section.classList.add('active');
@@ -660,14 +734,59 @@
       setTimeout(() => section.classList.add('visible'), 50);
     }
 
-    // FLASH LANCEMENT SITE
+    // FLASH
     function flashLancement() {
       const flash = document.getElementById('flash-overlay');
       flash.style.opacity = '1';
       setTimeout(() => { flash.style.opacity = '0'; }, 300);
     }
 
-    // CANVAS
+    // MODE CINEMA
+    function ouvrirCinema() {
+      flashLancement();
+      const overlay = document.getElementById('cinema-overlay');
+      document.getElementById('cinema-frame').src = 'https://www.youtube.com/embed?listType=search&list=spider+man';
+      overlay.style.display = 'flex';
+    }
+    function fermerCinema() {
+      document.getElementById('cinema-overlay').style.display = 'none';
+      document.getElementById('cinema-frame').src = '';
+    }
+
+    // EASTER EGG
+    let easterEggCode = '';
+    document.addEventListener('keydown', (e) => {
+      easterEggCode += e.key;
+      if (easterEggCode.includes('spidey')) {
+        activerEasterEgg();
+        easterEggCode = '';
+      }
+      if (easterEggCode.length > 20) easterEggCode = '';
+    });
+    function activerEasterEgg() {
+      flashLancement();
+      const overlay = document.getElementById('easter-egg-overlay');
+      overlay.style.display = 'flex';
+      for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+          const p = document.createElement('div');
+          p.className = 'particule-explosion';
+          const angle = Math.random() * 360;
+          const distance = 100 + Math.random() * 200;
+          const dx = Math.cos(angle * Math.PI/180) * distance + 'px';
+          const dy = Math.sin(angle * Math.PI/180) * distance + 'px';
+          const couleurs = ['#ff003c','#00f7ff','#ffffff','#ffaa00'];
+          p.style.cssText = 'left:50vw;top:50vh;background:' + couleurs[Math.floor(Math.random()*couleurs.length)] + ';--dx:' + dx + ';--dy:' + dy + ';box-shadow:0 0 6px currentColor;';
+          document.body.appendChild(p);
+          setTimeout(() => p.remove(), 800);
+        }, i * 30);
+      }
+    }
+    function fermerEasterEgg() {
+      document.getElementById('easter-egg-overlay').style.display = 'none';
+    }
+
+    // CANVAS PARTICLES
     const canvas = document.querySelector('canvas');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
@@ -688,23 +807,23 @@
           const dist = Math.sqrt((p.x - p2.x) ** 2 + (p.y - p2.y) ** 2);
           if (dist < 120) {
             ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = 'rgba(255,255,255,' + (1 - dist/120) * 0.3 + ')';
+            ctx.strokeStyle = 'rgba(255,0,60,' + (1 - dist/120) * 0.3 + ')';
             ctx.lineWidth = 0.5; ctx.stroke();
           }
         });
         ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255,255,255,' + p.alpha + ')'; ctx.fill();
+        ctx.fillStyle = 'rgba(255,0,60,' + p.alpha + ')'; ctx.fill();
       });
       requestAnimationFrame(animerParticules);
     }
     animerParticules();
 
-    // HORLOGE + HUD
+    // HORLOGE
     function majHorloge() {
       const maintenant = new Date();
-      const heures = String(maintenant.getHours()).padStart(2, '0');
-      const minutes = String(maintenant.getMinutes()).padStart(2, '0');
-      const secondes = String(maintenant.getSeconds()).padStart(2, '0');
+      const heures = String(maintenant.getHours()).padStart(2,'0');
+      const minutes = String(maintenant.getMinutes()).padStart(2,'0');
+      const secondes = String(maintenant.getSeconds()).padStart(2,'0');
       const jours = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
       const mois = ['Jan','Fev','Mar','Avr','Mai','Jun','Jul','Aou','Sep','Oct','Nov','Dec'];
       const el = document.getElementById('horloge');
@@ -714,17 +833,15 @@
     setInterval(majHorloge, 1000);
     majHorloge();
 
-    // BATTERIE HUD
+    // BATTERIE
     async function majBatterie() {
       try {
         const bat = await navigator.getBattery();
         const pct = Math.round(bat.level * 100);
         document.getElementById('hud-batterie-txt').textContent = pct + '%';
         document.getElementById('batterie-fill').style.width = pct + '%';
-        document.getElementById('batterie-fill').style.background = pct < 20 ? '#ff0000' : pct < 50 ? '#ffaa00' : '#ff3333';
-      } catch(e) {
-        document.getElementById('hud-batterie-txt').textContent = 'N/A';
-      }
+        document.getElementById('batterie-fill').style.background = pct < 20 ? '#ff0000' : pct < 50 ? '#ffaa00' : '#ff003c';
+      } catch(e) { document.getElementById('hud-batterie-txt').textContent = 'N/A'; }
     }
     majBatterie();
     setInterval(majBatterie, 30000);
@@ -735,11 +852,11 @@
       contenu.style.display = (contenu.style.display === 'flex') ? 'none' : 'flex';
     }
 
-    // JARVIS EXPLOSION
+    // JARVIS
     function activerJarvis(e) {
       const status = document.getElementById('jarvis-status');
       status.innerHTML = '⚡ Connexion en cours...';
-      const couleurs = ['#ff3333','#ff0000','#ff6600','#ffaa00','#4444ff','#ffffff'];
+      const couleurs = ['#ff003c','#ff0000','#00f7ff','#ffaa00','#ffffff'];
       for (let i = 0; i < 40; i++) {
         const p = document.createElement('div');
         p.className = 'particule-explosion';
@@ -815,70 +932,47 @@
     afficherPostits();
 
     // MINUTEUR
-    let minuteurInterval = null;
-    let minuteurSecondes = 0;
-    let minuteurEnCours = false;
+    let minuteurInterval = null, minuteurSecondes = 0, minuteurEnCours = false;
     function setMinuteur(min) { minuteurSecondes = min * 60; afficherMinuteur(); }
     function afficherMinuteur() {
-      const m = Math.floor(minuteurSecondes / 60);
-      const s = minuteurSecondes % 60;
+      const m = Math.floor(minuteurSecondes/60), s = minuteurSecondes % 60;
       document.getElementById('minuteur-display').textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
     }
     function demarrerMinuteur() {
       if (minuteurEnCours) return;
       minuteurEnCours = true;
       minuteurInterval = setInterval(() => {
-        if (minuteurSecondes <= 0) {
-          clearInterval(minuteurInterval);
-          minuteurEnCours = false;
-          document.getElementById('minuteur-display').textContent = '⏰ TERMINÉ !';
-          return;
-        }
-        minuteurSecondes--;
-        afficherMinuteur();
+        if (minuteurSecondes <= 0) { clearInterval(minuteurInterval); minuteurEnCours = false; document.getElementById('minuteur-display').textContent = '⏰ TERMINÉ !'; return; }
+        minuteurSecondes--; afficherMinuteur();
       }, 1000);
     }
     function pauseMinuteur() { clearInterval(minuteurInterval); minuteurEnCours = false; }
     function resetMinuteur() { clearInterval(minuteurInterval); minuteurEnCours = false; minuteurSecondes = 0; afficherMinuteur(); }
 
-    // CHRONOMETRE
-    let chronoInterval = null;
-    let chronoMs = 0;
-    let chronoEnCours = false;
+    // CHRONO
+    let chronoInterval = null, chronoMs = 0, chronoEnCours = false;
     function afficherChrono() {
-      const h = Math.floor(chronoMs / 360000);
-      const m = Math.floor((chronoMs % 360000) / 6000);
-      const s = Math.floor((chronoMs % 6000) / 100);
-      document.getElementById('chrono-display').textContent = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+      const h = Math.floor(chronoMs/360000), m = Math.floor((chronoMs%360000)/6000), s = Math.floor((chronoMs%6000)/100);
+      document.getElementById('chrono-display').textContent = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'00');
     }
-    function demarrerChrono() {
-      if (chronoEnCours) return;
-      chronoEnCours = true;
-      chronoInterval = setInterval(() => { chronoMs++; afficherChrono(); }, 10);
-    }
+    function demarrerChrono() { if (chronoEnCours) return; chronoEnCours = true; chronoInterval = setInterval(() => { chronoMs++; afficherChrono(); }, 10); }
     function pauseChrono() { clearInterval(chronoInterval); chronoEnCours = false; }
     function resetChrono() { clearInterval(chronoInterval); chronoEnCours = false; chronoMs = 0; afficherChrono(); }
 
     // CALENDRIER
     let calDate = new Date();
     function afficherCalendrier() {
-      const annee = calDate.getFullYear();
-      const mois = calDate.getMonth();
+      const annee = calDate.getFullYear(), mois = calDate.getMonth();
       const moisNoms = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
       document.getElementById('cal-titre').textContent = moisNoms[mois] + ' ' + annee;
       const grid = document.getElementById('cal-grid');
       grid.innerHTML = '';
-      ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].forEach(j => {
-        grid.innerHTML += '<div class="cal-day-name">' + j + '</div>';
-      });
+      ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].forEach(j => { grid.innerHTML += '<div class="cal-day-name">' + j + '</div>'; });
       const premier = new Date(annee, mois, 1);
       const dernier = new Date(annee, mois + 1, 0);
       let jourDebut = premier.getDay() === 0 ? 6 : premier.getDay() - 1;
       const today = new Date();
-      for (let i = 0; i < jourDebut; i++) {
-        const j = new Date(annee, mois, -jourDebut + i + 1);
-        grid.innerHTML += '<div class="cal-day autre-mois">' + j.getDate() + '</div>';
-      }
+      for (let i = 0; i < jourDebut; i++) { const j = new Date(annee, mois, -jourDebut + i + 1); grid.innerHTML += '<div class="cal-day autre-mois">' + j.getDate() + '</div>'; }
       for (let d = 1; d <= dernier.getDate(); d++) {
         const isToday = d === today.getDate() && mois === today.getMonth() && annee === today.getFullYear();
         grid.innerHTML += '<div class="cal-day' + (isToday ? ' today' : '') + '">' + d + '</div>';
@@ -888,38 +982,49 @@
     afficherCalendrier();
 
     // METEO
-    const meteoDonnees = {
-      'paris': { temp: 14, desc: 'Nuageux', icon: '☁️' },
-      'marseille': { temp: 19, desc: 'Ensoleillé', icon: '☀️' },
-      'lyon': { temp: 12, desc: 'Pluvieux', icon: '🌧️' },
-      'nice': { temp: 22, desc: 'Beau temps', icon: '🌤️' },
-      'bordeaux': { temp: 16, desc: 'Partiellement nuageux', icon: '⛅' },
-      'toulouse': { temp: 17, desc: 'Ensoleillé', icon: '☀️' },
-      'nantes': { temp: 11, desc: 'Pluvieux', icon: '🌧️' },
-      'lille': { temp: 9, desc: 'Couvert', icon: '🌥️' },
-    };
+    const meteoDonnees = { 'paris': { temp: 14, desc: 'Nuageux', icon: '☁️' }, 'marseille': { temp: 19, desc: 'Ensoleillé', icon: '☀️' }, 'lyon': { temp: 12, desc: 'Pluvieux', icon: '🌧️' }, 'nice': { temp: 22, desc: 'Beau temps', icon: '🌤️' }, 'bordeaux': { temp: 16, desc: 'Partiellement nuageux', icon: '⛅' }, 'toulouse': { temp: 17, desc: 'Ensoleillé', icon: '☀️' }, 'nantes': { temp: 11, desc: 'Pluvieux', icon: '🌧️' }, 'lille': { temp: 9, desc: 'Couvert', icon: '🌥️' } };
     function chercherMeteo() {
       const ville = document.getElementById('meteo-input').value.toLowerCase().trim();
       const result = document.getElementById('meteo-result');
       const data = meteoDonnees[ville];
-      if (data) {
-        result.innerHTML = '<div class="meteo-icon">' + data.icon + '</div><div class="meteo-temp">' + data.temp + '°C</div><div class="meteo-desc">' + data.desc + '</div><div class="meteo-ville">📍 ' + ville.charAt(0).toUpperCase() + ville.slice(1) + '</div>';
-      } else {
-        result.innerHTML = '<p style="color:#4444ff;opacity:0.6">Ville non trouvée. Essaie : Paris, Marseille, Lyon, Nice, Bordeaux, Toulouse, Nantes, Lille</p>';
-      }
+      if (data) { result.innerHTML = '<div class="meteo-icon">' + data.icon + '</div><div class="meteo-temp">' + data.temp + '°C</div><div class="meteo-desc">' + data.desc + '</div><div class="meteo-ville">📍 ' + ville.charAt(0).toUpperCase() + ville.slice(1) + '</div>'; }
+      else { result.innerHTML = '<p style="color:#00f7ff;opacity:0.6">Ville non trouvée. Essaie : Paris, Marseille, Lyon...</p>'; }
     }
     document.getElementById('meteo-input').addEventListener('keypress', function(e) { if (e.key === 'Enter') chercherMeteo(); });
+
+    // MUSIQUE YOUTUBE
+    function lancerMusique() {
+      const input = document.getElementById('music-input').value.trim();
+      if (!input) return;
+      let videoId = '';
+      if (input.includes('youtube.com/watch?v=')) {
+        videoId = input.split('v=')[1].split('&')[0];
+      } else if (input.includes('youtu.be/')) {
+        videoId = input.split('youtu.be/')[1].split('?')[0];
+      }
+      if (videoId) {
+        lancerMusiqueDirecte('https://www.youtube.com/embed/' + videoId + '?autoplay=1');
+      } else {
+        document.getElementById('music-frame').style.display = 'block';
+        document.getElementById('music-frame').src = 'https://www.youtube.com/embed?listType=search&list=' + encodeURIComponent(input);
+      }
+    }
+    function lancerMusiqueDirecte(url) {
+      const frame = document.getElementById('music-frame');
+      frame.style.display = 'block';
+      frame.src = url + '?autoplay=1';
+      flashLancement();
+    }
+    document.getElementById('music-input').addEventListener('keypress', function(e) { if (e.key === 'Enter') lancerMusique(); });
+
     // JEUX
     function afficherMessageJeu(msg) {
       flashLancement();
       const el = document.getElementById('jeu-message');
       el.textContent = msg;
-      el.style.color = '#ff3333';
-      el.style.textShadow = '0 0 15px #ff3333';
-      setTimeout(() => {
-        el.style.color = '#4444ff';
-        el.style.textShadow = 'none';
-      }, 2000);
+      el.style.color = '#ff003c';
+      el.style.textShadow = '0 0 15px #ff003c';
+      setTimeout(() => { el.style.color = '#00f7ff'; el.style.textShadow = 'none'; }, 2000);
     }
   </script>
 
