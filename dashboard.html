@@ -433,7 +433,6 @@
   <!-- SIDEBAR -->
   <div id="sidebar">
     <div class="sidebar-btn active" onclick="afficherSection('accueil',event)">🏠<span class="sidebar-tooltip">Accueil</span></div>
-    <div class="sidebar-btn" onclick="afficherSection('sites',event)">🌐<span class="sidebar-tooltip">Mes sites</span></div>
     <div class="sidebar-btn" onclick="afficherSection('dossiers',event)">📁<span class="sidebar-tooltip">Dossiers</span></div>
     <div class="sidebar-btn" onclick="afficherSection('devoirs',event)">📋<span class="sidebar-tooltip">Devoirs</span></div>
     <div class="sidebar-btn" onclick="afficherSection('rappels',event)">🔔<span class="sidebar-tooltip">Rappels</span></div>
@@ -558,30 +557,7 @@
         </div>
       </div>
     </div>
-
-    <!-- SITES -->
-    <div class="section" id="section-sites">
-      <h2>🌐 Mes sites</h2>
-      <div class="separateur"></div>
-      <div class="grille">
-        <a href="https://www.youtube.com" target="_blank" onclick="flashLancement()">▶ YouTube</a>
-        <a href="https://music.youtube.com" target="_blank" onclick="flashLancement()">🎵 YouTube Music</a>
-        <a href="https://character.ai" target="_blank" onclick="flashLancement()">🤖 C.ai</a>
-        <a href="https://purestream.cc" target="_blank" onclick="flashLancement()">🎥 Film</a>
-        <a href="https://www.aucollege84.vaucluse.fr" target="_blank" onclick="flashLancement()">🏫 ENT</a>
-        <a href="https://mail.google.com" target="_blank" onclick="flashLancement()">📧 Gmail</a>
-        <a href="https://chatgpt.com/" target="_blank" onclick="flashLancement()">🤖 ChatGPT</a>
-        <a href="https://calendar.google.com/calendar/u/0/r/week?pli=1" target="_blank" onclick="flashLancement()">📆calendrier</a>
-        <a href="https://notepad-online.com/v2/fr" target="_blank" onclick="flashLancement()">🗒️ bloc note</a>
-        <a href="https://science.nasa.gov/eyes/" target="_blank" onclick="flashLancement()">🌙 Nasa</a>
-        <a href="https://www.noisli.com/playlists" target="_blank" onclick="flashLancement()">bruit de fond</a>
-        <a href="https://app.lumosity.com/fr/onboard" target="_blank" onclick="flashLancement()">lumosity</a>
-        <a href="https://www.europe2.fr/webradios" target="_blank" onclick="flashLancement()">radio</a>
-        <a href="https://zzz.zoomquilt.org/" target="_blank" onclick="flashLancement()">zoom infini</a>
-        <a href="https://www.tiktok.com/fr/" target="_blank" onclick="flashLancement()">tiktok</a>
-        <a href="https://web.whatsapp.com/" target="_blank" onclick="flashLancement()">whatsapp</a>
-      </div>
-    </div>
+    
 
     <!-- DOSSIERS -->
     <div class="section" id="section-dossiers">
@@ -593,13 +569,22 @@
           <a href="https://www.kartable.fr" target="_blank" onclick="flashLancement()">📖 Kartable</a>
           <a href="https://www.lumni.fr" target="_blank" onclick="flashLancement()">🎓 Lumni</a>
           <a href="https://prof84700.fr/" target="_blank" onclick="flashLancement()">📝 Lexique HG</a>
+          <a href="https://www.aucollege84.vaucluse.fr" target="_blank" onclick="flashLancement()">🏫 ENT</a>
         </div>
       </div>
       <div class="dossier">
-        <button class="dossier-btn" onclick="toggleDossier('loisirs')">🎮 Loisirs</button>
+        <button class="dossier-btn" onclick="toggleDossier('loisirs')">🎮 divertissement</button>
         <div class="dossier-contenu" id="loisirs">
           <a href="https://www.twitch.tv" target="_blank" onclick="flashLancement()">🎥 Twitch</a>
           <a href="https://www.reddit.com" target="_blank" onclick="flashLancement()">💬 Reddit</a>
+          <a href="https://www.youtube.com" target="_blank" onclick="flashLancement()">▶ YouTube</a>
+        <a href="https://music.youtube.com" target="_blank" onclick="flashLancement()">🎵 YouTube Music</a>
+        <a href="https://character.ai" target="_blank" onclick="flashLancement()">🤖 C.ai</a>
+        <a href="https://purestream.cc" target="_blank" onclick="flashLancement()">🎥 Film</a>
+           <a href="https://science.nasa.gov/eyes/" target="_blank" onclick="flashLancement()">🌙 Nasa</a>
+           <a href="https://www.europe2.fr/webradios" target="_blank" onclick="flashLancement()">📻radio</a>
+        <a href="https://zzz.zoomquilt.org/" target="_blank" onclick="flashLancement()">🎨zoom infini</a>
+        <a href="https://www.tiktok.com/fr/" target="_blank" onclick="flashLancement()">🎦tiktok</a>
         </div>
       </div>
       <div class="dossier">
@@ -607,6 +592,14 @@
         <div class="dossier-contenu" id="outils">
           <a href="https://www.google.com/maps" target="_blank" onclick="flashLancement()">🗺️ Google Maps</a>
           <a href="https://translate.google.com" target="_blank" onclick="flashLancement()">🌍 Traducteur</a>
+           <a href="https://mail.google.com" target="_blank" onclick="flashLancement()">📧 Gmail</a>
+        <a href="https://chatgpt.com/" target="_blank" onclick="flashLancement()">🤖 ChatGPT</a>
+        <a href="https://calendar.google.com/calendar/u/0/r/week?pli=1" target="_blank" onclick="flashLancement()">📆calendrier</a>
+        <a href="https://notepad-online.com/v2/fr" target="_blank" onclick="flashLancement()">🗒️ bloc note</a>
+            <a href="https://www.noisli.com/playlists" target="_blank" onclick="flashLancement()">🔉bruit de fond</a>
+        <a href="https://app.lumosity.com/fr/onboard" target="_blank" onclick="flashLancement()">🧠lumosity</a>
+           <a href="https://web.whatsapp.com/" target="_blank" onclick="flashLancement()">📨whatsapp</a>
+          
         </div>
       </div>
     </div>
