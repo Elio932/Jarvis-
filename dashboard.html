@@ -9,8 +9,6 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
     body { background: #000; color: #fff; font-family: 'Orbitron', sans-serif; overflow-x: hidden; display: flex; }
-
-    /* SCANLINES */
     body::after { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 3px); pointer-events: none; z-index: 9990; }
 
     /* CURSEUR */
@@ -18,7 +16,10 @@
     #curseur svg { width: 20px; height: 20px; }
     #curseur-trail { position: fixed; pointer-events: none; z-index: 99998; width: 8px; height: 8px; border-radius: 50%; background: rgba(255,215,0,0.5); transform: translate(-50%,-50%); transition: left 0.08s, top 0.08s; }
 
-    /* CANVAS */
+    /* LASER CLICK */
+    .laser-ring { position: fixed; pointer-events: none; z-index: 9997; border-radius: 50%; border: 2px solid #ffd700; animation: laserExpand 0.5s ease-out forwards; }
+    @keyframes laserExpand { 0% { width: 0; height: 0; opacity: 1; transform: translate(-50%,-50%); } 100% { width: 80px; height: 80px; opacity: 0; transform: translate(-50%,-50%); box-shadow: 0 0 20px #ffd700; } }
+
     #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
 
     /* FOND IA */
@@ -28,13 +29,27 @@
     .ia-texte { position: absolute; font-size: 0.55em; font-family: 'Orbitron', monospace; opacity: 0.05; white-space: nowrap; animation: flotterTexte linear infinite; pointer-events: none; }
     @keyframes flotterTexte { 0% { transform: translateY(0); opacity: 0.05; } 100% { transform: translateY(-110vh); opacity: 0; } }
 
-    /* LOGO JARVIS */
+    /* LOGO */
     #jarvis-logo { position: fixed; top: 12px; left: 90px; z-index: 200; display: none; align-items: center; gap: 12px; }
     .logo-cercle { width: 44px; height: 44px; border-radius: 50%; background: radial-gradient(circle, #ffd700, #ff8c00); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px #ffd700, 0 0 40px #ff8c00; animation: logoGlow 2s ease-in-out infinite; font-size: 0.45em; font-weight: 900; color: #000; font-family: 'Orbitron', sans-serif; letter-spacing: 0.5px; text-align: center; line-height: 1.1; }
     @keyframes logoGlow { 0%,100% { box-shadow: 0 0 20px #ffd700, 0 0 40px #ff8c00; } 50% { box-shadow: 0 0 40px #ffd700, 0 0 80px #ff8c00; } }
     .logo-texte { font-size: 0.75em; color: #ffd700; text-shadow: 0 0 10px #ffd700; letter-spacing: 3px; }
 
-    /* TERMINAL IA */
+    /* AVATAR IA */
+    #ia-avatar { position: fixed; bottom: 20px; right: 200px; z-index: 300; display: none; flex-direction: column; align-items: center; gap: 8px; }
+    .avatar-cercle { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #ffd700; background: radial-gradient(circle, rgba(255,215,0,0.1), transparent); display: flex; align-items: center; justify-content: center; font-size: 1.8em; box-shadow: 0 0 15px rgba(255,215,0,0.4); animation: avatarPulse 3s ease-in-out infinite; cursor: none; }
+    @keyframes avatarPulse { 0%,100% { box-shadow: 0 0 15px rgba(255,215,0,0.4); transform: scale(1); } 50% { box-shadow: 0 0 30px rgba(255,215,0,0.8); transform: scale(1.05); } }
+    .avatar-bulle { background: rgba(0,0,0,0.9); border: 1px solid rgba(255,215,0,0.3); border-radius: 10px; padding: 8px 12px; font-size: 0.6em; color: #ffd700; max-width: 180px; text-align: center; line-height: 1.4; animation: apparaitreBulle 0.3s ease; }
+    @keyframes apparaitreBulle { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .avatar-ondes { display: flex; gap: 3px; align-items: flex-end; height: 20px; }
+    .avatar-onde { width: 3px; background: #ffd700; border-radius: 2px; animation: ondeAnim 0.6s ease-in-out infinite; }
+    .avatar-onde:nth-child(2) { animation-delay: 0.1s; }
+    .avatar-onde:nth-child(3) { animation-delay: 0.2s; }
+    .avatar-onde:nth-child(4) { animation-delay: 0.3s; }
+    .avatar-onde:nth-child(5) { animation-delay: 0.4s; }
+    @keyframes ondeAnim { 0%,100% { height: 4px; } 50% { height: 18px; } }
+
+    /* TERMINAL */
     #ia-terminal { position: fixed; bottom: 15px; left: 80px; z-index: 200; display: none; background: rgba(0,0,0,0.85); border: 1px solid rgba(0,247,255,0.25); border-radius: 10px; padding: 10px 14px; width: 260px; }
     .terminal-titre { font-size: 0.6em; color: #00f7ff; opacity: 0.6; margin-bottom: 8px; letter-spacing: 2px; }
     .barre-ia { height: 3px; border-radius: 3px; margin-bottom: 5px; overflow: hidden; background: rgba(255,255,255,0.05); }
@@ -43,7 +58,17 @@
     .terminal-ligne { font-size: 0.55em; color: #00f7ff; opacity: 0.4; margin-bottom: 3px; transition: all 0.5s; overflow: hidden; white-space: nowrap; }
     .terminal-ligne.active { opacity: 1; color: #ffd700; }
 
-    /* FAUX BOUTONS TECH */
+    /* RADAR */
+    #radar-widget { position: fixed; bottom: 100px; right: 195px; z-index: 150; display: none; width: 120px; height: 120px; }
+    #radar-canvas { border-radius: 50%; border: 1px solid rgba(0,247,255,0.3); }
+
+    /* SUGGESTIONS IA */
+    #ia-suggestion { position: fixed; top: 60px; right: 195px; z-index: 150; display: none; background: rgba(0,0,0,0.9); border: 1px solid rgba(0,247,255,0.3); border-radius: 10px; padding: 10px 14px; max-width: 180px; font-size: 0.6em; color: #00f7ff; line-height: 1.5; animation: suggAppear 0.5s ease; }
+    @keyframes suggAppear { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    .sugg-titre { color: #ffd700; font-size: 0.9em; margin-bottom: 5px; letter-spacing: 1px; }
+    .sugg-close { position: absolute; top: 5px; right: 8px; cursor: none; color: #ffd700; opacity: 0.5; font-size: 1.1em; }
+
+    /* FAUX BOUTONS */
     .tech-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 10px 0; }
     .tech-btn { padding: 6px 14px; border: 1px solid rgba(0,247,255,0.4); border-radius: 6px; background: rgba(0,247,255,0.05); color: #00f7ff; font-size: 0.65em; font-family: 'Orbitron', sans-serif; cursor: none; letter-spacing: 1px; transition: all 0.3s; }
     .tech-btn:hover { border-color: #00f7ff; background: rgba(0,247,255,0.15); box-shadow: 0 0 10px #00f7ff; color: #fff; }
@@ -52,7 +77,7 @@
     .tech-btn.gold { border-color: rgba(255,215,0,0.4); background: rgba(255,215,0,0.05); color: #ffd700; }
     .tech-btn.gold:hover { border-color: #ffd700; background: rgba(255,215,0,0.15); box-shadow: 0 0 10px #ffd700; }
 
-    /* BARRES DE CHARGEMENT MASSIVES */
+    /* BARRES MASSIVES */
     .barres-massives { width: 100%; padding: 15px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,215,0,0.1); border-radius: 12px; margin: 15px 0; }
     .barre-massive-ligne { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .barre-massive-label { font-size: 0.6em; color: #00f7ff; min-width: 120px; letter-spacing: 1px; opacity: 0.7; }
@@ -61,7 +86,7 @@
     @keyframes barreAnim { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
     .barre-massive-val { font-size: 0.6em; color: #ffd700; min-width: 40px; text-align: right; }
 
-    /* BARRES CIRCULAIRES */
+    /* CERCLES */
     .cercles-row { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 15px 0; }
     .cercle-stat { text-align: center; }
     .cercle-stat svg { width: 70px; height: 70px; }
@@ -71,7 +96,7 @@
     .cercle-label { font-size: 0.55em; color: #00f7ff; margin-top: 5px; letter-spacing: 1px; }
     .cercle-val { font-size: 0.8em; color: #ffd700; font-weight: bold; }
 
-    /* HUD INFO */
+    /* HUD */
     #hud-info { position: fixed; top: 8px; right: 50px; z-index: 50; display: none; gap: 15px; align-items: center; font-size: 0.7em; color: #ffd700; opacity: 0.8; font-family: 'Orbitron', monospace; letter-spacing: 1px; }
     #hud-info span { text-shadow: 0 0 8px #ffd700; }
     .batterie-bar { width: 30px; height: 10px; border: 1px solid #ffd700; border-radius: 2px; display: inline-block; margin-left: 4px; }
@@ -83,7 +108,7 @@
     #password-screen { z-index: 999; display: none; }
     #welcome-screen { z-index: 998; display: none; }
 
-    /* ECRAN MOT DE PASSE FUTURISTE */
+    /* MOT DE PASSE */
     .pw-logo { width: 80px; height: 80px; border-radius: 50%; background: radial-gradient(circle, #ffd700, #ff8c00); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px #ffd700; font-size: 0.6em; font-weight: 900; color: #000; margin: 0 auto 20px; animation: logoGlow 2s infinite; line-height: 1.2; }
     .pw-titre { font-size: 1.8em; color: #ffd700; text-shadow: 0 0 20px #ffd700; margin-bottom: 5px; letter-spacing: 3px; }
     .pw-sous-titre { font-size: 0.7em; color: #00f7ff; opacity: 0.7; margin-bottom: 20px; letter-spacing: 2px; }
@@ -95,6 +120,7 @@
     .pw-btns-tech { display: flex; gap: 8px; justify-content: center; margin-bottom: 15px; }
     .pw-btn-tech { padding: 5px 12px; border: 1px solid rgba(255,0,60,0.4); border-radius: 5px; background: rgba(255,0,60,0.05); color: #ff003c; font-size: 0.6em; font-family: 'Orbitron', sans-serif; cursor: none; letter-spacing: 1px; animation: clignoter 2s ease-in-out infinite; }
     @keyframes clignoter { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+    .pw-scan-status { font-size: 0.65em; color: #00f7ff; margin-bottom: 10px; min-height: 20px; letter-spacing: 1px; animation: clignoter 1s infinite; }
     #password-input { padding: 12px 20px; width: 280px; border-radius: 10px; border: 2px solid #ffd700; background: rgba(255,215,0,0.05); color: #ffd700; font-size: 1em; outline: none; text-align: center; font-family: 'Orbitron', sans-serif; box-shadow: 0 0 15px rgba(255,215,0,0.3); cursor: text; letter-spacing: 3px; margin-bottom: 12px; }
     #password-input:focus { box-shadow: 0 0 25px #ffd700; }
     #password-btn { padding: 12px 35px; background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; border-radius: 10px; color: #000; font-size: 0.9em; font-weight: bold; font-family: 'Orbitron', sans-serif; cursor: none; box-shadow: 0 0 15px #ffd700; transition: all 0.3s; letter-spacing: 2px; }
@@ -112,8 +138,6 @@
     .barre-progress { height: 100%; width: 0%; background: linear-gradient(to right, #ff003c, #ffd700); border-radius: 10px; transition: width 1.5s ease; }
     #loading-text { color: #00f7ff; margin-top: 10px; font-size: 0.85em; letter-spacing: 1px; }
     .eclair { position: fixed; top: 0; left: 50%; width: 4px; height: 0; background: linear-gradient(to bottom, #ffd700, #ff003c); box-shadow: 0 0 20px #ffd700; z-index: 1001; transition: height 0.8s ease-in; }
-
-    /* HUD COINS */
     .hud-bar { position: fixed; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(to right, #ff003c, #ffd700, #00f7ff, #ff003c); z-index: 5; animation: hudScan 3s linear infinite; }
     @keyframes hudScan { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
     .hud-corner { position: fixed; width: 28px; height: 28px; z-index: 5; opacity: 0.6; }
@@ -123,7 +147,7 @@
     .hud-corner-br { bottom: 5px; right: 5px; border-bottom: 2px solid #ffd700; border-right: 2px solid #ffd700; }
 
     /* SIDEBAR */
-    #sidebar { position: fixed; left: 0; top: 0; height: 100%; width: 68px; background: rgba(0,0,0,0.97); border-right: 1px solid rgba(255,215,0,0.15); display: none; flex-direction: column; align-items: center; padding-top: 75px; gap: 6px; z-index: 100; overflow-y: auto; }
+    #sidebar { position: fixed; left: 0; top: 0; height: 100%; width: 68px; background: rgba(0,0,0,0.97); border-right: 1px solid rgba(255,215,0,0.15); display: none; flex-direction: column; align-items: center; padding-top: 75px; gap: 5px; z-index: 100; overflow-y: auto; }
     .sidebar-btn { width: 48px; height: 48px; border-radius: 10px; border: 1px solid rgba(255,215,0,0.25); background: rgba(255,215,0,0.03); display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: none; transition: all 0.3s; position: relative; }
     .sidebar-btn:hover, .sidebar-btn.active { border-color: #ffd700; background: rgba(255,215,0,0.1); box-shadow: 0 0 12px #ffd700; }
     .sidebar-tooltip { position: absolute; left: 58px; background: rgba(0,0,0,0.97); border: 1px solid #ffd700; border-radius: 7px; padding: 4px 10px; font-size: 0.65em; color: #ffd700; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
@@ -180,13 +204,21 @@
     #cinema-frame { flex: 1; border: none; width: 100%; height: 100%; }
     #cinema-close { padding: 9px 18px; background: linear-gradient(135deg, #ffd700, #ff003c); border: none; color: #000; font-family: 'Orbitron', sans-serif; font-size: 0.85em; cursor: none; position: absolute; top: 12px; right: 12px; border-radius: 8px; z-index: 9996; font-weight: bold; }
 
+    /* SNAKE OVERLAY */
+    #snake-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9994; background: rgba(0,0,0,0.95); flex-direction: column; align-items: center; justify-content: center; }
+    #snake-overlay h2 { color: #ffd700; font-size: 1.5em; margin-bottom: 5px; }
+    #snake-score { color: #00f7ff; font-size: 0.8em; margin-bottom: 15px; letter-spacing: 2px; }
+    #snake-canvas { border: 2px solid rgba(255,215,0,0.5); border-radius: 8px; background: #000; }
+    #snake-close { margin-top: 15px; padding: 10px 20px; background: linear-gradient(135deg, #ffd700, #ff003c); border: none; border-radius: 8px; color: #000; font-family: 'Orbitron', sans-serif; font-size: 0.8em; cursor: none; font-weight: bold; }
+    #snake-info { color: rgba(255,215,0,0.5); font-size: 0.65em; margin-top: 8px; letter-spacing: 1px; }
+
     /* EASTER EGG */
     #easter-egg-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.96); z-index: 99997; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
     #easter-egg-overlay h2 { font-size: 2.5em; color: #ffd700; text-shadow: 0 0 30px #ffd700; animation: pulseGold 1s infinite; margin: 15px 0; }
     #easter-egg-overlay p { color: #00f7ff; font-size: 1em; margin-top: 15px; line-height: 1.6; }
     #easter-egg-close { margin-top: 25px; padding: 12px 25px; background: linear-gradient(135deg, #ffd700, #ff003c); border: none; border-radius: 10px; color: #000; font-family: 'Orbitron', sans-serif; font-size: 0.9em; cursor: none; font-weight: bold; }
 
-    /* BOUTONS PRINCIPAUX */
+    /* BOUTONS */
     .btn-v7 { background: linear-gradient(135deg, #ff003c, #001aff); border: none; padding: 11px 18px; border-radius: 10px; color: white; transition: 0.3s; box-shadow: 0 0 8px #ff003c; cursor: none; font-family: 'Orbitron', sans-serif; font-size: 0.8em; }
     .btn-v7:hover { transform: scale(1.05); box-shadow: 0 0 18px #00f7ff; }
     .btn-gold { background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; padding: 11px 18px; border-radius: 10px; color: #000; transition: 0.3s; box-shadow: 0 0 8px #ffd700; cursor: none; font-family: 'Orbitron', sans-serif; font-size: 0.8em; font-weight: bold; }
@@ -214,17 +246,41 @@
     .dossier-contenu a { padding: 7px 16px; border: 1px solid rgba(0,247,255,0.4); border-radius: 8px; color: #00f7ff; text-decoration: none; font-size: 0.75em; transition: all 0.3s; background: rgba(0,247,255,0.04); font-family: 'Orbitron', sans-serif; }
     .dossier-contenu a:hover { background: #00f7ff; color: #000; box-shadow: 0 0 12px #00f7ff; }
 
-    /* TODO */
-    .todo-input-zone { display: flex; gap: 10px; margin-bottom: 12px; width: 100%; }
-    .todo-input-zone input { flex: 1; padding: 10px 16px; border-radius: 10px; border: 2px solid rgba(255,215,0,0.4); background: rgba(255,215,0,0.03); color: #ffd700; font-size: 0.8em; outline: none; cursor: text; font-family: 'Orbitron', sans-serif; }
+    /* NOTES */
+    .notes-container { width: 100%; }
+    #notes { width: 100%; height: 200px; background: rgba(255,215,0,0.03); border: 2px solid rgba(255,215,0,0.4); border-radius: 12px; color: #ffd700; font-size: 0.9em; padding: 15px; resize: vertical; outline: none; font-family: 'Orbitron', sans-serif; cursor: text; }
+    #notes:focus { border-color: #ffd700; box-shadow: 0 0 15px rgba(255,215,0,0.3); }
+    #notes::placeholder { color: rgba(255,215,0,0.25); }
+    .save-btn { margin-top: 10px; padding: 9px 22px; background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; border-radius: 10px; color: #000; font-size: 0.8em; cursor: none; transition: all 0.3s; font-family: 'Orbitron', sans-serif; font-weight: bold; }
+    .save-btn:hover { transform: scale(1.05); box-shadow: 0 0 18px #ffd700; }
+    #notif-save { margin-left: 10px; font-size: 0.75em; opacity: 0.8; color: #00f7ff; }
+
+    /* TODO AVEC DATE */
+    .todo-input-zone { display: flex; gap: 8px; margin-bottom: 12px; width: 100%; flex-wrap: wrap; }
+    .todo-input-zone input[type=text] { flex: 2; min-width: 150px; padding: 10px 16px; border-radius: 10px; border: 2px solid rgba(255,215,0,0.4); background: rgba(255,215,0,0.03); color: #ffd700; font-size: 0.8em; outline: none; cursor: text; font-family: 'Orbitron', sans-serif; }
+    .todo-input-zone input[type=date] { flex: 1; min-width: 120px; padding: 10px 12px; border-radius: 10px; border: 2px solid rgba(0,247,255,0.4); background: rgba(0,247,255,0.03); color: #00f7ff; font-size: 0.75em; outline: none; cursor: text; font-family: 'Orbitron', sans-serif; }
     .todo-input-zone input::placeholder { color: rgba(255,215,0,0.25); }
     .todo-input-zone button { padding: 10px 18px; background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; border-radius: 10px; color: #000; font-size: 1em; cursor: none; font-weight: bold; }
-    .todo-item { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border: 1px solid rgba(255,215,0,0.2); border-radius: 9px; margin-bottom: 7px; background: rgba(255,215,0,0.02); width: 100%; }
+    .todo-item { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border: 1px solid rgba(255,215,0,0.2); border-radius: 9px; margin-bottom: 7px; background: rgba(255,215,0,0.02); width: 100%; flex-wrap: wrap; }
+    .todo-item.alerte { border-color: #ff003c; box-shadow: 0 0 8px rgba(255,0,60,0.3); animation: alertePulse 1s ease-in-out infinite; }
+    @keyframes alertePulse { 0%,100% { box-shadow: 0 0 8px rgba(255,0,60,0.3); } 50% { box-shadow: 0 0 20px rgba(255,0,60,0.6); } }
     .todo-item input[type=checkbox] { accent-color: #ffd700; width: 15px; height: 15px; cursor: pointer; }
     .todo-item span { flex: 1; text-align: left; color: #ffd700; font-family: 'Orbitron', sans-serif; font-size: 0.8em; }
     .todo-item span.done { text-decoration: line-through; opacity: 0.35; }
+    .todo-date-badge { font-size: 0.6em; color: #00f7ff; border: 1px solid rgba(0,247,255,0.3); border-radius: 5px; padding: 2px 6px; }
+    .todo-date-badge.urgent { color: #ff003c; border-color: rgba(255,0,60,0.5); }
     .todo-delete { background: none; border: none; color: #ff003c; cursor: none; opacity: 0.5; font-size: 1em; }
     .todo-delete:hover { opacity: 1; }
+
+    /* POST-IT */
+    .postits { display: flex; flex-wrap: wrap; gap: 15px; width: 100%; margin-top: 10px; }
+    .postit { width: 175px; min-height: 155px; padding: 14px; border-radius: 8px; position: relative; box-shadow: 3px 3px 12px rgba(0,0,0,0.6); transform: rotate(var(--rot)); transition: transform 0.3s; }
+    .postit:hover { transform: rotate(0deg) scale(1.05); z-index: 10; }
+    .postit textarea { background: transparent; border: none; width: 100%; height: 105px; resize: none; font-size: 0.85em; color: #1a0a00; font-family: Arial, sans-serif; outline: none; cursor: text; }
+    .postit-delete { position: absolute; top: 5px; right: 7px; background: none; border: none; cursor: none; opacity: 0.45; font-size: 0.95em; color: #1a0a00; }
+    .add-postit { width: 175px; min-height: 155px; border: 2px dashed rgba(255,215,0,0.3); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-size: 1.8em; color: rgba(255,215,0,0.3); cursor: none; transition: all 0.3s; }
+    .add-postit:hover { border-color: #ffd700; color: #ffd700; box-shadow: 0 0 12px rgba(255,215,0,0.3); }
+    .add-postit span { font-size: 0.4em; color: rgba(255,215,0,0.4); }
 
     /* MINUTEUR */
     .minuteur { width: 100%; text-align: center; }
@@ -241,7 +297,7 @@
     /* RAPPELS */
     .rappel-input { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
     .rappel-input input[type=text] { flex: 2; min-width: 150px; padding: 9px 14px; border-radius: 9px; border: 2px solid rgba(255,215,0,0.4); background: rgba(255,215,0,0.03); color: #ffd700; font-size: 0.8em; outline: none; cursor: text; font-family: 'Orbitron', sans-serif; }
-    .rappel-input input[type=time] { flex: 1; min-width: 100px; padding: 9px 12px; border-radius: 9px; border: 2px solid rgba(0,247,255,0.4); background: rgba(0,247,255,0.03); color: #00f7ff; font-size: 0.8em; outline: none; cursor: text; font-family: 'Orbitron', sans-serif; }
+    .rappel-input input[type=time] { flex: 1; min-width: 100px; padding: 9px 12px; border-radius: 9px; border: 2px solid rgba(0,247,255,0.4); background: rgba(0,247,255,0.03); color: #00f7ff; font-size: 0.8em; outline: none; cursor: text; }
     .rappel-input input::placeholder { color: rgba(255,215,0,0.25); }
     .rappel-input button { padding: 9px 18px; background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; border-radius: 9px; color: #000; font-size: 0.85em; cursor: none; font-weight: bold; font-family: 'Orbitron', sans-serif; }
     .rappel-item { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border: 1px solid rgba(255,215,0,0.2); border-radius: 9px; margin-bottom: 7px; background: rgba(255,215,0,0.02); width: 100%; }
@@ -249,7 +305,31 @@
     .rappel-texte { flex: 1; color: #ffd700; font-size: 0.8em; font-family: 'Orbitron', sans-serif; }
     .rappel-delete { background: none; border: none; color: #ff003c; cursor: none; opacity: 0.5; }
 
-    
+    /* CALENDRIER */
+    .calendrier { width: 100%; }
+    .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .cal-header button { background: transparent; border: 1px solid rgba(255,215,0,0.4); color: #ffd700; border-radius: 7px; padding: 5px 12px; cursor: none; transition: all 0.3s; font-size: 1em; font-family: 'Orbitron', sans-serif; }
+    .cal-header button:hover { background: #ffd700; color: #000; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; width: 100%; }
+    .cal-day-name { text-align: center; font-size: 0.65em; color: #00f7ff; padding: 5px; opacity: 0.7; }
+    .cal-day { text-align: center; padding: 8px 4px; border-radius: 7px; font-size: 0.75em; border: 1px solid transparent; transition: all 0.3s; cursor: none; font-family: 'Orbitron', sans-serif; }
+    .cal-day:hover { border-color: rgba(255,215,0,0.4); background: rgba(255,215,0,0.08); }
+    .cal-day.today { background: rgba(255,215,0,0.2); border-color: #ffd700; box-shadow: 0 0 8px rgba(255,215,0,0.3); font-weight: bold; color: #ffd700; }
+    .cal-day.autre-mois { opacity: 0.25; }
+    .cal-day.a-devoir { border-color: rgba(255,0,60,0.4); background: rgba(255,0,60,0.1); }
+
+    /* METEO */
+    .meteo-widget { width: 100%; border: 1px solid rgba(255,215,0,0.2); border-radius: 12px; padding: 18px; background: rgba(255,215,0,0.02); margin-bottom: 12px; }
+    .meteo-search { display: flex; gap: 10px; margin-bottom: 18px; }
+    .meteo-search input { flex: 1; padding: 10px 16px; border-radius: 10px; border: 2px solid rgba(255,215,0,0.4); background: rgba(255,215,0,0.03); color: #ffd700; font-size: 0.8em; outline: none; cursor: text; font-family: 'Orbitron', sans-serif; }
+    .meteo-search input::placeholder { color: rgba(255,215,0,0.25); }
+    .meteo-search button { padding: 10px 18px; background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; border-radius: 10px; color: #000; font-size: 0.8em; cursor: none; font-weight: bold; font-family: 'Orbitron', sans-serif; }
+    .meteo-result { text-align: center; }
+    .meteo-icon { font-size: 3.5em; margin-bottom: 8px; }
+    .meteo-temp { font-size: 2.2em; font-weight: bold; color: #ffd700; text-shadow: 0 0 18px #ffd700; }
+    .meteo-desc { color: #00f7ff; font-size: 0.95em; margin-top: 4px; }
+    .meteo-ville { opacity: 0.6; font-size: 0.8em; margin-top: 4px; }
+
     /* NEWS */
     .marvel-news { width: 100%; }
     .news-item { padding: 14px; border: 1px solid rgba(255,215,0,0.2); border-radius: 10px; margin-bottom: 10px; background: rgba(255,215,0,0.02); transition: all 0.3s; }
@@ -281,16 +361,22 @@
     .music-tag { padding: 5px 11px; border: 1px solid rgba(255,215,0,0.3); border-radius: 18px; color: #ffd700; font-size: 0.65em; cursor: none; font-family: 'Orbitron', sans-serif; transition: all 0.3s; }
     .music-tag:hover { background: #ffd700; color: #000; box-shadow: 0 0 8px #ffd700; }
 
-    /* CARTE — RESTAURÉE */
+    /* CARTE */
     #map { width: 100%; height: 420px; border-radius: 12px; border: 2px solid rgba(255,215,0,0.3); box-shadow: 0 0 20px rgba(255,215,0,0.1); z-index: 1; }
     .leaflet-container { background: #0a0a1a !important; border-radius: 12px; }
+
+    /* CHANGER MDP */
+    .mdp-form { width: 100%; max-width: 400px; }
+    .mdp-form input { width: 100%; padding: 12px 18px; border-radius: 10px; border: 2px solid rgba(255,215,0,0.4); background: rgba(255,215,0,0.03); color: #ffd700; font-size: 0.9em; outline: none; cursor: text; font-family: 'Orbitron', sans-serif; margin-bottom: 12px; }
+    .mdp-form input::placeholder { color: rgba(255,215,0,0.25); }
+    .mdp-msg { font-size: 0.8em; min-height: 25px; margin-top: 5px; text-align: center; }
 
     @media (max-width: 768px) {
       .btn-v7, .btn-gold { width: 100%; margin-bottom: 8px; }
       #bg-canvas { display: none; }
       #main-content { padding: 20px 20px 80px 78px; }
       .jeux-grid { grid-template-columns: repeat(2, 1fr); }
-      #ia-terminal { display: none !important; }
+      #ia-terminal, #ia-avatar, #radar-widget, #ia-suggestion { display: none !important; }
       #avengers-panel { display: none !important; }
     }
   </style>
@@ -314,13 +400,38 @@
   <div id="flash-overlay"></div>
   <div id="ia-bg"></div>
 
-  <!-- LOGO JARVIS -->
+  <!-- LOGO -->
   <div id="jarvis-logo">
     <div class="logo-cercle">J.A.R.V.I.S</div>
     <div class="logo-texte">INDUSTRY</div>
   </div>
 
-  <!-- TERMINAL IA -->
+  <!-- AVATAR IA -->
+  <div id="ia-avatar">
+    <div class="avatar-bulle" id="avatar-bulle">Système opérationnel 🔱</div>
+    <div class="avatar-ondes" id="avatar-ondes" style="display:none">
+      <div class="avatar-onde" style="height:8px"></div>
+      <div class="avatar-onde" style="height:14px"></div>
+      <div class="avatar-onde" style="height:18px"></div>
+      <div class="avatar-onde" style="height:14px"></div>
+      <div class="avatar-onde" style="height:8px"></div>
+    </div>
+    <div class="avatar-cercle" onclick="avatarParler()">⚙️</div>
+  </div>
+
+  <!-- RADAR -->
+  <div id="radar-widget">
+    <canvas id="radar-canvas" width="120" height="120"></canvas>
+  </div>
+
+  <!-- SUGGESTION IA -->
+  <div id="ia-suggestion" style="display:none">
+    <div class="sugg-titre">🤖 J.A.R.V.I.S</div>
+    <span class="sugg-close" onclick="fermerSuggestion()">✕</span>
+    <div id="sugg-texte">You should take a break.</div>
+  </div>
+
+  <!-- TERMINAL -->
   <div id="ia-terminal">
     <div class="terminal-titre">⬡ SYSTÈME J.A.R.V.I.S ACTIF</div>
     <div class="barre-ia"><div class="barre-ia-fill" style="background:linear-gradient(to right,#ff003c,#ffd700)"></div></div>
@@ -335,6 +446,15 @@
   <div id="cinema-overlay">
     <button id="cinema-close" onclick="fermerCinema()">✕ FERMER</button>
     <iframe id="cinema-frame" src="" allowfullscreen></iframe>
+  </div>
+
+  <!-- SNAKE -->
+  <div id="snake-overlay">
+    <h2>🐍 SNAKE — J.A.R.V.I.S ARCADE</h2>
+    <div id="snake-score">SCORE : 0</div>
+    <canvas id="snake-canvas" width="400" height="400"></canvas>
+    <div id="snake-info">← ↑ → ↓ pour jouer • ESPACE pour pause</div>
+    <button id="snake-close" onclick="fermerSnake()">✕ FERMER</button>
   </div>
 
   <!-- EASTER EGG -->
@@ -364,7 +484,7 @@
   <div id="loading-screen">
     <div class="logo-cercle" style="width:75px;height:75px;font-size:0.65em;margin-bottom:18px">J.A.R.V.I.S</div>
     <div style="font-size:1.8em;color:#ffd700;text-shadow:0 0 20px #ffd700;margin-bottom:5px;letter-spacing:3px">J.A.R.V.I.S INDUSTRY</div>
-    <div style="font-size:0.7em;color:#00f7ff;opacity:0.6;margin-bottom:15px;letter-spacing:2px">SYSTÈME DE CONTRÔLE AVANCÉ v9.0</div>
+    <div style="font-size:0.7em;color:#00f7ff;opacity:0.6;margin-bottom:15px;letter-spacing:2px">SYSTÈME DE CONTRÔLE AVANCÉ v10.0</div>
     <div class="barre-chargement"><div class="barre-progress" id="barre-progress"></div></div>
     <p id="loading-text">Initialisation du système...</p>
     <div class="tech-btns" style="margin-top:15px">
@@ -374,7 +494,7 @@
     </div>
   </div>
 
-  <!-- MOT DE PASSE — FUTURISTE -->
+  <!-- MOT DE PASSE -->
   <div id="password-screen">
     <div class="pw-logo">J.A.R.V.I.S</div>
     <div class="pw-titre">ACCÈS RESTREINT</div>
@@ -386,6 +506,7 @@
         <div class="pw-barre"><div class="pw-barre-fill" style="background:linear-gradient(to right,#00f7ff,#001aff);animation-delay:0.5s"></div></div>
         <div class="pw-barre"><div class="pw-barre-fill" style="background:linear-gradient(to right,#ffd700,#ff8c00);animation-delay:1s"></div></div>
       </div>
+      <div class="pw-scan-status" id="pw-scan-status">SCANNING FACE...</div>
       <div class="pw-btns-tech">
         <div class="pw-btn-tech">ACCESS</div>
         <div class="pw-btn-tech" style="animation-delay:0.3s">SCAN</div>
@@ -438,9 +559,15 @@
     <div class="sidebar-btn" onclick="afficherSection('devoirs',event)">📋<span class="sidebar-tooltip">Devoirs</span></div>
     <div class="sidebar-btn" onclick="afficherSection('rappels',event)">🔔<span class="sidebar-tooltip">Rappels</span></div>
     <div class="sidebar-btn" onclick="afficherSection('postits',event)">🗒️<span class="sidebar-tooltip">Post-its</span></div>
+    <div class="sidebar-btn" onclick="afficherSection('notes',event)">📝<span class="sidebar-tooltip">Bloc-notes</span></div>
     <div class="sidebar-btn" onclick="afficherSection('minuteur',event)">⏱️<span class="sidebar-tooltip">Minuteur</span></div>
+    <div class="sidebar-btn" onclick="afficherSection('calendrier',event)">🗓️<span class="sidebar-tooltip">Calendrier</span></div>
+    <div class="sidebar-btn" onclick="afficherSection('meteo',event)">🌦️<span class="sidebar-tooltip">Météo</span></div>
+    <div class="sidebar-btn" onclick="afficherSection('carte',event)">🗺️<span class="sidebar-tooltip">Carte</span></div>
     <div class="sidebar-btn" onclick="afficherSection('musique',event)">🎵<span class="sidebar-tooltip">Musique</span></div>
     <div class="sidebar-btn" onclick="afficherSection('jeux',event)">🎮<span class="sidebar-tooltip">Jeux</span></div>
+    <div class="sidebar-btn" onclick="ouvrirSnake()">🐍<span class="sidebar-tooltip">Snake</span></div>
+    <div class="sidebar-btn" onclick="afficherSection('securite',event)">🔐<span class="sidebar-tooltip">Sécurité</span></div>
     <div class="sidebar-btn" onclick="afficherSection('marvel',event)">⚡<span class="sidebar-tooltip">News Marvel</span></div>
   </div>
 
@@ -456,80 +583,27 @@
         <p class="subtitle">Système opérationnel — Tous protocoles en ligne</p>
       </div>
       <div class="horloge" id="horloge"></div>
-
-      <!-- BARRES MASSIVES ACCUEIL -->
       <div class="barres-massives">
-        <div class="barre-massive-ligne">
-          <div class="barre-massive-label">AI PROCESSING</div>
-          <div class="barre-massive-piste"><div class="barre-massive-fill" style="width:87%;background:linear-gradient(to right,#ff003c,#ffd700)"></div></div>
-          <div class="barre-massive-val">87%</div>
-        </div>
-        <div class="barre-massive-ligne">
-          <div class="barre-massive-label">DATA SYNC</div>
-          <div class="barre-massive-piste"><div class="barre-massive-fill" style="width:64%;background:linear-gradient(to right,#00f7ff,#001aff);animation-delay:0.5s"></div></div>
-          <div class="barre-massive-val">64%</div>
-        </div>
-        <div class="barre-massive-ligne">
-          <div class="barre-massive-label">AVENGERS NETWORK</div>
-          <div class="barre-massive-piste"><div class="barre-massive-fill" style="width:100%;background:linear-gradient(to right,#00ff88,#00f7ff);animation-delay:1s"></div></div>
-          <div class="barre-massive-val">OK</div>
-        </div>
-        <div class="barre-massive-ligne">
-          <div class="barre-massive-label">SHIELD PROTOCOL</div>
-          <div class="barre-massive-piste"><div class="barre-massive-fill" style="width:42%;background:linear-gradient(to right,#ffd700,#ff8c00);animation-delay:1.5s"></div></div>
-          <div class="barre-massive-val">42%</div>
-        </div>
+        <div class="barre-massive-ligne"><div class="barre-massive-label">AI PROCESSING</div><div class="barre-massive-piste"><div class="barre-massive-fill" style="width:87%;background:linear-gradient(to right,#ff003c,#ffd700)"></div></div><div class="barre-massive-val">87%</div></div>
+        <div class="barre-massive-ligne"><div class="barre-massive-label">DATA SYNC</div><div class="barre-massive-piste"><div class="barre-massive-fill" style="width:64%;background:linear-gradient(to right,#00f7ff,#001aff);animation-delay:0.5s"></div></div><div class="barre-massive-val">64%</div></div>
+        <div class="barre-massive-ligne"><div class="barre-massive-label">AVENGERS NETWORK</div><div class="barre-massive-piste"><div class="barre-massive-fill" style="width:100%;background:linear-gradient(to right,#00ff88,#00f7ff);animation-delay:1s"></div></div><div class="barre-massive-val">OK</div></div>
+        <div class="barre-massive-ligne"><div class="barre-massive-label">SHIELD PROTOCOL</div><div class="barre-massive-piste"><div class="barre-massive-fill" style="width:42%;background:linear-gradient(to right,#ffd700,#ff8c00);animation-delay:1.5s"></div></div><div class="barre-massive-val">42%</div></div>
       </div>
-
-      <!-- CERCLES STATS -->
       <div class="cercles-row">
-        <div class="cercle-stat">
-          <svg viewBox="0 0 70 70">
-            <circle class="cercle-bg" cx="35" cy="35" r="28"/>
-            <circle class="cercle-fill" cx="35" cy="35" r="28" stroke="#ff003c" stroke-dasharray="132 176"/>
-          </svg>
-          <div class="cercle-val">75%</div>
-          <div class="cercle-label">POWER</div>
-        </div>
-        <div class="cercle-stat">
-          <svg viewBox="0 0 70 70">
-            <circle class="cercle-bg" cx="35" cy="35" r="28"/>
-            <circle class="cercle-fill" cx="35" cy="35" r="28" stroke="#ffd700" stroke-dasharray="158 176"/>
-          </svg>
-          <div class="cercle-val">90%</div>
-          <div class="cercle-label">SHIELD</div>
-        </div>
-        <div class="cercle-stat">
-          <svg viewBox="0 0 70 70">
-            <circle class="cercle-bg" cx="35" cy="35" r="28"/>
-            <circle class="cercle-fill" cx="35" cy="35" r="28" stroke="#00f7ff" stroke-dasharray="105 176"/>
-          </svg>
-          <div class="cercle-val">60%</div>
-          <div class="cercle-label">AI CORE</div>
-        </div>
-        <div class="cercle-stat">
-          <svg viewBox="0 0 70 70">
-            <circle class="cercle-bg" cx="35" cy="35" r="28"/>
-            <circle class="cercle-fill" cx="35" cy="35" r="28" stroke="#00ff88" stroke-dasharray="176 176"/>
-          </svg>
-          <div class="cercle-val">100%</div>
-          <div class="cercle-label">NETWORK</div>
-        </div>
+        <div class="cercle-stat"><svg viewBox="0 0 70 70"><circle class="cercle-bg" cx="35" cy="35" r="28"/><circle class="cercle-fill" cx="35" cy="35" r="28" stroke="#ff003c" stroke-dasharray="132 176"/></svg><div class="cercle-val">75%</div><div class="cercle-label">POWER</div></div>
+        <div class="cercle-stat"><svg viewBox="0 0 70 70"><circle class="cercle-bg" cx="35" cy="35" r="28"/><circle class="cercle-fill" cx="35" cy="35" r="28" stroke="#ffd700" stroke-dasharray="158 176"/></svg><div class="cercle-val">90%</div><div class="cercle-label">SHIELD</div></div>
+        <div class="cercle-stat"><svg viewBox="0 0 70 70"><circle class="cercle-bg" cx="35" cy="35" r="28"/><circle class="cercle-fill" cx="35" cy="35" r="28" stroke="#00f7ff" stroke-dasharray="105 176"/></svg><div class="cercle-val">60%</div><div class="cercle-label">AI CORE</div></div>
+        <div class="cercle-stat"><svg viewBox="0 0 70 70"><circle class="cercle-bg" cx="35" cy="35" r="28"/><circle class="cercle-fill" cx="35" cy="35" r="28" stroke="#00ff88" stroke-dasharray="176 176"/></svg><div class="cercle-val">100%</div><div class="cercle-label">NETWORK</div></div>
       </div>
-
       <div class="separateur"></div>
-
       <div class="jarvis-section">
         <div class="jarvis-btn" onclick="activerJarvis(event)">
-          <div class="jarvis-ring"></div>
-          <div class="jarvis-ring2"></div>
+          <div class="jarvis-ring"></div><div class="jarvis-ring2"></div>
           <span class="jarvis-icon">⚙️</span>
           <span class="jarvis-text">ACTIVER JARVIS</span>
         </div>
         <p class="jarvis-status" id="jarvis-status">En attente d'activation...</p>
       </div>
-
-      <!-- FAUX BOUTONS TECH -->
       <div class="tech-btns">
         <div class="tech-btn rouge">SCAN</div>
         <div class="tech-btn">TARGET LOCK</div>
@@ -537,12 +611,12 @@
         <div class="tech-btn">UPLOAD DATA</div>
         <div class="tech-btn rouge">ALERT MODE</div>
       </div>
-
       <div class="separateur"></div>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:12px">
         <button class="btn-gold" onclick="ouvrirCinema()">🎬 MODE CINÉMA</button>
+        <button class="btn-v7" onclick="ouvrirSnake()">🐍 SNAKE</button>
         <button class="btn-v7" onclick="activerEasterEgg()">🔱 ???</button>
-        <button class="btn-v7" onclick="demanderNotifications()">🔔 Activer Notifs</button>
+        <button class="btn-v7" onclick="demanderNotifications()">🔔 Notifs</button>
       </div>
       <div class="recherche">
         <form action="https://www.google.com/search" target="_blank">
@@ -551,12 +625,8 @@
         </form>
       </div>
       <div class="separateur"></div>
-      <div style="text-align:center">
-        <h2>📧 Mes mails</h2>
-        <div class="grille">
-          <a href="https://mail.google.com" target="_blank" onclick="flashLancement()">📧 Gmail</a>
-        </div>
-      </div>
+      <h2>📧 Mes mails</h2>
+      <div class="grille"><a href="https://mail.google.com" target="_blank" onclick="flashLancement()">📧 Gmail</a></div>
     </div>
 
     <!-- SITES -->
@@ -571,15 +641,15 @@
         <a href="https://www.aucollege84.vaucluse.fr" target="_blank" onclick="flashLancement()">🏫 ENT</a>
         <a href="https://mail.google.com" target="_blank" onclick="flashLancement()">📧 Gmail</a>
         <a href="https://chatgpt.com/" target="_blank" onclick="flashLancement()">🤖 ChatGPT</a>
-        <a href="https://calendar.google.com/calendar/u/0/r/week?pli=1" target="_blank" onclick="flashLancement()">📆calendrier</a>
-        <a href="https://notepad-online.com/v2/fr" target="_blank" onclick="flashLancement()">🗒️ bloc note</a>
-        <a href="https://science.nasa.gov/eyes/" target="_blank" onclick="flashLancement()">🌙 Nasa</a>
-        <a href="https://www.noisli.com/playlists" target="_blank" onclick="flashLancement()">bruit de fond</a>
-        <a href="https://app.lumosity.com/fr/onboard" target="_blank" onclick="flashLancement()">lumosity</a>
-        <a href="https://www.europe2.fr/webradios" target="_blank" onclick="flashLancement()">radio</a>
-        <a href="https://zzz.zoomquilt.org/" target="_blank" onclick="flashLancement()">zoom infini</a>
-        <a href="https://www.tiktok.com/fr/" target="_blank" onclick="flashLancement()">tiktok</a>
-        <a href="https://web.whatsapp.com/" target="_blank" onclick="flashLancement()">whatsapp</a>
+        <a href="https://calendar.google.com" target="_blank" onclick="flashLancement()">📆 Calendrier</a>
+        <a href="https://notepad-online.com/v2/fr" target="_blank" onclick="flashLancement()">🗒️ Bloc-note</a>
+        <a href="https://science.nasa.gov/eyes/" target="_blank" onclick="flashLancement()">🌙 NASA</a>
+        <a href="https://www.noisli.com/playlists" target="_blank" onclick="flashLancement()">🎧 Bruit fond</a>
+        <a href="https://app.lumosity.com/fr/onboard" target="_blank" onclick="flashLancement()">🧠 Lumosity</a>
+        <a href="https://www.europe2.fr/webradios" target="_blank" onclick="flashLancement()">📻 Radio</a>
+        <a href="https://zzz.zoomquilt.org/" target="_blank" onclick="flashLancement()">🔭 Zoom infini</a>
+        <a href="https://www.tiktok.com/fr/" target="_blank" onclick="flashLancement()">📱 TikTok</a>
+        <a href="https://web.whatsapp.com/" target="_blank" onclick="flashLancement()">💬 WhatsApp</a>
       </div>
     </div>
 
@@ -611,12 +681,14 @@
       </div>
     </div>
 
-    <!-- DEVOIRS -->
+    <!-- DEVOIRS AVEC DATE LIMITE -->
     <div class="section" id="section-devoirs">
       <h2>📋 Mes devoirs</h2>
       <div class="separateur"></div>
+      <p style="color:#00f7ff;font-size:0.7em;margin-bottom:12px;opacity:0.6">Les devoirs en rouge arrivent à échéance bientôt !</p>
       <div class="todo-input-zone">
         <input type="text" id="todo-input" placeholder="Ajouter un devoir...">
+        <input type="date" id="todo-date">
         <button onclick="ajouterTodo()">＋</button>
       </div>
       <div id="todo-list" style="width:100%"></div>
@@ -626,7 +698,7 @@
     <div class="section" id="section-rappels">
       <h2>🔔 Rappels</h2>
       <div class="separateur"></div>
-      <p style="color:#00f7ff;font-size:0.75em;margin-bottom:15px;text-align:center;opacity:0.65;line-height:1.5">J.A.R.V.I.S te notifiera à l'heure exacte, même si l'onglet est en arrière-plan.</p>
+      <p style="color:#00f7ff;font-size:0.75em;margin-bottom:15px;text-align:center;opacity:0.65;line-height:1.5">J.A.R.V.I.S te notifiera à l'heure exacte.</p>
       <div class="rappel-input" style="width:100%">
         <input type="text" id="rappel-texte" placeholder="Ex: Machine à laver...">
         <input type="time" id="rappel-heure">
@@ -635,7 +707,14 @@
       <div id="rappel-list" style="width:100%"></div>
     </div>
 
-    <!-- NOTES — RESTAURÉ -->
+    <!-- POST-ITS -->
+    <div class="section" id="section-postits">
+      <h2>🗒️ Post-its</h2>
+      <div class="separateur"></div>
+      <div class="postits" id="postits-container"></div>
+    </div>
+
+    <!-- NOTES -->
     <div class="section" id="section-notes">
       <h2>📝 Bloc-notes</h2>
       <div class="separateur"></div>
@@ -646,13 +725,6 @@
           <span id="notif-save"></span>
         </div>
       </div>
-    </div>
-
-    <!-- POST-ITS — RESTAURÉ -->
-    <div class="section" id="section-postits">
-      <h2>🗒️ Post-its</h2>
-      <div class="separateur"></div>
-      <div class="postits" id="postits-container"></div>
     </div>
 
     <!-- MINUTEUR -->
@@ -671,7 +743,7 @@
           <button onclick="setMinuteur(10)">10 min</button>
           <button onclick="setMinuteur(15)">15 min</button>
           <button onclick="setMinuteur(20)">20 min</button>
-          <button onclick="setMinuteur(25)">25 min 🍅</button>
+          <button onclick="setMinuteur(25)">25 🍅</button>
           <button onclick="setMinuteur(30)">30 min</button>
         </div>
         <div class="separateur-outil"></div>
@@ -685,7 +757,7 @@
       </div>
     </div>
 
-    <!-- CALENDRIER — RESTAURÉ -->
+    <!-- CALENDRIER -->
     <div class="section" id="section-calendrier">
       <h2>🗓️ Calendrier</h2>
       <div class="separateur"></div>
@@ -696,6 +768,7 @@
           <button onclick="changerMois(1)">▶</button>
         </div>
         <div class="cal-grid" id="cal-grid"></div>
+        <p style="color:#ff003c;font-size:0.65em;margin-top:10px;opacity:0.7">🔴 = devoir à rendre ce jour</p>
       </div>
     </div>
 
@@ -714,11 +787,10 @@
       </div>
     </div>
 
-    <!-- CARTE — RESTAURÉE -->
+    <!-- CARTE -->
     <div class="section" id="section-carte">
       <h2>🗺️ Carte du Monde</h2>
       <div class="separateur"></div>
-      <p style="color:#00f7ff;font-size:0.75em;margin-bottom:12px;opacity:0.6">Zoomez et déplacez la carte librement.</p>
       <div id="map"></div>
     </div>
 
@@ -750,14 +822,38 @@
       <div class="separateur"></div>
       <div id="jeu-message"></div>
       <div class="jeux-grid">
-        <a href="https://poki.com/fr/g/subway-surfers" target="_blank" onclick="afficherMessageJeu('🏃 MISSION LANCÉE — Cours Spider-Man, cours !')" class="jeu-card"><div class="jeu-emoji">🏃</div><div class="jeu-titre">Subway Surfers</div><div class="jeu-desc">Course infinie</div></a>
+        <a href="https://poki.com/fr/g/subway-surfers" target="_blank" onclick="afficherMessageJeu('🏃 MISSION LANCÉE !')" class="jeu-card"><div class="jeu-emoji">🏃</div><div class="jeu-titre">Subway Surfers</div><div class="jeu-desc">Course infinie</div></a>
         <a href="https://poki.com/fr/g/dinosaur-game" target="_blank" onclick="afficherMessageJeu('🦖 Saute petit dino!')" class="jeu-card"><div class="jeu-emoji">🦖</div><div class="jeu-titre">Dino Run</div><div class="jeu-desc">Saute les cactus</div></a>
         <a href="https://poki.com/fr/g/retro-rex" target="_blank" onclick="afficherMessageJeu('🦕 Détruис tout!')" class="jeu-card"><div class="jeu-emoji">🦕</div><div class="jeu-titre">Dino Retro</div><div class="jeu-desc">Détruис tout</div></a>
-        <a href="https://poki.com/fr/g/ping-pong-go" target="_blank" onclick="afficherMessageJeu('🏓 Marty Supreme!')" class="jeu-card"><div class="jeu-emoji">🏓</div><div class="jeu-titre">Ping Pong</div><div class="jeu-desc">MARTY SUPREME ERA</div></a>
+        <a href="https://poki.com/fr/g/ping-pong-go" target="_blank" onclick="afficherMessageJeu('🏓 Marty Supreme!')" class="jeu-card"><div class="jeu-emoji">🏓</div><div class="jeu-titre">Ping Pong</div><div class="jeu-desc">MARTY ERA</div></a>
         <a href="https://poki.com/fr/g/stickman-hook" target="_blank" onclick="afficherMessageJeu('🕸️ Spider-Man ERA!')" class="jeu-card"><div class="jeu-emoji">🕸️</div><div class="jeu-titre">Stickman Hook</div><div class="jeu-desc">Spider-Man ERA</div></a>
-        <a href="https://poki.com/fr/g/monkey-mart" target="_blank" onclick="afficherMessageJeu('🐵 À toi de jouer!')" class="jeu-card"><div class="jeu-emoji">🐵</div><div class="jeu-titre">Monkey Market</div><div class="jeu-desc">Crée ton supermarché</div></a>
-        <a href="https://poki.com/fr/g/crossy-road" target="_blank" onclick="afficherMessageJeu('🐔 Te fais pas écraser!')" class="jeu-card"><div class="jeu-emoji">🐔</div><div class="jeu-titre">Chicken Run</div><div class="jeu-desc">Évite les voitures</div></a>
-        <a href="https://poki.com/fr/g/blocky-blast-puzzle" target="_blank" onclick="afficherMessageJeu('🟦 Quel score?')" class="jeu-card"><div class="jeu-emoji">🟦</div><div class="jeu-titre">Block Blast</div><div class="jeu-desc">Quel score feras-tu?</div></a>
+        <a href="https://poki.com/fr/g/monkey-mart" target="_blank" onclick="afficherMessageJeu('🐵 À toi!')" class="jeu-card"><div class="jeu-emoji">🐵</div><div class="jeu-titre">Monkey Market</div><div class="jeu-desc">Crée ton supermarché</div></a>
+        <a href="https://poki.com/fr/g/crossy-road" target="_blank" onclick="afficherMessageJeu('🐔 Évite !')" class="jeu-card"><div class="jeu-emoji">🐔</div><div class="jeu-titre">Chicken Run</div><div class="jeu-desc">Évite les voitures</div></a>
+        <a href="https://poki.com/fr/g/blocky-blast-puzzle" target="_blank" onclick="afficherMessageJeu('🟦 Quel score?')" class="jeu-card"><div class="jeu-emoji">🟦</div><div class="jeu-titre">Block Blast</div><div class="jeu-desc">Quel score?</div></a>
+        <div class="jeu-card" onclick="ouvrirSnake()" style="cursor:none">
+          <div class="jeu-emoji">🐍</div><div class="jeu-titre">Snake J.A.R.V.I.S</div><div class="jeu-desc">Mini-jeu caché</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SÉCURITÉ — CHANGER MDP -->
+    <div class="section" id="section-securite">
+      <h2>🔐 Sécurité</h2>
+      <div class="separateur"></div>
+      <p style="color:#00f7ff;font-size:0.75em;margin-bottom:20px;opacity:0.7;text-align:center">Modifier le code d'accès J.A.R.V.I.S</p>
+      <div class="mdp-form">
+        <input type="password" id="mdp-ancien" placeholder="Mot de passe actuel..." autocomplete="off">
+        <input type="password" id="mdp-nouveau" placeholder="Nouveau mot de passe..." autocomplete="off">
+        <input type="password" id="mdp-confirm" placeholder="Confirmer le nouveau..." autocomplete="off">
+        <button class="btn-gold" style="width:100%;margin-top:5px" onclick="changerMdp()">🔐 MODIFIER LE CODE</button>
+        <div class="mdp-msg" id="mdp-msg"></div>
+      </div>
+      <div class="separateur"></div>
+      <h2>📊 Statistiques</h2>
+      <div class="barres-massives" style="margin-top:10px">
+        <div class="barre-massive-ligne"><div class="barre-massive-label">DEVOIRS FAITS</div><div class="barre-massive-piste"><div class="barre-massive-fill" id="stat-devoirs-barre" style="width:0%;background:linear-gradient(to right,#00ff88,#00f7ff)"></div></div><div class="barre-massive-val" id="stat-devoirs-val">0%</div></div>
+        <div class="barre-massive-ligne"><div class="barre-massive-label">POST-ITS ACTIFS</div><div class="barre-massive-piste"><div class="barre-massive-fill" id="stat-postits-barre" style="width:0%;background:linear-gradient(to right,#ffd700,#ff8c00)"></div></div><div class="barre-massive-val" id="stat-postits-val">0</div></div>
+        <div class="barre-massive-ligne"><div class="barre-massive-label">RAPPELS ACTIFS</div><div class="barre-massive-piste"><div class="barre-massive-fill" id="stat-rappels-barre" style="width:0%;background:linear-gradient(to right,#ff003c,#ffd700)"></div></div><div class="barre-massive-val" id="stat-rappels-val">0</div></div>
       </div>
     </div>
 
@@ -767,18 +863,27 @@
       <div class="separateur"></div>
       <div class="marvel-news">
         <div class="news-item"><h3>🕷️ Spider-Man : Nouveau costume confirmé</h3><p>Marvel Studios a confirmé l'apparition d'un nouveau costume pour Peter Parker dans le prochain film.</p><div class="news-date">Marvel Universe</div></div>
-        <div class="news-item"><h3>🔨 Thor : Love and Thunder 2 en développement</h3><p>Taika Waititi aurait été approché pour réaliser une suite de Thor Love and Thunder.</p><div class="news-date">Marvel Studios</div></div>
-        <div class="news-item"><h3>💚 World War Hulk : Le projet avance</h3><p>Des sources confirment que Marvel travaille activement sur l'adaptation de World War Hulk.</p><div class="news-date">Marvel News</div></div>
+        <div class="news-item"><h3>🔨 Thor : Love and Thunder 2 en développement</h3><p>Taika Waititi aurait été approché pour réaliser une suite.</p><div class="news-date">Marvel Studios</div></div>
+        <div class="news-item"><h3>💚 World War Hulk : Le projet avance</h3><p>Des sources confirment que Marvel travaille activement sur l'adaptation.</p><div class="news-date">Marvel News</div></div>
         <div class="news-item"><h3>🌮 Deadpool rejoint les Avengers ?</h3><p>Après Deadpool & Wolverine, le Mercenaire bavard pourrait apparaître dans Avengers : Doomsday.</p><div class="news-date">Marvel Rumeurs</div></div>
-        <div class="news-item"><h3>🔮 Doctor Strange 3 officiellement annoncé</h3><p>Marvel a confirmé le développement d'un troisième volet pour le Sorcier Suprême.</p><div class="news-date">Marvel Studios</div></div>
-        <div class="news-item"><h3>⚡ Avengers : Doomsday — ce qu'on sait</h3><p>Le casting, l'histoire et les connections avec le multivers : tout ce qu'on sait sur le prochain Avengers.</p><div class="news-date">Marvel Universe</div></div>
+        <div class="news-item"><h3>🔮 Doctor Strange 3 officiellement annoncé</h3><p>Marvel a confirmé le développement d'un troisième volet.</p><div class="news-date">Marvel Studios</div></div>
+        <div class="news-item"><h3>⚡ Avengers : Doomsday — ce qu'on sait</h3><p>Le casting, l'histoire et les connections avec le multivers.</p><div class="news-date">Marvel Universe</div></div>
       </div>
     </div>
 
   </div>
 
   <script>
-    const MDP = "spiderman";
+    // ===== MOT DE PASSE DYNAMIQUE =====
+    let MDP = localStorage.getItem('jarvis_mdp') || 'spiderman';
+
+    // ===== SCAN STATUS LOGIN =====
+    const scanMessages = ['SCANNING FACE...','ANALYZING BIOMETRICS...','CHECKING CREDENTIALS...','ACCESS PENDING...'];
+    let scanIdx = 0;
+    setInterval(() => {
+      const el = document.getElementById('pw-scan-status');
+      if (el) { el.textContent = scanMessages[scanIdx % scanMessages.length]; scanIdx++; }
+    }, 1500);
 
     // ===== CURSEUR =====
     const curseur = document.getElementById('curseur');
@@ -788,23 +893,25 @@
       curseur.style.top = e.clientY + 'px';
       setTimeout(() => { trail.style.left = e.clientX + 'px'; trail.style.top = e.clientY + 'px'; }, 80);
     });
+    // LASER CLICK
+    document.addEventListener('click', (e) => {
+      const ring = document.createElement('div');
+      ring.className = 'laser-ring';
+      ring.style.left = e.clientX + 'px';
+      ring.style.top = e.clientY + 'px';
+      document.body.appendChild(ring);
+      setTimeout(() => ring.remove(), 500);
+    });
 
     // ===== FOND IA =====
     const iaBg = document.getElementById('ia-bg');
-    const textesIA = [
-      'Analyse réseau en cours...','SYSTEM SCAN ACTIVE','Mission Avengers détectée',
-      'Connexion serveurs sécurisée','SURVEILLANCE PÉRIMÈTRE','Données cryptées OK',
-      'AI PROCESSING DATA...','Protocole défense initialisé','IA quantique opérationnelle',
-      'THREAT LEVEL: ZERO','Arc Reactor stable','SYSTEMS ONLINE: 100%',
-      'INITIALIZING SYSTEM...','DATA SYNC 78%','AVENGERS NETWORK LINKED'
-    ];
+    const textesIA = ['Analyse réseau en cours...','SYSTEM SCAN ACTIVE','Mission Avengers détectée','Connexion serveurs sécurisée','AI PROCESSING DATA...','Protocole défense initialisé','THREAT LEVEL: ZERO','Arc Reactor stable','SYSTEMS ONLINE: 100%','INITIALIZING SYSTEM...','DATA SYNC 78%','AVENGERS NETWORK LINKED'];
     for (let i = 0; i < 10; i++) {
       const barre = document.createElement('div');
       barre.className = 'ia-barre';
       barre.style.top = (5 + i * 9.5) + '%';
       barre.style.width = (25 + Math.random() * 50) + '%';
-      const couleurs = ['#ff003c','#00f7ff','#ffd700','#001aff'];
-      barre.style.background = couleurs[i % couleurs.length];
+      barre.style.background = ['#ff003c','#00f7ff','#ffd700','#001aff'][i % 4];
       barre.style.animationDuration = (5 + Math.random() * 8) + 's';
       barre.style.animationDelay = (Math.random() * 5) + 's';
       iaBg.appendChild(barre);
@@ -822,24 +929,112 @@
     }
     setInterval(creerTexteIA, 1800);
 
-    // TERMINAL ROTATION
-    const lignesTerminal = [
-      'Analyse réseau en cours...','Scan satellites actif','Mission Avengers détectée',
-      'Connexion sécurisée OK','Surveillance périmètre active','IA quantique opérationnelle',
-      'Arc Reactor stable','Protocole défense initialisé','Menace détectée : 0',
-      'DATA SYNC EN COURS...','SYSTEM CHECK PASSED','UPLOAD DATA 100%'
-    ];
+    // TERMINAL
+    const lignesTerminal = ['Analyse réseau en cours...','Scan satellites actif','Mission Avengers détectée','Connexion sécurisée OK','Surveillance périmètre active','IA quantique opérationnelle','Arc Reactor stable','Protocole défense initialisé','Menace détectée : 0','DATA SYNC EN COURS...','SYSTEM CHECK PASSED','UPLOAD DATA 100%'];
     let terminalIdx = 0;
     function rotationTerminal() {
       const ids = ['terminal-ligne1','terminal-ligne2','terminal-ligne3'];
       ids.forEach(id => document.getElementById(id).classList.remove('active'));
-      const activeId = ids[terminalIdx % 3];
-      const el = document.getElementById(activeId);
+      const el = document.getElementById(ids[terminalIdx % 3]);
       el.textContent = '› ' + lignesTerminal[terminalIdx % lignesTerminal.length];
       el.classList.add('active');
       terminalIdx++;
     }
     setInterval(rotationTerminal, 1800);
+
+    // ===== AVATAR IA =====
+    const phrasesAvatar = [
+      'Système opérationnel 🔱','All systems nominal.','You should take a break.','Hydration recommended 💧','Good performance today!','Network secure ✅','Avengers: all online.','Arc Reactor: 100% ⚡','Stay focused, Spider-Elio.','Mission status: active 🔴','Data sync complete.','Shield protocol engaged.'
+    ];
+    let avatarParlant = false;
+    function avatarParler(message) {
+      const bulle = document.getElementById('avatar-bulle');
+      const ondes = document.getElementById('avatar-ondes');
+      if (!bulle) return;
+      const msg = message || phrasesAvatar[Math.floor(Math.random() * phrasesAvatar.length)];
+      bulle.textContent = msg;
+      bulle.style.display = 'block';
+      ondes.style.display = 'flex';
+      avatarParlant = true;
+      setTimeout(() => { ondes.style.display = 'none'; avatarParlant = false; }, 3000);
+    }
+    setInterval(() => { if (!avatarParlant) avatarParler(); }, 12000);
+
+    // ===== SUGGESTIONS IA =====
+    const suggestions = ['💧 Hydration recommended','☕ Time for a break','🎯 Focus mode: ON','🌙 Rest soon','💪 Great progress today!','🔋 Energy level: check','👁️ Eye rest recommended','🧠 Mental load: high'];
+    let suggIdx = 0;
+    function afficherSuggestion() {
+      const el = document.getElementById('ia-suggestion');
+      const texte = document.getElementById('sugg-texte');
+      if (!el || !texte) return;
+      texte.textContent = suggestions[suggIdx % suggestions.length];
+      suggIdx++;
+      el.style.display = 'block';
+      setTimeout(() => { if (el.style.display === 'block') fermerSuggestion(); }, 8000);
+    }
+    function fermerSuggestion() {
+      const el = document.getElementById('ia-suggestion');
+      if (el) el.style.display = 'none';
+    }
+    setInterval(afficherSuggestion, 45000);
+
+    // ===== RADAR =====
+    function initRadar() {
+      const radarCanvas = document.getElementById('radar-canvas');
+      if (!radarCanvas) return;
+      const rCtx = radarCanvas.getContext('2d');
+      const cx = 60, cy = 60, r = 55;
+      let angle = 0;
+      const points = [];
+      for (let i = 0; i < 6; i++) {
+        points.push({ x: cx + (Math.random()-0.5)*r*1.5, y: cy + (Math.random()-0.5)*r*1.5, life: Math.random()*100, maxLife: 100+Math.random()*100 });
+      }
+      function drawRadar() {
+        rCtx.clearRect(0,0,120,120);
+        rCtx.strokeStyle = 'rgba(0,247,255,0.15)';
+        rCtx.lineWidth = 1;
+        [r*0.33, r*0.66, r].forEach(radius => {
+          rCtx.beginPath(); rCtx.arc(cx,cy,radius,0,Math.PI*2); rCtx.stroke();
+        });
+        rCtx.beginPath(); rCtx.moveTo(cx-r,cy); rCtx.lineTo(cx+r,cy); rCtx.stroke();
+        rCtx.beginPath(); rCtx.moveTo(cx,cy-r); rCtx.lineTo(cx,cy+r); rCtx.stroke();
+        const grad = rCtx.createConicalGradient ? null : null;
+        rCtx.save();
+        rCtx.translate(cx,cy);
+        rCtx.rotate(angle);
+        const sweep = rCtx.createLinearGradient(0,0,r,0);
+        sweep.addColorStop(0,'rgba(0,247,255,0)');
+        sweep.addColorStop(0.5,'rgba(0,247,255,0.08)');
+        sweep.addColorStop(1,'rgba(0,247,255,0.3)');
+        rCtx.beginPath();
+        rCtx.moveTo(0,0);
+        rCtx.arc(0,0,r,-0.3,0);
+        rCtx.fillStyle = sweep;
+        rCtx.fill();
+        rCtx.beginPath();
+        rCtx.moveTo(0,0);
+        rCtx.lineTo(r,0);
+        rCtx.strokeStyle = '#00f7ff';
+        rCtx.lineWidth = 1.5;
+        rCtx.stroke();
+        rCtx.restore();
+        points.forEach((p,i) => {
+          p.life++;
+          if (p.life > p.maxLife) { p.x = cx+(Math.random()-0.5)*r*1.5; p.y = cy+(Math.random()-0.5)*r*1.5; p.life = 0; p.maxLife = 100+Math.random()*100; }
+          const dist = Math.sqrt((p.x-cx)**2+(p.y-cy)**2);
+          if (dist <= r) {
+            const alpha = Math.max(0, 1 - p.life/p.maxLife);
+            rCtx.beginPath();
+            rCtx.arc(p.x,p.y,2,0,Math.PI*2);
+            rCtx.fillStyle = `rgba(0,247,255,${alpha})`;
+            rCtx.fill();
+          }
+        });
+        angle += 0.03;
+        requestAnimationFrame(drawRadar);
+      }
+      drawRadar();
+    }
 
     // ===== CHARGEMENT =====
     window.addEventListener('load', () => {
@@ -864,26 +1059,55 @@
       const input = document.getElementById('password-input').value;
       const error = document.getElementById('password-error');
       if (input === MDP) {
-        document.getElementById('password-screen').style.display = 'none';
-        document.getElementById('welcome-screen').style.display = 'flex';
+        document.getElementById('pw-scan-status').textContent = '✅ ACCESS GRANTED';
         setTimeout(() => {
-          document.getElementById('welcome-screen').style.display = 'none';
-          document.getElementById('main-content').style.display = 'flex';
-          document.getElementById('sidebar').style.display = 'flex';
-          document.getElementById('avengers-panel').style.display = 'block';
-          document.getElementById('hud-info').style.display = 'flex';
-          document.getElementById('jarvis-logo').style.display = 'flex';
-          document.getElementById('ia-terminal').style.display = 'block';
-          setTimeout(() => { document.getElementById('section-accueil').classList.add('visible'); }, 60);
-          initialiserCarte();
-        }, 3000);
+          document.getElementById('password-screen').style.display = 'none';
+          document.getElementById('welcome-screen').style.display = 'flex';
+          setTimeout(() => {
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'flex';
+            document.getElementById('sidebar').style.display = 'flex';
+            document.getElementById('avengers-panel').style.display = 'block';
+            document.getElementById('hud-info').style.display = 'flex';
+            document.getElementById('jarvis-logo').style.display = 'flex';
+            document.getElementById('ia-terminal').style.display = 'block';
+            document.getElementById('ia-avatar').style.display = 'flex';
+            document.getElementById('radar-widget').style.display = 'block';
+            setTimeout(() => { document.getElementById('section-accueil').classList.add('visible'); }, 60);
+            initialiserCarte();
+            initRadar();
+            setTimeout(() => { afficherSuggestion(); avatarParler('ACCESS GRANTED. Welcome back, Spider-Elio 🔱'); }, 3000);
+            mettreAJourStats();
+          }, 3000);
+        }, 800);
       } else {
+        document.getElementById('pw-scan-status').textContent = '❌ ACCESS DENIED';
         error.style.opacity = '1';
-        setTimeout(() => { error.style.opacity = '0'; }, 2000);
+        setTimeout(() => { error.style.opacity = '0'; document.getElementById('pw-scan-status').textContent = 'SCANNING FACE...'; }, 2000);
         document.getElementById('password-input').value = '';
       }
     }
     document.addEventListener('keypress', (e) => { if (e.key === 'Enter') verifierMdp(); });
+
+    // ===== CHANGER MDP =====
+    function changerMdp() {
+      const ancien = document.getElementById('mdp-ancien').value;
+      const nouveau = document.getElementById('mdp-nouveau').value;
+      const confirm = document.getElementById('mdp-confirm').value;
+      const msg = document.getElementById('mdp-msg');
+      if (ancien !== MDP) { msg.style.color = '#ff003c'; msg.textContent = '❌ Mot de passe actuel incorrect.'; return; }
+      if (nouveau.length < 4) { msg.style.color = '#ff003c'; msg.textContent = '❌ Nouveau mot de passe trop court (min 4).'; return; }
+      if (nouveau !== confirm) { msg.style.color = '#ff003c'; msg.textContent = '❌ Les mots de passe ne correspondent pas.'; return; }
+      MDP = nouveau;
+      localStorage.setItem('jarvis_mdp', MDP);
+      msg.style.color = '#00f7ff';
+      msg.textContent = '✅ Code d\'accès modifié avec succès !';
+      document.getElementById('mdp-ancien').value = '';
+      document.getElementById('mdp-nouveau').value = '';
+      document.getElementById('mdp-confirm').value = '';
+      avatarParler('Security protocol updated ✅');
+      setTimeout(() => { msg.textContent = ''; }, 4000);
+    }
 
     // ===== SECTIONS =====
     function afficherSection(nom, e) {
@@ -895,6 +1119,28 @@
       if (e && e.currentTarget) e.currentTarget.classList.add('active');
       setTimeout(() => { section.classList.add('visible'); }, 50);
       if (nom === 'carte') setTimeout(rafraichirCarte, 250);
+      if (nom === 'securite') mettreAJourStats();
+    }
+
+    // ===== STATS =====
+    function mettreAJourStats() {
+      const t = JSON.parse(localStorage.getItem('todos_jarvis') || '[]');
+      const total = t.length, faits = t.filter(x => x.done).length;
+      const pct = total > 0 ? Math.round(faits/total*100) : 0;
+      const b1 = document.getElementById('stat-devoirs-barre');
+      const v1 = document.getElementById('stat-devoirs-val');
+      if (b1) b1.style.width = pct + '%';
+      if (v1) v1.textContent = pct + '%';
+      const postits = JSON.parse(localStorage.getItem('postits_jarvis') || '[]');
+      const b2 = document.getElementById('stat-postits-barre');
+      const v2 = document.getElementById('stat-postits-val');
+      if (b2) b2.style.width = Math.min(postits.length * 10, 100) + '%';
+      if (v2) v2.textContent = postits.length;
+      const rappels = JSON.parse(localStorage.getItem('rappels') || '[]');
+      const b3 = document.getElementById('stat-rappels-barre');
+      const v3 = document.getElementById('stat-rappels-val');
+      if (b3) b3.style.width = Math.min(rappels.length * 10, 100) + '%';
+      if (v3) v3.textContent = rappels.length;
     }
 
     // ===== FLASH =====
@@ -904,26 +1150,77 @@
       setTimeout(() => { flash.style.opacity = '0'; }, 300);
     }
 
-    // ===== MODE CINEMA =====
+    // ===== CINEMA =====
     function ouvrirCinema() {
       flashLancement();
-      const overlay = document.getElementById('cinema-overlay');
-      overlay.style.display = 'flex';
+      document.getElementById('cinema-overlay').style.display = 'flex';
       const frame = document.getElementById('cinema-frame');
       frame.src = 'https://purstream.art';
-      // Si iframe bloqué après 4s, ouvre dans nouvel onglet
       setTimeout(() => {
-        try {
-          if (frame.contentDocument === null) throw new Error('blocked');
-        } catch(err) {
-          window.open('https://purstream.art', '_blank');
-          fermerCinema();
-        }
+        try { if (frame.contentDocument === null) throw new Error(); } catch(err) { window.open('https://purstream.art', '_blank'); fermerCinema(); }
       }, 4000);
     }
     function fermerCinema() {
       document.getElementById('cinema-overlay').style.display = 'none';
       document.getElementById('cinema-frame').src = '';
+    }
+
+    // ===== SNAKE =====
+    let snakeGame = null;
+    function ouvrirSnake() {
+      document.getElementById('snake-overlay').style.display = 'flex';
+      demarrerSnake();
+    }
+    function fermerSnake() {
+      document.getElementById('snake-overlay').style.display = 'none';
+      if (snakeGame) { clearInterval(snakeGame); snakeGame = null; }
+    }
+    function demarrerSnake() {
+      const sc = document.getElementById('snake-canvas');
+      const sCtx = sc.getContext('2d');
+      const taille = 20, cols = 20, rows = 20;
+      let serpent = [{x:10,y:10}], dir = {x:1,y:0}, nourriture = {x:5,y:5}, score = 0, pause = false;
+      function placerNourriture() { nourriture = {x:Math.floor(Math.random()*cols), y:Math.floor(Math.random()*rows)}; }
+      function dessiner() {
+        sCtx.fillStyle = '#000'; sCtx.fillRect(0,0,400,400);
+        sCtx.strokeStyle = 'rgba(255,215,0,0.05)'; sCtx.lineWidth = 0.5;
+        for (let i=0;i<=cols;i++) { sCtx.beginPath(); sCtx.moveTo(i*taille,0); sCtx.lineTo(i*taille,400); sCtx.stroke(); }
+        for (let i=0;i<=rows;i++) { sCtx.beginPath(); sCtx.moveTo(0,i*taille); sCtx.lineTo(400,i*taille); sCtx.stroke(); }
+        sCtx.fillStyle = '#ff003c'; sCtx.beginPath(); sCtx.arc(nourriture.x*taille+10, nourriture.y*taille+10, 7, 0, Math.PI*2); sCtx.fill();
+        serpent.forEach((s,i) => {
+          sCtx.fillStyle = i===0 ? '#ffd700' : `rgba(255,215,0,${0.8-i*0.03})`;
+          sCtx.fillRect(s.x*taille+1, s.y*taille+1, taille-2, taille-2);
+        });
+      }
+      function update() {
+        if (pause) return;
+        const tete = {x: serpent[0].x+dir.x, y: serpent[0].y+dir.y};
+        if (tete.x<0||tete.x>=cols||tete.y<0||tete.y>=rows||serpent.some(s=>s.x===tete.x&&s.y===tete.y)) {
+          clearInterval(snakeGame); snakeGame = null;
+          sCtx.fillStyle = 'rgba(0,0,0,0.7)'; sCtx.fillRect(0,0,400,400);
+          sCtx.fillStyle = '#ffd700'; sCtx.font = 'bold 20px Orbitron'; sCtx.textAlign = 'center';
+          sCtx.fillText('GAME OVER', 200, 180);
+          sCtx.font = '14px Orbitron'; sCtx.fillStyle = '#00f7ff';
+          sCtx.fillText('Score : ' + score, 200, 210);
+          sCtx.fillText('Clique pour rejouer', 200, 240);
+          sc.onclick = () => { sc.onclick = null; demarrerSnake(); };
+          return;
+        }
+        serpent.unshift(tete);
+        if (tete.x===nourriture.x&&tete.y===nourriture.y) { score++; document.getElementById('snake-score').textContent = 'SCORE : ' + score; placerNourriture(); }
+        else serpent.pop();
+        dessiner();
+      }
+      dessiner();
+      if (snakeGame) clearInterval(snakeGame);
+      snakeGame = setInterval(update, 120);
+      document.onkeydown = (e) => {
+        if (e.key==='ArrowUp'&&dir.y!==1) dir={x:0,y:-1};
+        else if (e.key==='ArrowDown'&&dir.y!==-1) dir={x:0,y:1};
+        else if (e.key==='ArrowLeft'&&dir.x!==1) dir={x:-1,y:0};
+        else if (e.key==='ArrowRight'&&dir.x!==-1) dir={x:1,y:0};
+        else if (e.key===' ') pause = !pause;
+      };
     }
 
     // ===== EASTER EGG =====
@@ -936,19 +1233,17 @@
     function activerEasterEgg() {
       flashLancement();
       document.getElementById('easter-egg-overlay').style.display = 'flex';
-      for (let i = 0; i < 60; i++) {
+      for (let i=0;i<60;i++) {
         setTimeout(() => {
           const p = document.createElement('div');
           p.className = 'particule-explosion';
-          const angle = Math.random() * 360;
-          const dist = 120 + Math.random() * 250;
-          const dx = Math.cos(angle * Math.PI/180) * dist + 'px';
-          const dy = Math.sin(angle * Math.PI/180) * dist + 'px';
+          const angle = Math.random()*360, dist = 120+Math.random()*250;
+          const dx = Math.cos(angle*Math.PI/180)*dist+'px', dy = Math.sin(angle*Math.PI/180)*dist+'px';
           const c = ['#ffd700','#ff003c','#00f7ff','#ff8c00','#fff'];
-          p.style.cssText = 'left:50vw;top:50vh;background:' + c[Math.floor(Math.random()*c.length)] + ';--dx:' + dx + ';--dy:' + dy + ';box-shadow:0 0 8px currentColor;';
+          p.style.cssText = 'left:50vw;top:50vh;background:'+c[Math.floor(Math.random()*c.length)]+';--dx:'+dx+';--dy:'+dy+';box-shadow:0 0 8px currentColor;';
           document.body.appendChild(p);
           setTimeout(() => p.remove(), 800);
-        }, i * 20);
+        }, i*20);
       }
     }
     function fermerEasterEgg() { document.getElementById('easter-egg-overlay').style.display = 'none'; }
@@ -956,27 +1251,20 @@
     // ===== CANVAS =====
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
     window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
     const pArr = [];
-    for (let i = 0; i < 80; i++) {
-      pArr.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*2+0.5, dx: (Math.random()-0.5)*0.5, dy: (Math.random()-0.5)*0.5, alpha: Math.random() });
-    }
+    for (let i=0;i<80;i++) pArr.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2+0.5,dx:(Math.random()-0.5)*0.5,dy:(Math.random()-0.5)*0.5,alpha:Math.random()});
     function animerParticules() {
       ctx.clearRect(0,0,canvas.width,canvas.height);
       pArr.forEach((p,i) => {
-        p.x += p.dx; p.y += p.dy;
+        p.x+=p.dx; p.y+=p.dy;
         if (p.x<0||p.x>canvas.width) p.dx*=-1;
         if (p.y<0||p.y>canvas.height) p.dy*=-1;
         pArr.forEach((p2,j) => {
           if (i===j) return;
           const d = Math.sqrt((p.x-p2.x)**2+(p.y-p2.y)**2);
-          if (d<120) {
-            ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p2.x,p2.y);
-            ctx.strokeStyle='rgba(255,215,0,'+(1-d/120)*0.15+')';
-            ctx.lineWidth=0.5; ctx.stroke();
-          }
+          if (d<120) { ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p2.x,p2.y); ctx.strokeStyle='rgba(255,215,0,'+(1-d/120)*0.15+')'; ctx.lineWidth=0.5; ctx.stroke(); }
         });
         ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
         ctx.fillStyle=(i%3===0?'rgba(255,215,0,':'rgba(0,247,255,')+p.alpha+')'; ctx.fill();
@@ -988,9 +1276,7 @@
     // ===== HORLOGE =====
     function majHorloge() {
       const n = new Date();
-      const h = String(n.getHours()).padStart(2,'0');
-      const m = String(n.getMinutes()).padStart(2,'0');
-      const s = String(n.getSeconds()).padStart(2,'0');
+      const h = String(n.getHours()).padStart(2,'0'), m = String(n.getMinutes()).padStart(2,'0'), s = String(n.getSeconds()).padStart(2,'0');
       const j = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
       const mo = ['Jan','Fev','Mar','Avr','Mai','Jun','Jul','Aou','Sep','Oct','Nov','Dec'];
       const el = document.getElementById('horloge');
@@ -998,6 +1284,7 @@
       const hh = document.getElementById('hud-heure');
       if (hh) hh.textContent = h+':'+m;
       verifierRappels(h, m);
+      verifierDevoirs();
     }
     setInterval(majHorloge, 1000);
     majHorloge();
@@ -1010,6 +1297,7 @@
         document.getElementById('hud-batterie-txt').textContent = pct+'%';
         document.getElementById('batterie-fill').style.width = pct+'%';
         document.getElementById('batterie-fill').style.background = pct<20?'#ff0000':pct<50?'#ffaa00':'#ffd700';
+        if (pct < 20) avatarParler('⚠️ Battery low: ' + pct + '%');
       } catch(e) { document.getElementById('hud-batterie-txt').textContent = 'N/A'; }
     }
     majBatterie();
@@ -1018,100 +1306,75 @@
     // ===== NOTIFICATIONS =====
     function demanderNotifications() {
       if ('Notification' in window) {
-        Notification.requestPermission().then(p => {
-          if (p === 'granted') new Notification('J.A.R.V.I.S INDUSTRY', { body: 'Notifications activées ! Rappels opérationnels.' });
-        });
-      } else { alert('Les notifications ne sont pas supportées sur ce navigateur.'); }
+        Notification.requestPermission().then(p => { if (p==='granted') new Notification('J.A.R.V.I.S INDUSTRY', {body:'Notifications activées !'}); });
+      }
     }
 
     // ===== RAPPELS =====
     let rappels = JSON.parse(localStorage.getItem('rappels') || '[]');
     let rappelsDeclenchés = JSON.parse(localStorage.getItem('rappelsDeclenchés') || '[]');
-
     function afficherRappels() {
       const list = document.getElementById('rappel-list');
       if (!list) return;
-      list.innerHTML = '';
-      if (rappels.length === 0) {
-        list.innerHTML = '<p style="color:rgba(255,215,0,0.3);font-size:0.75em;text-align:center;margin-top:10px">Aucun rappel configuré.</p>';
-        return;
-      }
-      rappels.forEach((r, i) => {
-        list.innerHTML += '<div class="rappel-item"><div class="rappel-heure">⏰ '+r.heure+'</div><div class="rappel-texte">'+r.texte+'</div><button class="rappel-delete" onclick="supprimerRappel('+i+')">🗑️</button></div>';
-      });
+      list.innerHTML = rappels.length === 0 ? '<p style="color:rgba(255,215,0,0.3);font-size:0.75em;text-align:center;margin-top:10px">Aucun rappel.</p>' : '';
+      rappels.forEach((r,i) => { list.innerHTML += '<div class="rappel-item"><div class="rappel-heure">⏰ '+r.heure+'</div><div class="rappel-texte">'+r.texte+'</div><button class="rappel-delete" onclick="supprimerRappel('+i+')">🗑️</button></div>'; });
     }
     function ajouterRappel() {
-      const texte = document.getElementById('rappel-texte').value.trim();
-      const heure = document.getElementById('rappel-heure').value;
-      if (!texte || !heure) return;
-      rappels.push({ texte, heure });
+      const t = document.getElementById('rappel-texte').value.trim(), h = document.getElementById('rappel-heure').value;
+      if (!t||!h) return;
+      rappels.push({texte:t,heure:h});
       localStorage.setItem('rappels', JSON.stringify(rappels));
-      document.getElementById('rappel-texte').value = '';
-      document.getElementById('rappel-heure').value = '';
-      afficherRappels();
+      document.getElementById('rappel-texte').value = ''; document.getElementById('rappel-heure').value = '';
+      afficherRappels(); mettreAJourStats();
     }
-    function supprimerRappel(i) {
-      rappels.splice(i, 1);
-      localStorage.setItem('rappels', JSON.stringify(rappels));
-      afficherRappels();
-    }
+    function supprimerRappel(i) { rappels.splice(i,1); localStorage.setItem('rappels', JSON.stringify(rappels)); afficherRappels(); mettreAJourStats(); }
     function verifierRappels(h, m) {
-      const now = h + ':' + m;
+      const now = h+':'+m;
       rappels.forEach(r => {
-        const cle = r.heure + '_' + r.texte;
-        if (r.heure === now && !rappelsDeclenchés.includes(cle)) {
+        const cle = r.heure+'_'+r.texte;
+        if (r.heure===now&&!rappelsDeclenchés.includes(cle)) {
           rappelsDeclenchés.push(cle);
           localStorage.setItem('rappelsDeclenchés', JSON.stringify(rappelsDeclenchés));
-          if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification('⏰ J.A.R.V.I.S RAPPEL', { body: r.texte + ' — ' + r.heure });
-          }
+          if ('Notification' in window&&Notification.permission==='granted') new Notification('⏰ J.A.R.V.I.S', {body:r.texte+' — '+r.heure});
           flashLancement();
-          setTimeout(() => alert('⏰ RAPPEL J.A.R.V.I.S : ' + r.texte), 100);
+          avatarParler('⏰ RAPPEL: ' + r.texte);
+          setTimeout(() => alert('⏰ RAPPEL J.A.R.V.I.S : '+r.texte), 100);
         }
       });
-      if (h === '00' && m === '00') { rappelsDeclenchés = []; localStorage.setItem('rappelsDeclenchés', '[]'); }
+      if (h==='00'&&m==='00') { rappelsDeclenchés=[]; localStorage.setItem('rappelsDeclenchés','[]'); }
     }
     afficherRappels();
 
     // ===== DOSSIERS =====
-    function toggleDossier(id) {
-      const c = document.getElementById(id);
-      c.style.display = (c.style.display === 'flex') ? 'none' : 'flex';
-    }
+    function toggleDossier(id) { const c=document.getElementById(id); c.style.display=(c.style.display==='flex')?'none':'flex'; }
 
     // ===== JARVIS =====
     function activerJarvis(e) {
       const status = document.getElementById('jarvis-status');
       status.innerHTML = '⚡ Connexion J.A.R.V.I.S en cours...';
       const couleurs = ['#ffd700','#ff8c00','#ff003c','#00f7ff','#fff'];
-      for (let i = 0; i < 45; i++) {
+      for (let i=0;i<45;i++) {
         const p = document.createElement('div');
         p.className = 'particule-explosion';
-        const angle = Math.random()*360;
-        const dist = 80 + Math.random()*160;
-        const dx = Math.cos(angle*Math.PI/180)*dist + 'px';
-        const dy = Math.sin(angle*Math.PI/180)*dist + 'px';
+        const angle = Math.random()*360, dist = 80+Math.random()*160;
+        const dx = Math.cos(angle*Math.PI/180)*dist+'px', dy = Math.sin(angle*Math.PI/180)*dist+'px';
         p.style.cssText = 'left:'+e.clientX+'px;top:'+e.clientY+'px;background:'+couleurs[Math.floor(Math.random()*couleurs.length)]+';--dx:'+dx+';--dy:'+dy+';box-shadow:0 0 6px currentColor;';
-        document.body.appendChild(p);
-        setTimeout(() => p.remove(), 800);
+        document.body.appendChild(p); setTimeout(()=>p.remove(),800);
       }
       flashLancement();
       setTimeout(() => {
         status.innerHTML = '✅ J.A.R.V.I.S en ligne !';
-        setTimeout(() => { window.open('https://chatgpt.com/', '_blank'); status.innerHTML = "En attente d'activation..."; }, 1000);
+        avatarParler('Connecting to ChatGPT...');
+        setTimeout(() => { window.open('https://chatgpt.com/','_blank'); status.innerHTML="En attente d'activation..."; }, 1000);
       }, 1500);
     }
 
-    // ===== NOTES — RESTAURÉ =====
+    // ===== NOTES =====
     const notesEl = document.getElementById('notes');
-    // Charger depuis localStorage
     if (notesEl) {
-      const savedNotes = localStorage.getItem('notes_jarvis');
-      if (savedNotes) notesEl.value = savedNotes;
-      // Sauvegarde auto à chaque frappe
-      notesEl.addEventListener('input', () => {
-        localStorage.setItem('notes_jarvis', notesEl.value);
-      });
+      const saved = localStorage.getItem('notes_jarvis');
+      if (saved) notesEl.value = saved;
+      notesEl.addEventListener('input', () => { localStorage.setItem('notes_jarvis', notesEl.value); });
     }
     function sauvegarderNotes() {
       if (!notesEl) return;
@@ -1121,47 +1384,65 @@
       setTimeout(() => { notif.innerHTML = ''; }, 2000);
     }
 
-    // ===== TODO =====
+    // ===== TODO AVEC DATE LIMITE =====
     let todos = JSON.parse(localStorage.getItem('todos_jarvis') || '[]');
     function afficherTodos() {
       const list = document.getElementById('todo-list');
       if (!list) return;
       list.innerHTML = '';
-      if (todos.length === 0) { list.innerHTML = '<p style="color:rgba(255,215,0,0.3);font-size:0.75em;text-align:center;margin-top:10px">Aucun devoir pour le moment.</p>'; return; }
+      if (todos.length === 0) { list.innerHTML = '<p style="color:rgba(255,215,0,0.3);font-size:0.75em;text-align:center;margin-top:10px">Aucun devoir.</p>'; return; }
+      const today = new Date(); today.setHours(0,0,0,0);
       todos.forEach((t, i) => {
-        list.innerHTML += '<div class="todo-item"><input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTodo('+i+')"><span class="'+(t.done?'done':'')+'">' + t.text + '</span><button class="todo-delete" onclick="supprimerTodo('+i+')">🗑️</button></div>';
+        let badge = '', urgent = false;
+        if (t.date) {
+          const d = new Date(t.date); d.setHours(0,0,0,0);
+          const diff = Math.ceil((d-today)/(1000*60*60*24));
+          urgent = diff <= 2 && !t.done;
+          badge = '<span class="todo-date-badge'+(urgent?' urgent':'')+'">'+( diff < 0 ? '⚠️ EXPIRÉ' : diff === 0 ? '📌 AUJOURD\'HUI' : diff === 1 ? '⏰ DEMAIN' : '📅 J-'+diff)+'</span>';
+        }
+        list.innerHTML += '<div class="todo-item'+(urgent?' alerte':'')+'"><input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTodo('+i+')"><span class="'+(t.done?'done':'')+'">' + t.text + '</span>'+badge+'<button class="todo-delete" onclick="supprimerTodo('+i+')">🗑️</button></div>';
       });
     }
     function ajouterTodo() {
-      const input = document.getElementById('todo-input');
+      const input = document.getElementById('todo-input'), dateInput = document.getElementById('todo-date');
       if (!input.value.trim()) return;
-      todos.push({ text: input.value.trim(), done: false });
+      todos.push({text:input.value.trim(), done:false, date:dateInput.value||null});
       localStorage.setItem('todos_jarvis', JSON.stringify(todos));
-      input.value = ''; afficherTodos();
+      input.value = ''; dateInput.value = '';
+      afficherTodos(); mettreAJourStats(); afficherCalendrier();
     }
-    function toggleTodo(i) { todos[i].done = !todos[i].done; localStorage.setItem('todos_jarvis', JSON.stringify(todos)); afficherTodos(); }
-    function supprimerTodo(i) { todos.splice(i,1); localStorage.setItem('todos_jarvis', JSON.stringify(todos)); afficherTodos(); }
+    function toggleTodo(i) { todos[i].done=!todos[i].done; localStorage.setItem('todos_jarvis',JSON.stringify(todos)); afficherTodos(); mettreAJourStats(); }
+    function supprimerTodo(i) { todos.splice(i,1); localStorage.setItem('todos_jarvis',JSON.stringify(todos)); afficherTodos(); mettreAJourStats(); afficherCalendrier(); }
+    function verifierDevoirs() {
+      const today = new Date(); today.setHours(0,0,0,0);
+      todos.forEach(t => {
+        if (t.date && !t.done) {
+          const d = new Date(t.date); d.setHours(0,0,0,0);
+          const diff = Math.ceil((d-today)/(1000*60*60*24));
+          if (diff === 1 && !t._alerteDemain) { t._alerteDemain = true; avatarParler('⚠️ Devoir demain: ' + t.text); }
+          if (diff === 0 && !t._alerteAujourdhui) { t._alerteAujourdhui = true; avatarParler('🚨 Devoir AUJOURD\'HUI: ' + t.text); }
+        }
+      });
+    }
     document.getElementById('todo-input').addEventListener('keypress', (e) => { if (e.key==='Enter') ajouterTodo(); });
     afficherTodos();
 
-    // ===== POST-ITS — RESTAURÉ COMPLET =====
+    // ===== POST-ITS =====
     const couleursPostit = ['#ffeb3b','#ff8a65','#81c784','#64b5f6','#f48fb1','#ce93d8','#80cbc4','#ffcc02'];
     let postits = JSON.parse(localStorage.getItem('postits_jarvis') || '[]');
-
     function afficherPostits() {
       const container = document.getElementById('postits-container');
       if (!container) return;
       container.innerHTML = '';
-      postits.forEach((p, i) => {
-        const rot = ((i % 7) - 3) * 1.5;
+      postits.forEach((p,i) => {
+        const rot = ((i%7)-3)*1.5;
         const div = document.createElement('div');
         div.className = 'postit';
         div.style.background = p.couleur;
-        div.style.setProperty('--rot', rot + 'deg');
-        div.innerHTML = '<button class="postit-delete" onclick="supprimerPostit('+i+')">✕</button><textarea placeholder="Note..." onchange="sauverPostit('+i+', this.value)" oninput="sauverPostit('+i+', this.value)">'+p.texte+'</textarea>';
+        div.style.setProperty('--rot', rot+'deg');
+        div.innerHTML = '<button class="postit-delete" onclick="supprimerPostit('+i+')">✕</button><textarea placeholder="Note..." onchange="sauverPostit('+i+',this.value)" oninput="sauverPostit('+i+',this.value)">'+p.texte+'</textarea>';
         container.appendChild(div);
       });
-      // Bouton ajouter
       const addDiv = document.createElement('div');
       addDiv.className = 'add-postit';
       addDiv.innerHTML = '＋<span>Nouveau post-it</span>';
@@ -1169,158 +1450,102 @@
       container.appendChild(addDiv);
     }
     function ajouterPostit() {
-      postits.push({ texte: '', couleur: couleursPostit[Math.floor(Math.random()*couleursPostit.length)] });
-      localStorage.setItem('postits_jarvis', JSON.stringify(postits));
-      afficherPostits();
-      // Focus sur le dernier textarea
-      setTimeout(() => {
-        const textareas = document.querySelectorAll('.postit textarea');
-        if (textareas.length > 0) textareas[textareas.length-1].focus();
-      }, 100);
+      postits.push({texte:'',couleur:couleursPostit[Math.floor(Math.random()*couleursPostit.length)]});
+      localStorage.setItem('postits_jarvis',JSON.stringify(postits));
+      afficherPostits(); mettreAJourStats();
+      setTimeout(() => { const t = document.querySelectorAll('.postit textarea'); if (t.length>0) t[t.length-1].focus(); }, 100);
     }
-    function supprimerPostit(i) {
-      postits.splice(i, 1);
-      localStorage.setItem('postits_jarvis', JSON.stringify(postits));
-      afficherPostits();
-    }
-    function sauverPostit(i, val) {
-      if (postits[i]) {
-        postits[i].texte = val;
-        localStorage.setItem('postits_jarvis', JSON.stringify(postits));
-      }
-    }
+    function supprimerPostit(i) { postits.splice(i,1); localStorage.setItem('postits_jarvis',JSON.stringify(postits)); afficherPostits(); mettreAJourStats(); }
+    function sauverPostit(i,val) { if (postits[i]) { postits[i].texte=val; localStorage.setItem('postits_jarvis',JSON.stringify(postits)); } }
     afficherPostits();
 
     // ===== MINUTEUR =====
-    let minuteurInterval = null, minuteurSecondes = 0, minuteurEnCours = false;
-    function setMinuteur(min) { minuteurSecondes = min*60; afficherMinuteur(); }
-    function afficherMinuteur() {
-      const m = Math.floor(minuteurSecondes/60), s = minuteurSecondes%60;
-      document.getElementById('minuteur-display').textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'00');
-    }
+    let minuteurInterval=null, minuteurSecondes=0, minuteurEnCours=false;
+    function setMinuteur(min) { minuteurSecondes=min*60; afficherMinuteur(); }
+    function afficherMinuteur() { const m=Math.floor(minuteurSecondes/60),s=minuteurSecondes%60; document.getElementById('minuteur-display').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'00'); }
     function demarrerMinuteur() {
       if (minuteurEnCours) return;
-      minuteurEnCours = true;
-      minuteurInterval = setInterval(() => {
-        if (minuteurSecondes <= 0) {
-          clearInterval(minuteurInterval); minuteurEnCours = false;
-          document.getElementById('minuteur-display').textContent = '✅ TERMINÉ !';
-          if ('Notification' in window && Notification.permission==='granted') new Notification('⏰ J.A.R.V.I.S', { body: 'Timer terminé !' });
-          flashLancement();
-          return;
-        }
+      minuteurEnCours=true;
+      minuteurInterval=setInterval(()=>{
+        if (minuteurSecondes<=0) { clearInterval(minuteurInterval); minuteurEnCours=false; document.getElementById('minuteur-display').textContent='✅ TERMINÉ !'; if ('Notification' in window&&Notification.permission==='granted') new Notification('⏰ J.A.R.V.I.S',{body:'Timer terminé !'}); flashLancement(); avatarParler('Timer complete! ✅'); return; }
         minuteurSecondes--; afficherMinuteur();
-      }, 1000);
+      },1000);
     }
-    function pauseMinuteur() { clearInterval(minuteurInterval); minuteurEnCours = false; }
-    function resetMinuteur() { clearInterval(minuteurInterval); minuteurEnCours = false; minuteurSecondes = 0; afficherMinuteur(); }
+    function pauseMinuteur() { clearInterval(minuteurInterval); minuteurEnCours=false; }
+    function resetMinuteur() { clearInterval(minuteurInterval); minuteurEnCours=false; minuteurSecondes=0; afficherMinuteur(); }
 
     // ===== CHRONO =====
-    let chronoInterval = null, chronoMs = 0, chronoEnCours = false;
-    function afficherChrono() {
-      const h = Math.floor(chronoMs/360000), m = Math.floor((chronoMs%360000)/6000), s = Math.floor((chronoMs%6000)/100);
-      document.getElementById('chrono-display').textContent = String(h).padStart(2,'00')+':'+String(m).padStart(2,'00')+':'+String(s).padStart(2,'00');
-    }
+    let chronoInterval=null, chronoMs=0, chronoEnCours=false;
+    function afficherChrono() { const h=Math.floor(chronoMs/360000),m=Math.floor((chronoMs%360000)/6000),s=Math.floor((chronoMs%6000)/100); document.getElementById('chrono-display').textContent=String(h).padStart(2,'00')+':'+String(m).padStart(2,'00')+':'+String(s).padStart(2,'00'); }
     function demarrerChrono() { if (chronoEnCours) return; chronoEnCours=true; chronoInterval=setInterval(()=>{chronoMs++;afficherChrono();},10); }
     function pauseChrono() { clearInterval(chronoInterval); chronoEnCours=false; }
     function resetChrono() { clearInterval(chronoInterval); chronoEnCours=false; chronoMs=0; afficherChrono(); }
 
-    // ===== CALENDRIER — RESTAURÉ =====
+    // ===== CALENDRIER AVEC DEVOIRS =====
     let calDate = new Date();
     function afficherCalendrier() {
-      const annee = calDate.getFullYear(), mois = calDate.getMonth();
-      const moisNoms = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-      const titre = document.getElementById('cal-titre');
-      if (titre) titre.textContent = moisNoms[mois] + ' ' + annee;
-      const grid = document.getElementById('cal-grid');
+      const annee=calDate.getFullYear(), mois=calDate.getMonth();
+      const moisNoms=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+      const titre=document.getElementById('cal-titre');
+      if (titre) titre.textContent=moisNoms[mois]+' '+annee;
+      const grid=document.getElementById('cal-grid');
       if (!grid) return;
-      grid.innerHTML = '';
-      ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].forEach(j => { grid.innerHTML += '<div class="cal-day-name">'+j+'</div>'; });
-      const premier = new Date(annee, mois, 1);
-      const dernier = new Date(annee, mois+1, 0);
-      let debut = premier.getDay()===0?6:premier.getDay()-1;
-      const today = new Date();
-      for (let i=0;i<debut;i++) {
-        const j = new Date(annee, mois, -debut+i+1);
-        grid.innerHTML += '<div class="cal-day autre-mois">'+j.getDate()+'</div>';
-      }
+      grid.innerHTML='';
+      ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].forEach(j=>{grid.innerHTML+='<div class="cal-day-name">'+j+'</div>';});
+      const premier=new Date(annee,mois,1), dernier=new Date(annee,mois+1,0);
+      let debut=premier.getDay()===0?6:premier.getDay()-1;
+      const today=new Date();
+      const devoirsJours = new Set(todos.filter(t=>t.date&&!t.done).map(t=>{ const d=new Date(t.date); return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate(); }));
+      for (let i=0;i<debut;i++) { const j=new Date(annee,mois,-debut+i+1); grid.innerHTML+='<div class="cal-day autre-mois">'+j.getDate()+'</div>'; }
       for (let d=1;d<=dernier.getDate();d++) {
-        const isToday = d===today.getDate()&&mois===today.getMonth()&&annee===today.getFullYear();
-        grid.innerHTML += '<div class="cal-day'+(isToday?' today':'')+'">' + d + '</div>';
+        const isToday=d===today.getDate()&&mois===today.getMonth()&&annee===today.getFullYear();
+        const key=annee+'-'+mois+'-'+d;
+        const hasDevoir=devoirsJours.has(key);
+        grid.innerHTML+='<div class="cal-day'+(isToday?' today':'')+(hasDevoir?' a-devoir':'')+'">' + d + (hasDevoir?'🔴':'') + '</div>';
       }
     }
     function changerMois(dir) { calDate.setMonth(calDate.getMonth()+dir); afficherCalendrier(); }
     afficherCalendrier();
 
     // ===== METEO =====
-    const meteoData = {
-      'paris':{temp:14,desc:'Nuageux',icon:'☁️'},'marseille':{temp:19,desc:'Ensoleillé',icon:'☀️'},
-      'lyon':{temp:12,desc:'Pluvieux',icon:'🌧️'},'nice':{temp:22,desc:'Beau temps',icon:'🌤️'},
-      'bordeaux':{temp:16,desc:'Partiellement nuageux',icon:'⛅'},'toulouse':{temp:17,desc:'Ensoleillé',icon:'☀️'},
-      'nantes':{temp:11,desc:'Pluvieux',icon:'🌧️'},'lille':{temp:9,desc:'Couvert',icon:'🌥️'}
-    };
+    const meteoData={'paris':{temp:14,desc:'Nuageux',icon:'☁️'},'marseille':{temp:19,desc:'Ensoleillé',icon:'☀️'},'lyon':{temp:12,desc:'Pluvieux',icon:'🌧️'},'nice':{temp:22,desc:'Beau temps',icon:'🌤️'},'bordeaux':{temp:16,desc:'Partiellement nuageux',icon:'⛅'},'toulouse':{temp:17,desc:'Ensoleillé',icon:'☀️'},'nantes':{temp:11,desc:'Pluvieux',icon:'🌧️'},'lille':{temp:9,desc:'Couvert',icon:'🌥️'}};
     function chercherMeteo() {
-      const ville = document.getElementById('meteo-input').value.toLowerCase().trim();
-      const result = document.getElementById('meteo-result');
-      const data = meteoData[ville];
-      if (data) result.innerHTML='<div class="meteo-icon">'+data.icon+'</div><div class="meteo-temp">'+data.temp+'°C</div><div class="meteo-desc">'+data.desc+'</div><div class="meteo-ville">📍 '+ville.charAt(0).toUpperCase()+ville.slice(1)+'</div>';
-      else result.innerHTML='<p style="color:#00f7ff;opacity:0.5;font-size:0.8em">Ville non trouvée. Essaie : Paris, Marseille, Lyon, Nice...</p>';
+      const ville=document.getElementById('meteo-input').value.toLowerCase().trim();
+      const result=document.getElementById('meteo-result');
+      const data=meteoData[ville];
+      if (data) { result.innerHTML='<div class="meteo-icon">'+data.icon+'</div><div class="meteo-temp">'+data.temp+'°C</div><div class="meteo-desc">'+data.desc+'</div><div class="meteo-ville">📍 '+ville.charAt(0).toUpperCase()+ville.slice(1)+'</div>'; }
+      else result.innerHTML='<p style="color:#00f7ff;opacity:0.5;font-size:0.8em">Ville non trouvée. Essaie : Paris, Marseille, Lyon...</p>';
     }
     document.getElementById('meteo-input').addEventListener('keypress',(e)=>{if(e.key==='Enter')chercherMeteo();});
 
-    // ===== CARTE LEAFLET — RESTAURÉE =====
-    let mapInstance = null;
+    // ===== CARTE =====
+    let mapInstance=null;
     function initialiserCarte() {
       if (mapInstance) return;
       try {
-        mapInstance = L.map('map', { zoomControl: true, scrollWheelZoom: true }).setView([20, 10], 2);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-          attribution:'© CartoDB', subdomains:'abcd', maxZoom:19
-        }).addTo(mapInstance);
-        const marqueurs = [
-          [48.8566, 2.3522, '🗼 Paris — QG France'],
-          [43.2965, 5.3698, '🌊 Marseille'],
-          [40.7128, -74.0060, '🗽 New York — Stark Tower'],
-          [35.6762, 139.6503, '🗾 Tokyo'],
-          [51.5074, -0.1278, '🎡 Londres'],
-          [-33.8688, 151.2093, '🦘 Sydney'],
-          [55.7558, 37.6176, '🏰 Moscou']
-        ];
-        marqueurs.forEach(([lat, lng, popup]) => {
-          L.marker([lat,lng]).addTo(mapInstance).bindPopup('<span style="font-family:Orbitron,sans-serif;font-size:0.8em;color:#ffd700">'+popup+'</span>');
-        });
-      } catch(e) { document.getElementById('map').innerHTML = '<p style="color:#ffd700;text-align:center;padding:20px;font-size:0.8em">Carte non disponible. Vérifiez votre connexion.</p>'; }
-    }
-    function rafraichirCarte() { if (mapInstance) mapInstance.invalidateSize(); }
+        mapInstance=L.map('map',{zoomControl:true,scrollWheelZoom:true}).setView([20,10],2);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© CartoDB',subdomains:'abcd',maxZoom:19}).addTo(mapInstance);
+        [[48.8566,2.3522,'🗼 Paris'],[43.2965,5.3698,'🌊 Marseille'],[40.7128,-74.0060,'🗽 New York'],[35.6762,139.6503,'🗾 Tokyo'],[51.5074,-0.1278,'🎡 Londres'],[-33.8688,151.2093,'🦘 Sydney'],[55.7558,37.6176,'🏰 Moscou']].forEach​​​​​​​​​​​​​​​​
 
-    // ===== MUSIQUE =====
-    function lancerMusique() {
-      const input = document.getElementById('music-input').value.trim();
-      if (!input) return;
-      let videoId = '';
-      if (input.includes('youtube.com/watch?v=')) videoId = input.split('v=')[1].split('&')[0];
-      else if (input.includes('youtu.be/')) videoId = input.split('youtu.be/')[1].split('?')[0];
-      if (videoId) lancerMusiqueDirecte('https://www.youtube.com/embed/'+videoId);
-      else { const f=document.getElementById('music-frame'); f.style.display='block'; f.src='https://www.youtube.com/embed?listType=search&list='+encodeURIComponent(input); }
-    }
-    function lancerMusiqueDirecte(url) {
-      const f = document.getElementById('music-frame');
-      f.style.display = 'block';
-      f.src = url + '?autoplay=1';
-      flashLancement();
-    }
-    document.getElementById('music-input').addEventListener('keypress',(e)=>{if(e.key==='Enter')lancerMusique();});
+(([lat,lng,popup])=>{L.marker([lat,lng]).addTo(mapInstance).bindPopup(’<span style="font-family:Orbitron,sans-serif;font-size:0.8em;color:#ffd700">’+popup+’</span>’);});
+} catch(e) { document.getElementById(‘map’).innerHTML=’<p style="color:#ffd700;text-align:center;padding:20px;font-size:0.8em">Carte non disponible.</p>’; }
+}
+function rafraichirCarte() { if (mapInstance) mapInstance.invalidateSize(); }
+// ===== MUSIQUE =====
+function lancerMusique() {
+  const input=document.getElementById('music-input').value.trim();
+  if (!input) return;
+  let videoId='';
+  if (input.includes('youtube.com/watch?v=')) videoId=input.split('v=')[1].split('&')[0];
+  else if (input.includes('youtu.be/')) videoId=input.split('youtu.be/')[1].split('?')[0];
+  if (videoId) lancerMusiqueDirecte('https://www.youtube.com/embed/'+videoId);
+  else { const f=document.getElementById('music-frame'); f.style.display='block'; f.src='https://www.youtube.com/embed?listType=search&list='+encodeURIComponent(input); }
+}
+function lancerMusiqueDirecte(url) { const f=document.getElementById('music-frame'); f.style.display='block'; f.src=url+'?autoplay=1'; flashLancement(); }
+document.getElementById('music-input').addEventListener('keypress',(e)=>{if(e.key==='Enter')lancerMusique();});
 
-    // ===== JEUX =====
-    function afficherMessageJeu(msg) {
-      flashLancement();
-      const el = document.getElementById('jeu-message');
-      el.textContent = msg;
-      el.style.color = '#ffd700';
-      el.style.textShadow = '0 0 12px #ffd700';
-      setTimeout(() => { el.style.color = '#00f7ff'; el.style.textShadow = 'none'; }, 2000);
-    }
-  </script>
+// ===== JEUX =====
+function afficherMessageJeu(msg) { flashLancement(); const el=document.getElementById('jeu-message'); el.textContent=msg; el.style.color='#ffd700'; el.style.textShadow='0 0 12px #ffd700'; setTimeout(()=>{el.style.color='#00f7ff';el.style.textShadow='none';},2000); }
 
-</body>
+</script></body>
 </html>
