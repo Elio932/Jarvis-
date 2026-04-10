@@ -751,6 +751,81 @@
         <a href="https://poki.com/fr/g/monkey-mart" target="_blank" onclick="afficherMessageJeu('🐵 À toi de jouer!')" class="jeu-card"><div class="jeu-emoji">🐵</div><div class="jeu-titre">Monkey Market</div><div class="jeu-desc">Crée ton supermarché</div></a>
         <a href="https://poki.com/fr/g/crossy-road" target="_blank" onclick="afficherMessageJeu('🐔 Te fais pas écraser!')" class="jeu-card"><div class="jeu-emoji">🐔</div><div class="jeu-titre">Chicken Run</div><div class="jeu-desc">Évite les voitures</div></a>
         <a href="https://poki.com/fr/g/blocky-blast-puzzle" target="_blank" onclick="afficherMessageJeu('🟦 Quel score?')" class="jeu-card"><div class="jeu-emoji">🟦</div><div class="jeu-titre">Block Blast</div><div class="jeu-desc">Quel score feras-tu?</div></a>
+        <!-- 🔴 BOUTON ROBLOX -->
+<div class="jarvis-game-card" onclick="launchRoblox()">
+  <div class="glow-circle"></div>
+  <div class="game-content">
+    <h2>J.A.R.V.I.S</h2>
+    <p>Initialize Roblox System</p>
+  </div>
+</div>
+
+<style>
+.jarvis-game-card {
+  position: relative;
+  width: 220px;
+  height: 120px;
+  border-radius: 20px;
+  background: rgba(0,0,0,0.7);
+  border: 2px solid rgba(255, 0, 0, 0.4);
+  color: #fff;
+  cursor: pointer;
+  overflow: hidden;
+  transition: 0.3s;
+  backdrop-filter: blur(10px);
+}
+
+.jarvis-game-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px red;
+}
+
+.glow-circle {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255,0,0,0.6), transparent);
+  top: -50px;
+  left: -50px;
+  animation: rotate 6s linear infinite;
+}
+
+@keyframes rotate {
+  0% {transform: rotate(0deg);}
+  100% {transform: rotate(360deg);}
+}
+
+.game-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  top: 25px;
+}
+
+.game-content h2 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.game-content p {
+  margin-top: 5px;
+  font-size: 12px;
+  color: #aaa;
+}
+</style>
+
+<script>
+function launchRoblox() {
+  // effet "IA processing"
+  document.body.style.cursor = "wait";
+
+  // petit délai pour effet stylé
+  setTimeout(() => {
+    window.location.href = "https://www.roblox.com/home";
+  }, 800);
+}
+</script>
       </div>
     </div>
 
