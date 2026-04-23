@@ -654,49 +654,7 @@
       </div>
     </div>
 
-    <!-- DEVOIRS -->
-    <div class="section" id="section-devoirs">
-      <h2>📋 Mes devoirs</h2>
-      <div class="separateur"></div>
-      <div class="todo-input-zone">
-        <input type="text" id="todo-input" placeholder="Ajouter un devoir...">
-        <button onclick="ajouterTodo()">＋</button>
-      </div>
-      <div id="todo-list" style="width:100%"></div>
-    </div>
-
-    <!-- RAPPELS -->
-    <div class="section" id="section-rappels">
-      <h2>🔔 Rappels</h2>
-      <div class="separateur"></div>
-      <p style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--bleu-doux);font-size:0.85em;margin-bottom:15px;text-align:center;opacity:0.7">Je te rappellerai à l'heure exacte, même si tu es au bord du lac.</p>
-      <div class="rappel-input" style="width:100%">
-        <input type="text" id="rappel-texte" placeholder="Ex: Appeler Oliver à 17h...">
-        <input type="time" id="rappel-heure">
-        <button onclick="ajouterRappel()">＋</button>
-      </div>
-      <div id="rappel-list" style="width:100%"></div>
-    </div>
-
-    <!-- NOTES / JOURNAL -->
-    <div class="section" id="section-notes">
-      <h2>📝 Journal d'Elio</h2>
-      <div class="separateur"></div>
-      <div class="notes-container" style="width:100%">
-        <textarea id="notes" placeholder="Cher journal, aujourd'hui j'ai..."></textarea>
-        <div style="margin-top:12px;display:flex;align-items:center">
-          <button class="save-btn" onclick="sauvegarderNotes()">💾 Sauvegarder</button>
-          <span id="notif-save"></span>
-        </div>
-      </div>
-    </div>
-
-    <!-- POST-ITS -->
-    <div class="section" id="section-postits">
-      <h2>🗒️ Post-its</h2>
-      <div class="separateur"></div>
-      <div class="postits" id="postits-container"></div>
-    </div>
+   
 
     <!-- MINUTEUR -->
     <div class="section" id="section-minuteur">
@@ -728,65 +686,9 @@
       </div>
     </div>
 
-    <!-- CALENDRIER -->
-    <div class="section" id="section-calendrier">
-      <h2>🗓️ Calendrier</h2>
-      <div class="separateur"></div>
-      <div class="calendrier" style="width:100%">
-        <div class="cal-header">
-          <button onclick="changerMois(-1)">◀</button>
-          <h2 id="cal-titre" style="margin:0;font-size:1.1em"></h2>
-          <button onclick="changerMois(1)">▶</button>
-        </div>
-        <div class="cal-grid" id="cal-grid"></div>
-      </div>
-    </div>
+   
 
-    <!-- METEO -->
-    <div class="section" id="section-meteo">
-      <h2>🌦️ Météo</h2>
-      <div class="separateur"></div>
-      <div class="meteo-widget">
-        <div class="meteo-search">
-          <input type="text" id="meteo-input" placeholder="Une ville...">
-          <button onclick="chercherMeteo()">Chercher</button>
-        </div>
-        <div class="meteo-result" id="meteo-result">
-          <p style="color:var(--bleu-doux);opacity:0.5;font-size:0.85em;font-style:italic;font-family:'Cormorant Garamond',serif">Entrez une ville pour voir la météo</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- CARTE -->
-    <div class="section" id="section-carte">
-      <h2>🗺️ Carte du Monde</h2>
-      <div class="separateur"></div>
-      <p style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--bleu-doux);font-size:0.8em;margin-bottom:14px;opacity:0.6">Explore librement. Crema t'attend toujours.</p>
-      <div id="map"></div>
-    </div>
-
-    <!-- MUSIQUE -->
-    <div class="section" id="section-musique">
-      <h2>🎵 Lecteur YouTube</h2>
-      <div class="separateur"></div>
-      <div class="music-player">
-        <div class="music-search">
-          <input type="text" id="music-input" placeholder="Colle un lien YouTube...">
-          <button onclick="lancerMusique()">▶ Écouter</button>
-        </div>
-        <iframe id="music-frame" allowfullscreen allow="autoplay"></iframe>
-        <div style="margin-top:14px">
-          <p style="color:var(--bleu-doux);font-size:0.68em;margin-bottom:8px;opacity:0.6;font-style:italic;font-family:'Cormorant Garamond',serif">Bande originale de l'été :</p>
-          <div class="music-suggestions">
-            <div class="music-tag" onclick="lancerMusiqueDirecte('https://www.youtube.com/embed/K2OuTEYHqEA')">🍑 Mystery of Love</div>
-            <div class="music-tag" onclick="lancerMusiqueDirecte('https://www.youtube.com/embed/60ItHLz5WEA')">🌙 LoFi</div>
-            <div class="music-tag" onclick="lancerMusiqueDirecte('https://www.youtube.com/embed/JGwWNGJdvx8')">🎸 Été</div>
-            <div class="music-tag" onclick="lancerMusiqueDirecte('https://www.youtube.com/embed/dQw4w9WgXcQ')">🎵 Classic</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
+   
     <!-- JEUX -->
     <div class="section" id="section-jeux">
       <h2>🎮 Arcade</h2>
@@ -824,13 +726,7 @@
   <script>
     const MDP = "crema1983";
 
-    // CURSEUR
-    const curseur = document.getElementById('curseur');
-    const trail = document.getElementById('curseur-trail');
-    document.addEventListener('mousemove', (e) => {
-      curseur.style.left = e.clientX + 'px'; curseur.style.top = e.clientY + 'px';
-      setTimeout(() => { trail.style.left = e.clientX + 'px'; trail.style.top = e.clientY + 'px'; }, 80);
-    });
+    
 
     // ÉTOILES FILANTES
     function creerEtoile() {
@@ -1106,58 +1002,7 @@
       setTimeout(()=>{status.innerHTML='<em>ChatGPT ouvert 🍑</em>'; setTimeout(()=>{window.open('https://chatgpt.com/','_blank');status.innerHTML='<em>En attente d\'un souvenir...</em>';},1000);},1500);
     }
 
-    // NOTES
-    const notesEl = document.getElementById('notes');
-    if (notesEl) {
-      const saved = localStorage.getItem('notes_jarvis');
-      if (saved) notesEl.value = saved;
-      notesEl.addEventListener('input', () => { localStorage.setItem('notes_jarvis', notesEl.value); });
-    }
-    function sauvegarderNotes() {
-      if (!notesEl) return;
-      localStorage.setItem('notes_jarvis', notesEl.value);
-      const notif = document.getElementById('notif-save');
-      notif.innerHTML = '<em>✅ Sauvegardé...</em>';
-      setTimeout(() => { notif.innerHTML = ''; }, 2000);
-    }
-
-    // TODO
-    let todos = JSON.parse(localStorage.getItem('todos_jarvis') || '[]');
-    function afficherTodos() {
-      const list = document.getElementById('todo-list');
-      if (!list) return;
-      list.innerHTML = '';
-      if (todos.length===0) { list.innerHTML='<p style="color:rgba(255,190,152,0.25);font-size:0.78em;text-align:center;margin-top:12px;font-style:italic;font-family:Cormorant Garamond,serif">Aucun devoir pour l\'instant...</p>'; return; }
-      todos.forEach((t,i) => { list.innerHTML+='<div class="todo-item"><input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTodo('+i+')"><span class="'+(t.done?'done':'')+'">' +t.text+'</span><button class="todo-delete" onclick="supprimerTodo('+i+')">🗑️</button></div>'; });
-    }
-    function ajouterTodo() { const input=document.getElementById('todo-input'); if(!input.value.trim())return; todos.push({text:input.value.trim(),done:false}); localStorage.setItem('todos_jarvis',JSON.stringify(todos)); input.value=''; afficherTodos(); }
-    function toggleTodo(i) { todos[i].done=!todos[i].done; localStorage.setItem('todos_jarvis',JSON.stringify(todos)); afficherTodos(); }
-    function supprimerTodo(i) { todos.splice(i,1); localStorage.setItem('todos_jarvis',JSON.stringify(todos)); afficherTodos(); }
-    document.getElementById('todo-input').addEventListener('keypress',(e)=>{if(e.key==='Enter')ajouterTodo();});
-    afficherTodos();
-
-    // POST-ITS
-    const couleursPostit = ['#FFDAB9','#FFE4B5','#FFF0D0','#E8D5B7','#F5DEB3','#FAEBD7','#FFE8CC','#FFDDC1'];
-    let postits = JSON.parse(localStorage.getItem('postits_jarvis') || '[]');
-    function afficherPostits() {
-      const container = document.getElementById('postits-container');
-      if (!container) return;
-      container.innerHTML = '';
-      postits.forEach((p,i) => {
-        const rot=((i%7)-3)*1.5;
-        const div=document.createElement('div'); div.className='postit'; div.style.background=p.couleur; div.style.setProperty('--rot',rot+'deg');
-        div.innerHTML='<button class="postit-delete" onclick="supprimerPostit('+i+')">✕</button><textarea placeholder="Note..." onchange="sauverPostit('+i+',this.value)" oninput="sauverPostit('+i+',this.value)">'+p.texte+'</textarea>';
-        container.appendChild(div);
-      });
-      const addDiv=document.createElement('div'); addDiv.className='add-postit';
-      addDiv.innerHTML='＋<span>Nouveau post-it</span>'; addDiv.onclick=ajouterPostit;
-      container.appendChild(addDiv);
-    }
-    function ajouterPostit() { postits.push({texte:'',couleur:couleursPostit[Math.floor(Math.random()*couleursPostit.length)]}); localStorage.setItem('postits_jarvis',JSON.stringify(postits)); afficherPostits(); setTimeout(()=>{const t=document.querySelectorAll('.postit textarea');if(t.length>0)t[t.length-1].focus();},100); }
-    function supprimerPostit(i) { postits.splice(i,1); localStorage.setItem('postits_jarvis',JSON.stringify(postits)); afficherPostits(); }
-    function sauverPostit(i,val) { if(postits[i]){postits[i].texte=val;localStorage.setItem('postits_jarvis',JSON.stringify(postits));} }
-    afficherPostits();
-
+   
     // MINUTEUR
     let minuteurInterval=null,minuteurSecondes=0,minuteurEnCours=false;
     function setMinuteur(min){minuteurSecondes=min*60;afficherMinuteur();}
@@ -1173,57 +1018,7 @@
     function pauseChrono(){clearInterval(chronoInterval);chronoEnCours=false;}
     function resetChrono(){clearInterval(chronoInterval);chronoEnCours=false;chronoMs=0;afficherChrono();}
 
-    // CALENDRIER
-    let calDate=new Date();
-    function afficherCalendrier(){
-      const annee=calDate.getFullYear(),mois=calDate.getMonth();
-      const moisNoms=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-      const titre=document.getElementById('cal-titre'); if(titre)titre.textContent=moisNoms[mois]+' '+annee;
-      const grid=document.getElementById('cal-grid'); if(!grid)return; grid.innerHTML='';
-      ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].forEach(j=>{grid.innerHTML+='<div class="cal-day-name">'+j+'</div>';});
-      const premier=new Date(annee,mois,1),dernier=new Date(annee,mois+1,0);
-      let debut=premier.getDay()===0?6:premier.getDay()-1;
-      const today=new Date();
-      for(let i=0;i<debut;i++){const j=new Date(annee,mois,-debut+i+1);grid.innerHTML+='<div class="cal-day autre-mois">'+j.getDate()+'</div>';}
-      for(let d=1;d<=dernier.getDate();d++){const isToday=d===today.getDate()&&mois===today.getMonth()&&annee===today.getFullYear();grid.innerHTML+='<div class="cal-day'+(isToday?' today':'')+'">'+d+'</div>';}
-    }
-    function changerMois(dir){calDate.setMonth(calDate.getMonth()+dir);afficherCalendrier();}
-    afficherCalendrier();
-
-    // METEO
-    const meteoData={'paris':{temp:14,desc:'Nuageux',icon:'☁️'},'marseille':{temp:22,desc:'Ensoleillé',icon:'☀️'},'lyon':{temp:12,desc:'Pluvieux',icon:'🌧️'},'nice':{temp:24,desc:'Beau temps',icon:'🌤️'},'bordeaux':{temp:18,desc:'Partiellement nuageux',icon:'⛅'},'toulouse':{temp:19,desc:'Ensoleillé',icon:'☀️'},'nantes':{temp:11,desc:'Pluvieux',icon:'🌧️'},'lille':{temp:9,desc:'Couvert',icon:'🌥️'},'crema':{temp:28,desc:'Été éternel',icon:'🍑'},'milan':{temp:26,desc:'Ensoleillé',icon:'☀️'},'rome':{temp:30,desc:'Chaud et lumineux',icon:'🌅'}};
-    function chercherMeteo(){
-      const ville=document.getElementById('meteo-input').value.toLowerCase().trim();
-      const result=document.getElementById('meteo-result');
-      const data=meteoData[ville];
-      if(data)result.innerHTML='<div class="meteo-icon">'+data.icon+'</div><div class="meteo-temp">'+data.temp+'°C</div><div class="meteo-desc">'+data.desc+'</div><div class="meteo-ville">📍 '+ville.charAt(0).toUpperCase()+ville.slice(1)+'</div>';
-      else result.innerHTML='<p style="color:var(--bleu-doux);opacity:0.5;font-size:0.8em;font-style:italic;font-family:Cormorant Garamond,serif">Ville non trouvée. Essaie : Crema, Milan, Rome, Paris...</p>';
-    }
-    document.getElementById('meteo-input').addEventListener('keypress',(e)=>{if(e.key==='Enter')chercherMeteo();});
-
-    // CARTE
-    let mapInstance=null;
-    function initialiserCarte(){
-      if(mapInstance)return;
-      try{
-        mapInstance=L.map('map',{zoomControl:true,scrollWheelZoom:true}).setView([45.8,9.5],6);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© CartoDB',subdomains:'abcd',maxZoom:19}).addTo(mapInstance);
-        [[45.3658,9.6896,'🍑 Crema — Villa d\'Elio'],[45.4654,9.1859,'🏛️ Milan'],[45.9763,8.9042,'🌊 Lac de Côme'],[41.9028,12.4964,'🏛️ Rome'],[43.7696,11.2558,'🌸 Florence'],[48.8566,2.3522,'🗼 Paris'],[40.7128,-74.0060,'🗽 New York']].forEach(([lat,lng,popup])=>{L.marker([lat,lng]).addTo(mapInstance).bindPopup('<span style="font-family:Cormorant Garamond,serif;font-style:italic;font-size:0.9em;color:#FFBE98">'+popup+'</span>');});
-      }catch(e){document.getElementById('map').innerHTML='<p style="color:var(--peche);text-align:center;padding:20px;font-size:0.8em;font-style:italic">Carte non disponible.</p>';}
-    }
-    function rafraichirCarte(){if(mapInstance)mapInstance.invalidateSize();}
-
-    // MUSIQUE
-    function lancerMusique(){
-      const input=document.getElementById('music-input').value.trim(); if(!input)return;
-      let videoId='';
-      if(input.includes('youtube.com/watch?v='))videoId=input.split('v=')[1].split('&')[0];
-      else if(input.includes('youtu.be/'))videoId=input.split('youtu.be/')[1].split('?')[0];
-      if(videoId)lancerMusiqueDirecte('https://www.youtube.com/embed/'+videoId);
-      else{const f=document.getElementById('music-frame');f.style.display='block';f.src='https://www.youtube.com/embed?listType=search&list='+encodeURIComponent(input);}
-    }
-    function lancerMusiqueDirecte(url){const f=document.getElementById('music-frame');f.style.display='block';f.src=url+'?autoplay=1';flashLancement();}
-    document.getElementById('music-input').addEventListener('keypress',(e)=>{if(e.key==='Enter')lancerMusique();});
+  
 
     // JEUX
     function afficherMessageJeu(msg){
