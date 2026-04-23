@@ -2,288 +2,388 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>J.A.R.V.I.S INDUSTRY</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <title>ELIO — Été 1983</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
-    body { background: #000; color: #fff; font-family: 'Orbitron', sans-serif; overflow-x: hidden; display: flex; }
+    :root {
+      --peche: #FFBE98;
+      --abricot: #F4845F;
+      --terre: #C2623F;
+      --creme: #FFF5E6;
+      --bleu-nuit: #2C3E6B;
+      --bleu-doux: #5B7BAF;
+      --rose-pale: #F9CBA7;
+      --or-chaud: #E8A857;
+      --ombre: rgba(44,30,15,0.6);
+    }
 
-    /* SCANLINES */
-    body::after { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 3px); pointer-events: none; z-index: 9990; }
+    * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+
+    body {
+      background: #1a0e07;
+      color: var(--creme);
+      font-family: 'Josefin Sans', sans-serif;
+      overflow-x: hidden;
+      display: flex;
+    }
+
+    /* GRAIN ESTIVAL */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(255,190,152,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(92,106,162,0.08) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.008) 0px,
+        rgba(255,255,255,0.008) 1px,
+        transparent 1px,
+        transparent 4px
+      );
+      pointer-events: none;
+      z-index: 9990;
+    }
 
     /* CURSEUR */
-    #curseur { position: fixed; pointer-events: none; z-index: 99999; width: 20px; height: 20px; transform: translate(-50%,-50%); }
-    #curseur svg { width: 20px; height: 20px; }
-    #curseur-trail { position: fixed; pointer-events: none; z-index: 99998; width: 8px; height: 8px; border-radius: 50%; background: rgba(255,215,0,0.5); transform: translate(-50%,-50%); transition: left 0.08s, top 0.08s; }
+    #curseur { position: fixed; pointer-events: none; z-index: 99999; width: 18px; height: 18px; transform: translate(-50%,-50%); }
+    #curseur svg { width: 18px; height: 18px; }
+    #curseur-trail { position: fixed; pointer-events: none; z-index: 99998; width: 6px; height: 6px; border-radius: 50%; background: rgba(255,190,152,0.6); transform: translate(-50%,-50%); transition: left 0.1s, top 0.1s; }
 
     /* CANVAS */
     #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
 
-    /* FOND IA */
+    /* FOND ESTIVAL */
     #ia-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: hidden; }
-    .ia-barre { position: absolute; height: 2px; border-radius: 2px; animation: scanBarre linear infinite; opacity: 0.12; }
+    .ia-barre { position: absolute; height: 1px; border-radius: 2px; animation: scanBarre linear infinite; opacity: 0.08; }
     @keyframes scanBarre { 0% { left: -100%; } 100% { left: 110%; } }
-    .ia-texte { position: absolute; font-size: 0.55em; font-family: 'Orbitron', monospace; opacity: 0.05; white-space: nowrap; animation: flotterTexte linear infinite; pointer-events: none; }
-    @keyframes flotterTexte { 0% { transform: translateY(0); opacity: 0.05; } 100% { transform: translateY(-110vh); opacity: 0; } }
+    .ia-texte { position: absolute; font-size: 0.5em; font-family: 'Cormorant Garamond', serif; font-style: italic; opacity: 0.04; white-space: nowrap; animation: flotterTexte linear infinite; pointer-events: none; }
+    @keyframes flotterTexte { 0% { transform: translateY(0); opacity: 0.04; } 100% { transform: translateY(-110vh); opacity: 0; } }
 
-    /* LOGO JARVIS */
-    #jarvis-logo { position: fixed; top: 12px; left: 90px; z-index: 200; display: none; align-items: center; gap: 12px; }
-    .logo-cercle { width: 44px; height: 44px; border-radius: 50%; background: radial-gradient(circle, #ffd700, #ff8c00); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px #ffd700, 0 0 40px #ff8c00; animation: logoGlow 2s ease-in-out infinite; font-size: 0.45em; font-weight: 900; color: #000; font-family: 'Orbitron', sans-serif; letter-spacing: 0.5px; text-align: center; line-height: 1.1; }
-    @keyframes logoGlow { 0%,100% { box-shadow: 0 0 20px #ffd700, 0 0 40px #ff8c00; } 50% { box-shadow: 0 0 40px #ffd700, 0 0 80px #ff8c00; } }
-    .logo-texte { font-size: 0.75em; color: #ffd700; text-shadow: 0 0 10px #ffd700; letter-spacing: 3px; }
+    /* ÉTOILES FILANTES */
+    .etoile-filante { position: fixed; width: 2px; height: 2px; background: var(--peche); border-radius: 50%; pointer-events: none; z-index: 1; animation: filante linear forwards; }
+    @keyframes filante { 0% { opacity: 1; transform: translate(0,0); } 100% { opacity: 0; transform: translate(200px, 200px); } }
 
-    /* TERMINAL IA */
-    #ia-terminal { position: fixed; bottom: 15px; left: 80px; z-index: 200; display: none; background: rgba(0,0,0,0.85); border: 1px solid rgba(0,247,255,0.25); border-radius: 10px; padding: 10px 14px; width: 260px; }
-    .terminal-titre { font-size: 0.6em; color: #00f7ff; opacity: 0.6; margin-bottom: 8px; letter-spacing: 2px; }
-    .barre-ia { height: 3px; border-radius: 3px; margin-bottom: 5px; overflow: hidden; background: rgba(255,255,255,0.05); }
-    .barre-ia-fill { height: 100%; border-radius: 3px; animation: barreIaAnim 2s ease-in-out infinite; }
-    @keyframes barreIaAnim { 0% { width: 10%; } 50% { width: 100%; } 100% { width: 10%; } }
-    .terminal-ligne { font-size: 0.55em; color: #00f7ff; opacity: 0.4; margin-bottom: 3px; transition: all 0.5s; overflow: hidden; white-space: nowrap; }
-    .terminal-ligne.active { opacity: 1; color: #ffd700; }
+    /* LOGO */
+    #jarvis-logo { position: fixed; top: 12px; left: 90px; z-index: 200; display: none; align-items: center; gap: 14px; }
+    .logo-cercle {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: radial-gradient(circle, var(--peche), var(--abricot));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 20px rgba(255,190,152,0.5), 0 0 40px rgba(244,132,95,0.3);
+      animation: logoGlow 3s ease-in-out infinite;
+      font-size: 1.2em; color: #1a0e07; text-align: center; line-height: 1;
+    }
+    @keyframes logoGlow { 0%,100% { box-shadow: 0 0 20px rgba(255,190,152,0.5); } 50% { box-shadow: 0 0 40px rgba(255,190,152,0.8), 0 0 70px rgba(244,132,95,0.4); } }
+    .logo-texte { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1em; color: var(--peche); text-shadow: 0 0 15px rgba(255,190,152,0.4); letter-spacing: 4px; }
 
-    /* FAUX BOUTONS TECH */
-    .tech-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 10px 0; }
-    .tech-btn { padding: 6px 14px; border: 1px solid rgba(0,247,255,0.4); border-radius: 6px; background: rgba(0,247,255,0.05); color: #00f7ff; font-size: 0.65em; font-family: 'Orbitron', sans-serif; cursor: none; letter-spacing: 1px; transition: all 0.3s; }
-    .tech-btn:hover { border-color: #00f7ff; background: rgba(0,247,255,0.15); box-shadow: 0 0 10px #00f7ff; color: #fff; }
-    .tech-btn.rouge { border-color: rgba(255,0,60,0.4); background: rgba(255,0,60,0.05); color: #ff003c; }
-    .tech-btn.rouge:hover { border-color: #ff003c; background: rgba(255,0,60,0.15); box-shadow: 0 0 10px #ff003c; }
-    .tech-btn.gold { border-color: rgba(255,215,0,0.4); background: rgba(255,215,0,0.05); color: #ffd700; }
-    .tech-btn.gold:hover { border-color: #ffd700; background: rgba(255,215,0,0.15); box-shadow: 0 0 10px #ffd700; }
+    /* TERMINAL */
+    #ia-terminal { position: fixed; bottom: 15px; left: 80px; z-index: 200; display: none; background: rgba(26,14,7,0.9); border: 1px solid rgba(255,190,152,0.2); border-radius: 10px; padding: 12px 16px; width: 270px; }
+    .terminal-titre { font-size: 0.6em; color: var(--peche); opacity: 0.5; margin-bottom: 8px; letter-spacing: 3px; font-family: 'Josefin Sans', sans-serif; }
+    .barre-ia { height: 2px; border-radius: 2px; margin-bottom: 5px; overflow: hidden; background: rgba(255,255,255,0.04); }
+    .barre-ia-fill { height: 100%; border-radius: 2px; animation: barreIaAnim 2.5s ease-in-out infinite; }
+    @keyframes barreIaAnim { 0% { width: 5%; } 50% { width: 100%; } 100% { width: 5%; } }
+    .terminal-ligne { font-size: 0.55em; color: var(--peche); opacity: 0.3; margin-bottom: 3px; transition: all 0.6s; font-style: italic; font-family: 'Cormorant Garamond', serif; }
+    .terminal-ligne.active { opacity: 0.9; color: var(--or-chaud); }
 
-    /* BARRES DE CHARGEMENT MASSIVES */
-    .barres-massives { width: 100%; padding: 15px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,215,0,0.1); border-radius: 12px; margin: 15px 0; }
-    .barre-massive-ligne { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-    .barre-massive-label { font-size: 0.6em; color: #00f7ff; min-width: 120px; letter-spacing: 1px; opacity: 0.7; }
-    .barre-massive-piste { flex: 1; height: 4px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
-    .barre-massive-fill { height: 100%; border-radius: 4px; animation: barreAnim 3s ease-in-out infinite; }
-    @keyframes barreAnim { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
-    .barre-massive-val { font-size: 0.6em; color: #ffd700; min-width: 40px; text-align: right; }
+    /* BOUTONS DÉCORATIFS */
+    .tech-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 12px 0; }
+    .tech-btn { padding: 6px 14px; border: 1px solid rgba(255,190,152,0.3); border-radius: 20px; background: rgba(255,190,152,0.04); color: var(--peche); font-size: 0.6em; font-family: 'Josefin Sans', sans-serif; cursor: none; letter-spacing: 2px; transition: all 0.4s; }
+    .tech-btn:hover { border-color: var(--peche); background: rgba(255,190,152,0.1); box-shadow: 0 0 12px rgba(255,190,152,0.2); }
+    .tech-btn.chaud { border-color: rgba(244,132,95,0.4); color: var(--abricot); background: rgba(244,132,95,0.04); }
+    .tech-btn.bleu { border-color: rgba(91,123,175,0.4); color: var(--bleu-doux); background: rgba(91,123,175,0.04); }
 
-    /* BARRES CIRCULAIRES */
+    /* BARRES MASSIVES */
+    .barres-massives { width: 100%; padding: 18px; background: rgba(255,190,152,0.03); border: 1px solid rgba(255,190,152,0.08); border-radius: 14px; margin: 15px 0; }
+    .barre-massive-ligne { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .barre-massive-label { font-size: 0.55em; color: var(--peche); min-width: 130px; letter-spacing: 2px; opacity: 0.6; font-family: 'Josefin Sans', sans-serif; }
+    .barre-massive-piste { flex: 1; height: 3px; background: rgba(255,255,255,0.04); border-radius: 3px; overflow: hidden; }
+    .barre-massive-fill { height: 100%; border-radius: 3px; animation: barreAnim 4s ease-in-out infinite; }
+    @keyframes barreAnim { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+    .barre-massive-val { font-size: 0.6em; color: var(--or-chaud); min-width: 40px; text-align: right; font-family: 'Josefin Sans', sans-serif; }
+
+    /* CERCLES */
     .cercles-row { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 15px 0; }
     .cercle-stat { text-align: center; }
     .cercle-stat svg { width: 70px; height: 70px; }
-    .cercle-stat .cercle-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 6; }
-    .cercle-stat .cercle-fill { fill: none; stroke-width: 6; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 35px 35px; animation: cercleAnim 3s ease-in-out infinite; }
-    @keyframes cercleAnim { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
-    .cercle-label { font-size: 0.55em; color: #00f7ff; margin-top: 5px; letter-spacing: 1px; }
-    .cercle-val { font-size: 0.8em; color: #ffd700; font-weight: bold; }
+    .cercle-stat .cercle-bg { fill: none; stroke: rgba(255,255,255,0.04); stroke-width: 5; }
+    .cercle-stat .cercle-fill { fill: none; stroke-width: 5; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 35px 35px; animation: cercleAnim 3.5s ease-in-out infinite; }
+    @keyframes cercleAnim { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
+    .cercle-label { font-size: 0.5em; color: var(--peche); margin-top: 5px; letter-spacing: 2px; opacity: 0.7; }
+    .cercle-val { font-size: 0.75em; color: var(--or-chaud); font-weight: 600; }
 
-    /* HUD INFO */
-    #hud-info { position: fixed; top: 8px; right: 50px; z-index: 50; display: none; gap: 15px; align-items: center; font-size: 0.7em; color: #ffd700; opacity: 0.8; font-family: 'Orbitron', monospace; letter-spacing: 1px; }
-    #hud-info span { text-shadow: 0 0 8px #ffd700; }
-    .batterie-bar { width: 30px; height: 10px; border: 1px solid #ffd700; border-radius: 2px; display: inline-block; margin-left: 4px; }
-    .batterie-fill { height: 100%; background: #ffd700; border-radius: 2px; transition: width 0.5s; }
+    /* HUD */
+    #hud-info { position: fixed; top: 8px; right: 50px; z-index: 50; display: none; gap: 15px; align-items: center; font-size: 0.65em; color: var(--peche); opacity: 0.7; font-family: 'Josefin Sans', sans-serif; letter-spacing: 2px; }
+    .batterie-bar { width: 28px; height: 9px; border: 1px solid var(--peche); border-radius: 2px; display: inline-block; margin-left: 4px; }
+    .batterie-fill { height: 100%; background: var(--peche); border-radius: 2px; transition: width 0.5s; }
 
-    /* ECRANS */
-    #loading-screen, #password-screen, #welcome-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #0a0a0f 40%, #000); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+    /* ÉCRANS */
+    #loading-screen, #password-screen, #welcome-screen {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(ellipse at center, #2a1508 0%, #0d0603 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px;
+    }
     #loading-screen { z-index: 1000; }
     #password-screen { z-index: 999; display: none; }
     #welcome-screen { z-index: 998; display: none; }
 
-    /* ECRAN MOT DE PASSE FUTURISTE */
-    .pw-logo { width: 80px; height: 80px; border-radius: 50%; background: radial-gradient(circle, #ffd700, #ff8c00); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px #ffd700; font-size: 0.6em; font-weight: 900; color: #000; margin: 0 auto 20px; animation: logoGlow 2s infinite; line-height: 1.2; }
-    .pw-titre { font-size: 1.8em; color: #ffd700; text-shadow: 0 0 20px #ffd700; margin-bottom: 5px; letter-spacing: 3px; }
-    .pw-sous-titre { font-size: 0.7em; color: #00f7ff; opacity: 0.7; margin-bottom: 20px; letter-spacing: 2px; }
-    .pw-scan-zone { width: 300px; border: 1px solid rgba(0,247,255,0.2); border-radius: 10px; padding: 15px; margin: 15px auto; background: rgba(0,247,255,0.03); }
-    .pw-scan-label { font-size: 0.6em; color: #00f7ff; opacity: 0.6; margin-bottom: 8px; letter-spacing: 2px; }
-    .pw-barres { margin-bottom: 12px; }
-    .pw-barre { height: 3px; border-radius: 3px; margin-bottom: 4px; background: rgba(255,255,255,0.05); overflow: hidden; }
-    .pw-barre-fill { height: 100%; border-radius: 3px; animation: barreIaAnim 1.5s ease-in-out infinite; }
-    .pw-btns-tech { display: flex; gap: 8px; justify-content: center; margin-bottom: 15px; }
-    .pw-btn-tech { padding: 5px 12px; border: 1px solid rgba(255,0,60,0.4); border-radius: 5px; background: rgba(255,0,60,0.05); color: #ff003c; font-size: 0.6em; font-family: 'Orbitron', sans-serif; cursor: none; letter-spacing: 1px; animation: clignoter 2s ease-in-out infinite; }
-    @keyframes clignoter { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
-    #password-input { padding: 12px 20px; width: 280px; border-radius: 10px; border: 2px solid #ffd700; background: rgba(255,215,0,0.05); color: #ffd700; font-size: 1em; outline: none; text-align: center; font-family: 'Orbitron', sans-serif; box-shadow: 0 0 15px rgba(255,215,0,0.3); cursor: text; letter-spacing: 3px; margin-bottom: 12px; }
-    #password-input:focus { box-shadow: 0 0 25px #ffd700; }
-    #password-btn { padding: 12px 35px; background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; border-radius: 10px; color: #000; font-size: 0.9em; font-weight: bold; font-family: 'Orbitron', sans-serif; cursor: none; box-shadow: 0 0 15px #ffd700; transition: all 0.3s; letter-spacing: 2px; }
-    #password-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px #ffd700; }
-    #password-error { color: #ff003c; margin-top: 10px; opacity: 0; transition: opacity 0.3s; font-size: 0.8em; letter-spacing: 1px; }
-    .pw-acces-btns { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+    /* LOGIN */
+    .pw-logo { width: 85px; height: 85px; border-radius: 50%; background: radial-gradient(circle, var(--peche), var(--abricot)); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 40px rgba(255,190,152,0.4); font-size: 2em; margin: 0 auto 22px; animation: logoGlow 2s infinite; }
+    .pw-titre { font-family: 'Cormorant Garamond', serif; font-size: 2.2em; font-style: italic; color: var(--peche); text-shadow: 0 0 30px rgba(255,190,152,0.4); margin-bottom: 6px; letter-spacing: 2px; }
+    .pw-sous-titre { font-size: 0.65em; color: var(--bleu-doux); opacity: 0.7; margin-bottom: 22px; letter-spacing: 4px; }
+    .pw-scan-zone { width: 310px; border: 1px solid rgba(255,190,152,0.15); border-radius: 14px; padding: 18px; margin: 15px auto; background: rgba(255,190,152,0.03); }
+    .pw-scan-label { font-size: 0.55em; color: var(--peche); opacity: 0.5; margin-bottom: 10px; letter-spacing: 3px; font-style: italic; font-family: 'Cormorant Garamond', serif; }
+    .pw-barres { margin-bottom: 14px; }
+    .pw-barre { height: 2px; border-radius: 2px; margin-bottom: 5px; background: rgba(255,255,255,0.04); overflow: hidden; }
+    .pw-barre-fill { height: 100%; border-radius: 2px; animation: barreIaAnim 1.8s ease-in-out infinite; }
+    .pw-btns-tech { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+    .pw-btn-tech { padding: 4px 12px; border: 1px solid rgba(255,190,152,0.3); border-radius: 12px; background: transparent; color: var(--peche); font-size: 0.55em; font-family: 'Josefin Sans', sans-serif; cursor: none; letter-spacing: 2px; animation: clignoter 2.5s ease-in-out infinite; }
+    @keyframes clignoter { 0%,100% { opacity: 0.3; } 50% { opacity: 0.9; } }
+    #password-input { padding: 13px 22px; width: 275px; border-radius: 30px; border: 1px solid rgba(255,190,152,0.4); background: rgba(255,190,152,0.05); color: var(--peche); font-size: 1em; outline: none; text-align: center; font-family: 'Josefin Sans', sans-serif; box-shadow: 0 0 20px rgba(255,190,152,0.1); cursor: text; letter-spacing: 4px; margin-bottom: 14px; }
+    #password-input:focus { box-shadow: 0 0 30px rgba(255,190,152,0.25); border-color: var(--peche); }
+    #password-btn { padding: 13px 38px; background: linear-gradient(135deg, var(--peche), var(--abricot)); border: none; border-radius: 30px; color: #1a0e07; font-size: 0.85em; font-weight: 600; font-family: 'Josefin Sans', sans-serif; cursor: none; box-shadow: 0 0 20px rgba(255,190,152,0.3); transition: all 0.4s; letter-spacing: 3px; }
+    #password-btn:hover { transform: scale(1.04); box-shadow: 0 0 35px rgba(255,190,152,0.5); }
+    #password-error { color: var(--abricot); margin-top: 10px; opacity: 0; transition: opacity 0.3s; font-size: 0.75em; letter-spacing: 1px; }
+    .pw-acces-btns { display: flex; gap: 10px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
 
     /* WELCOME */
-    #welcome-screen h1 { font-size: 2.5em; color: #ffd700; animation: pulseGold 1s infinite; margin: 15px 0; }
-    @keyframes pulseGold { 0%,100% { text-shadow: 0 0 20px #ffd700, 0 0 40px #ff8c00; } 50% { text-shadow: 0 0 40px #ffd700, 0 0 80px #ff8c00, 0 0 120px #ff003c; } }
-    #welcome-screen .sub { font-size: 1.1em; color: #00f7ff; line-height: 1.8; margin-top: 10px; }
+    #welcome-screen h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.8em; font-style: italic; color: var(--peche); animation: pulsePerche 1.5s infinite; margin: 15px 0; }
+    @keyframes pulsePerche { 0%,100% { text-shadow: 0 0 20px rgba(255,190,152,0.5), 0 0 40px rgba(244,132,95,0.3); } 50% { text-shadow: 0 0 40px rgba(255,190,152,0.8), 0 0 80px rgba(244,132,95,0.5); } }
+    #welcome-screen .sub { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.2em; color: var(--bleu-doux); line-height: 2; margin-top: 10px; }
 
     /* CHARGEMENT */
-    .barre-chargement { width: 300px; height: 4px; background: rgba(255,215,0,0.15); border-radius: 10px; overflow: hidden; margin-top: 10px; }
-    .barre-progress { height: 100%; width: 0%; background: linear-gradient(to right, #ff003c, #ffd700); border-radius: 10px; transition: width 1.5s ease; }
-    #loading-text { color: #00f7ff; margin-top: 10px; font-size: 0.85em; letter-spacing: 1px; }
-    .eclair { position: fixed; top: 0; left: 50%; width: 4px; height: 0; background: linear-gradient(to bottom, #ffd700, #ff003c); box-shadow: 0 0 20px #ffd700; z-index: 1001; transition: height 0.8s ease-in; }
+    .barre-chargement { width: 280px; height: 2px; background: rgba(255,190,152,0.1); border-radius: 10px; overflow: hidden; margin-top: 14px; }
+    .barre-progress { height: 100%; width: 0%; background: linear-gradient(to right, var(--abricot), var(--peche)); border-radius: 10px; transition: width 1.5s ease; }
+    #loading-text { color: var(--bleu-doux); margin-top: 12px; font-size: 0.75em; letter-spacing: 3px; font-style: italic; font-family: 'Cormorant Garamond', serif; }
+    .eclair { position: fixed; top: 0; left: 50%; width: 2px; height: 0; background: linear-gradient(to bottom, var(--peche), var(--abricot)); box-shadow: 0 0 15px var(--peche); z-index: 1001; transition: height 0.8s ease-in; }
 
     /* HUD COINS */
-    .hud-bar { position: fixed; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(to right, #ff003c, #ffd700, #00f7ff, #ff003c); z-index: 5; animation: hudScan 3s linear infinite; }
-    @keyframes hudScan { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
-    .hud-corner { position: fixed; width: 28px; height: 28px; z-index: 5; opacity: 0.6; }
-    .hud-corner-tl { top: 5px; left: 5px; border-top: 2px solid #ffd700; border-left: 2px solid #ffd700; }
-    .hud-corner-tr { top: 5px; right: 5px; border-top: 2px solid #ffd700; border-right: 2px solid #ffd700; }
-    .hud-corner-bl { bottom: 5px; left: 5px; border-bottom: 2px solid #ffd700; border-left: 2px solid #ffd700; }
-    .hud-corner-br { bottom: 5px; right: 5px; border-bottom: 2px solid #ffd700; border-right: 2px solid #ffd700; }
+    .hud-bar { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(to right, var(--abricot), var(--peche), var(--bleu-doux), var(--abricot)); z-index: 5; animation: hudScan 4s linear infinite; opacity: 0.4; }
+    @keyframes hudScan { 0%,100% { opacity: 0.2; } 50% { opacity: 0.6; } }
+    .hud-corner { position: fixed; width: 24px; height: 24px; z-index: 5; opacity: 0.4; }
+    .hud-corner-tl { top: 5px; left: 5px; border-top: 1px solid var(--peche); border-left: 1px solid var(--peche); }
+    .hud-corner-tr { top: 5px; right: 5px; border-top: 1px solid var(--peche); border-right: 1px solid var(--peche); }
+    .hud-corner-bl { bottom: 5px; left: 5px; border-bottom: 1px solid var(--peche); border-left: 1px solid var(--peche); }
+    .hud-corner-br { bottom: 5px; right: 5px; border-bottom: 1px solid var(--peche); border-right: 1px solid var(--peche); }
 
     /* SIDEBAR */
-    #sidebar { position: fixed; left: 0; top: 0; height: 100%; width: 68px; background: rgba(0,0,0,0.97); border-right: 1px solid rgba(255,215,0,0.15); display: none; flex-direction: column; align-items: center; padding-top: 75px; gap: 6px; z-index: 100; overflow-y: auto; }
-    .sidebar-btn { width: 48px; height: 48px; border-radius: 10px; border: 1px solid rgba(255,215,0,0.25); background: rgba(255,215,0,0.03); display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: none; transition: all 0.3s; position: relative; }
-    .sidebar-btn:hover, .sidebar-btn.active { border-color: #ffd700; background: rgba(255,215,0,0.1); box-shadow: 0 0 12px #ffd700; }
-    .sidebar-tooltip { position: absolute; left: 58px; background: rgba(0,0,0,0.97); border: 1px solid #ffd700; border-radius: 7px; padding: 4px 10px; font-size: 0.65em; color: #ffd700; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    #sidebar { position: fixed; left: 0; top: 0; height: 100%; width: 68px; background: rgba(15,8,3,0.97); border-right: 1px solid rgba(255,190,152,0.1); display: none; flex-direction: column; align-items: center; padding-top: 75px; gap: 5px; z-index: 100; overflow-y: auto; }
+    .sidebar-btn { width: 46px; height: 46px; border-radius: 12px; border: 1px solid rgba(255,190,152,0.15); background: rgba(255,190,152,0.02); display: flex; align-items: center; justify-content: center; font-size: 1.1em; cursor: none; transition: all 0.4s; position: relative; }
+    .sidebar-btn:hover, .sidebar-btn.active { border-color: rgba(255,190,152,0.5); background: rgba(255,190,152,0.08); box-shadow: 0 0 12px rgba(255,190,152,0.2); }
+    .sidebar-tooltip { position: absolute; left: 56px; background: rgba(15,8,3,0.97); border: 1px solid rgba(255,190,152,0.3); border-radius: 8px; padding: 4px 10px; font-size: 0.6em; color: var(--peche); white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; font-family: 'Josefin Sans', sans-serif; letter-spacing: 1px; }
     .sidebar-btn:hover .sidebar-tooltip { opacity: 1; }
 
-    /* AVENGERS */
-    #avengers-panel { position: fixed; right: 15px; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(0,0,0,0.92); border: 1px solid rgba(255,215,0,0.2); border-radius: 12px; padding: 12px; width: 165px; max-height: 80vh; overflow-y: auto; display: none; }
-    #avengers-panel h3 { color: #ffd700; font-size: 0.75em; text-align: center; margin-bottom: 10px; letter-spacing: 2px; text-shadow: 0 0 10px #ffd700; }
-    .contact { display: flex; align-items: center; gap: 7px; padding: 5px 0; border-bottom: 1px solid rgba(255,215,0,0.08); }
+    /* PANEL CONTACTS */
+    #avengers-panel { position: fixed; right: 15px; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(15,8,3,0.93); border: 1px solid rgba(255,190,152,0.15); border-radius: 14px; padding: 14px; width: 165px; max-height: 80vh; overflow-y: auto; display: none; }
+    #avengers-panel h3 { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--peche); font-size: 0.85em; text-align: center; margin-bottom: 12px; letter-spacing: 2px; opacity: 0.8; }
+    .contact { display: flex; align-items: center; gap: 7px; padding: 5px 0; border-bottom: 1px solid rgba(255,190,152,0.06); }
     .contact:last-child { border-bottom: none; }
-    .contact-avatar { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 0.9em; border: 1px solid rgba(255,215,0,0.3); background: rgba(255,215,0,0.08); flex-shrink: 0; }
+    .contact-avatar { width: 27px; height: 27px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.85em; border: 1px solid rgba(255,190,152,0.2); background: rgba(255,190,152,0.06); flex-shrink: 0; }
     .contact-info { flex: 1; min-width: 0; }
-    .contact-name { font-size: 0.65em; color: #ffd700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .contact-status { font-size: 0.55em; color: #00f7ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .status-dot { width: 5px; height: 5px; border-radius: 50%; background: #00ff00; box-shadow: 0 0 4px #00ff00; display: inline-block; margin-right: 2px; }
-    .status-dot.offline { background: #ff003c; box-shadow: 0 0 4px #ff003c; }
-    .status-dot.mission { background: #ffaa00; box-shadow: 0 0 4px #ffaa00; }
+    .contact-name { font-size: 0.62em; color: var(--peche); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 1px; }
+    .contact-status { font-size: 0.52em; color: var(--bleu-doux); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-style: italic; font-family: 'Cormorant Garamond', serif; }
+    .status-dot { width: 4px; height: 4px; border-radius: 50%; background: #a8d5a2; box-shadow: 0 0 4px #a8d5a2; display: inline-block; margin-right: 2px; }
+    .status-dot.offline { background: var(--abricot); box-shadow: 0 0 4px var(--abricot); }
+    .status-dot.mission { background: var(--or-chaud); box-shadow: 0 0 4px var(--or-chaud); }
 
     /* CONTENU */
     #main-content { display: none; flex-direction: column; align-items: center; width: 100%; padding: 40px 190px 100px 82px; min-height: 100vh; }
-    .section { display: none; width: 100%; max-width: 820px; flex-direction: column; align-items: center; opacity: 0; transform: translateY(20px); transition: opacity 0.4s ease, transform 0.4s ease; }
+    .section { display: none; width: 100%; max-width: 820px; flex-direction: column; align-items: center; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
     .section.active { display: flex; }
     .section.visible { opacity: 1; transform: translateY(0); }
 
-    .header { text-align: center; margin-bottom: 10px; }
-    h1 { font-size: 2em; color: #ffd700; text-shadow: 0 0 20px #ffd700; margin-bottom: 5px; animation: pulseGold 3s infinite; }
-    .subtitle { font-size: 1em; color: #00f7ff; opacity: 0.9; margin-bottom: 15px; text-shadow: 0 0 8px #00f7ff; }
-    h2 { margin-bottom: 15px; font-size: 1.2em; color: #ffd700; text-shadow: 0 0 10px #ffd700; opacity: 0.9; }
-    .separateur { width: 85%; height: 1px; background: linear-gradient(to right, transparent, #ffd700, #00f7ff, transparent); margin: 18px 0; }
-    .horloge { font-size: 2.8em; font-weight: bold; color: #ffd700; text-shadow: 0 0 30px #ffd700; margin-top: 12px; text-align: center; }
-    .horloge span { font-size: 0.38em; opacity: 0.7; color: #00f7ff; }
+    .header { text-align: center; margin-bottom: 12px; }
+    h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.4em; font-style: italic; color: var(--peche); text-shadow: 0 0 30px rgba(255,190,152,0.4); margin-bottom: 6px; animation: pulsePerche 4s infinite; }
+    .subtitle { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.05em; color: var(--bleu-doux); opacity: 0.85; margin-bottom: 15px; }
+    h2 { font-family: 'Cormorant Garamond', serif; font-style: italic; margin-bottom: 15px; font-size: 1.3em; color: var(--peche); opacity: 0.85; font-weight: 400; letter-spacing: 1px; }
+    .separateur { width: 80%; height: 1px; background: linear-gradient(to right, transparent, rgba(255,190,152,0.3), rgba(91,123,175,0.3), transparent); margin: 20px 0; }
+    .horloge { font-family: 'Cormorant Garamond', serif; font-size: 3.2em; font-weight: 600; color: var(--peche); text-shadow: 0 0 30px rgba(255,190,152,0.3); margin-top: 12px; text-align: center; }
+    .horloge span { font-size: 0.35em; opacity: 0.6; color: var(--bleu-doux); font-style: italic; }
 
-    /* JARVIS BTN */
-    .jarvis-section { text-align: center; margin: 15px 0; position: relative; z-index: 2; width: 100%; }
-    .jarvis-btn { position: relative; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 170px; height: 170px; border-radius: 50%; border: 3px solid #ffd700; cursor: none; transition: all 0.3s; background: rgba(255,215,0,0.04); z-index: 2; box-shadow: 0 0 20px rgba(255,215,0,0.4); }
-    .jarvis-btn:hover { box-shadow: 0 0 50px #ffd700, 0 0 100px rgba(255,215,0,0.3); transform: scale(1.05); }
-    .jarvis-ring { position: absolute; width: 190px; height: 190px; border-radius: 50%; border: 1px solid rgba(255,215,0,0.3); animation: rotate 4s linear infinite; }
-    .jarvis-ring2 { position: absolute; width: 210px; height: 210px; border-radius: 50%; border: 1px solid rgba(255,0,60,0.25); animation: rotate 7s linear infinite reverse; }
+    /* BOUTON CENTRAL */
+    .jarvis-section { text-align: center; margin: 18px 0; position: relative; z-index: 2; width: 100%; }
+    .jarvis-btn { position: relative; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; width: 170px; height: 170px; border-radius: 50%; border: 2px solid rgba(255,190,152,0.4); cursor: none; transition: all 0.4s; background: rgba(255,190,152,0.03); z-index: 2; box-shadow: 0 0 30px rgba(255,190,152,0.15); }
+    .jarvis-btn:hover { box-shadow: 0 0 60px rgba(255,190,152,0.35); transform: scale(1.04); border-color: rgba(255,190,152,0.7); }
+    .jarvis-ring { position: absolute; width: 192px; height: 192px; border-radius: 50%; border: 1px solid rgba(255,190,152,0.2); animation: rotate 6s linear infinite; }
+    .jarvis-ring2 { position: absolute; width: 214px; height: 214px; border-radius: 50%; border: 1px solid rgba(91,123,175,0.15); animation: rotate 10s linear infinite reverse; }
     @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    .jarvis-icon { font-size: 2.8em; }
-    .jarvis-text { font-size: 0.65em; font-weight: bold; color: #ffd700; letter-spacing: 2px; margin-top: 5px; }
-    .jarvis-status { margin-top: 15px; font-size: 0.85em; color: #00f7ff; opacity: 0.8; }
+    .jarvis-icon { font-size: 2.6em; }
+    .jarvis-text { font-family: 'Josefin Sans', sans-serif; font-size: 0.6em; color: var(--peche); letter-spacing: 3px; margin-top: 6px; opacity: 0.8; }
+    .jarvis-status { margin-top: 14px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.95em; color: var(--bleu-doux); opacity: 0.7; }
 
     /* EXPLOSION */
-    .particule-explosion { position: fixed; width: 8px; height: 8px; border-radius: 50%; pointer-events: none; z-index: 9999; animation: exploser 0.8s ease-out forwards; }
+    .particule-explosion { position: fixed; width: 6px; height: 6px; border-radius: 50%; pointer-events: none; z-index: 9999; animation: exploser 0.9s ease-out forwards; }
     @keyframes exploser { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; } }
 
     /* FLASH */
-    #flash-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,215,0,0.08); z-index: 9998; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    #flash-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,190,152,0.06); z-index: 9998; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
 
     /* CINEMA */
-    #cinema-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9995; background: #000; flex-direction: column; animation: fadeCinema 0.6s ease; }
+    #cinema-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9995; background: #000; flex-direction: column; animation: fadeCinema 0.7s ease; }
     @keyframes fadeCinema { from { opacity: 0; } to { opacity: 1; } }
     #cinema-frame { flex: 1; border: none; width: 100%; height: 100%; }
-    #cinema-close { padding: 9px 18px; background: linear-gradient(135deg, #ffd700, #ff003c); border: none; color: #000; font-family: 'Orbitron', sans-serif; font-size: 0.85em; cursor: none; position: absolute; top: 12px; right: 12px; border-radius: 8px; z-index: 9996; font-weight: bold; }
+    #cinema-close { padding: 9px 18px; background: linear-gradient(135deg, var(--peche), var(--abricot)); border: none; color: #1a0e07; font-family: 'Josefin Sans', sans-serif; font-size: 0.8em; cursor: none; position: absolute; top: 12px; right: 12px; border-radius: 20px; z-index: 9996; font-weight: 600; letter-spacing: 2px; }
 
     /* EASTER EGG */
-    #easter-egg-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.96); z-index: 99997; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-    #easter-egg-overlay h2 { font-size: 2.5em; color: #ffd700; text-shadow: 0 0 30px #ffd700; animation: pulseGold 1s infinite; margin: 15px 0; }
-    #easter-egg-overlay p { color: #00f7ff; font-size: 1em; margin-top: 15px; line-height: 1.6; }
-    #easter-egg-close { margin-top: 25px; padding: 12px 25px; background: linear-gradient(135deg, #ffd700, #ff003c); border: none; border-radius: 10px; color: #000; font-family: 'Orbitron', sans-serif; font-size: 0.9em; cursor: none; font-weight: bold; }
+    #easter-egg-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,5,2,0.97); z-index: 99997; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+    #easter-egg-overlay h2 { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 2.8em; color: var(--peche); text-shadow: 0 0 30px rgba(255,190,152,0.5); animation: pulsePerche 1.5s infinite; margin: 15px 0; }
+    #easter-egg-overlay p { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--bleu-doux); font-size: 1.15em; margin-top: 15px; line-height: 1.8; }
+    #easter-egg-close { margin-top: 25px; padding: 12px 28px; background: linear-gradient(135deg, var(--peche), var(--abricot)); border: none; border-radius: 25px; color: #1a0e07; font-family: 'Josefin Sans', sans-serif; font-size: 0.85em; cursor: none; font-weight: 600; letter-spacing: 2px; }
 
     /* BOUTONS PRINCIPAUX */
-    .btn-v7 { background: linear-gradient(135deg, #ff003c, #001aff); border: none; padding: 11px 18px; border-radius: 10px; color: white; transition: 0.3s; box-shadow: 0 0 8px #ff003c; cursor: none; font-family: 'Orbitron', sans-serif; font-size: 0.8em; }
-    .btn-v7:hover { transform: scale(1.05); box-shadow: 0 0 18px #00f7ff; }
-    .btn-gold { background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; padding: 11px 18px; border-radius: 10px; color: #000; transition: 0.3s; box-shadow: 0 0 8px #ffd700; cursor: none; font-family: 'Orbitron', sans-serif; font-size: 0.8em; font-weight: bold; }
-    .btn-gold:hover { transform: scale(1.05); box-shadow: 0 0 25px #ffd700; }
+    .btn-v7 { background: linear-gradient(135deg, var(--bleu-nuit), var(--bleu-doux)); border: none; padding: 11px 20px; border-radius: 25px; color: var(--creme); transition: 0.4s; box-shadow: 0 0 12px rgba(44,62,107,0.4); cursor: none; font-family: 'Josefin Sans', sans-serif; font-size: 0.75em; letter-spacing: 2px; }
+    .btn-v7:hover { transform: scale(1.04); box-shadow: 0 0 22px rgba(91,123,175,0.5); }
+    .btn-gold { background: linear-gradient(135deg, var(--peche), var(--abricot)); border: none; padding: 11px 20px; border-radius: 25px; color: #1a0e07; transition: 0.4s; box-shadow: 0 0 12px rgba(255,190,152,0.3); cursor: none; font-family: 'Josefin Sans', sans-serif; font-size: 0.75em; font-weight: 600; letter-spacing: 2px; }
+    .btn-gold:hover { transform: scale(1.04); box-shadow: 0 0 28px rgba(255,190,152,0.5); }
 
     /* RECHERCHE */
     .recherche { margin-top: 10px; width: 100%; display: flex; justify-content: center; }
-    .recherche input { width: 380px; padding: 11px 18px; border-radius: 10px 0 0 10px; border: 2px solid #ffd700; background: rgba(255,215,0,0.04); color: #ffd700; font-size: 0.85em; outline: none; cursor: text; font-family: 'Orbitron', sans-serif; }
-    .recherche input:focus { box-shadow: 0 0 12px rgba(255,215,0,0.4); }
-    .recherche input::placeholder { color: rgba(255,215,0,0.35); }
-    .recherche button { padding: 11px 18px; border-radius: 0 10px 10px 0; border: none; background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; font-size: 0.85em; cursor: none; font-weight: bold; font-family: 'Orbitron', sans-serif; }
+    .recherche input { width: 360px; padding: 12px 20px; border-radius: 25px 0 0 25px; border: 1px solid rgba(255,190,152,0.3); background: rgba(255,190,152,0.04); color: var(--peche); font-size: 0.85em; outline: none; cursor: text; font-family: 'Josefin Sans', sans-serif; letter-spacing: 1px; }
+    .recherche input:focus { box-shadow: 0 0 15px rgba(255,190,152,0.2); }
+    .recherche input::placeholder { color: rgba(255,190,152,0.3); }
+    .recherche button { padding: 12px 20px; border-radius: 0 25px 25px 0; border: none; background: linear-gradient(135deg, var(--peche), var(--abricot)); color: #1a0e07; font-size: 0.85em; cursor: none; font-weight: 600; font-family: 'Josefin Sans', sans-serif; letter-spacing: 1px; }
 
     /* GRILLES */
-    .grille { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px; }
-    .grille a { padding: 10px 18px; border: 2px solid rgba(255,215,0,0.4); border-radius: 10px; color: #ffd700; text-decoration: none; font-size: 0.8em; transition: all 0.4s; background: rgba(255,215,0,0.03); position: relative; overflow: hidden; font-family: 'Orbitron', sans-serif; }
-    .grille a::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255,215,0,0.2); border-radius: 50%; transform: translate(-50%,-50%); transition: width 0.4s, height 0.4s; }
+    .grille { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px; }
+    .grille a { padding: 10px 18px; border: 1px solid rgba(255,190,152,0.25); border-radius: 22px; color: var(--peche); text-decoration: none; font-size: 0.75em; transition: all 0.4s; background: rgba(255,190,152,0.03); font-family: 'Josefin Sans', sans-serif; letter-spacing: 1px; position: relative; overflow: hidden; }
+    .grille a::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255,190,152,0.15); border-radius: 50%; transform: translate(-50%,-50%); transition: width 0.4s, height 0.4s; }
     .grille a:hover::before { width: 200px; height: 200px; }
-    .grille a:hover { color: #000; box-shadow: 0 0 18px #ffd700; transform: translateY(-3px); }
+    .grille a:hover { color: #1a0e07; box-shadow: 0 0 15px rgba(255,190,152,0.3); transform: translateY(-2px); border-color: var(--peche); }
 
     /* DOSSIERS */
-    .dossier { margin-bottom: 10px; width: 100%; text-align: center; }
-    .dossier-btn { padding: 9px 28px; background: rgba(255,215,0,0.03); border: 2px solid rgba(255,215,0,0.4); border-radius: 10px; color: #ffd700; font-size: 0.8em; cursor: none; transition: all 0.3s; font-family: 'Orbitron', sans-serif; }
-    .dossier-btn:hover { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; box-shadow: 0 0 18px #ffd700; }
-    .dossier-contenu { display: none; margin-top: 10px; gap: 10px; justify-content: center; flex-wrap: wrap; }
-    .dossier-contenu a { padding: 7px 16px; border: 1px solid rgba(0,247,255,0.4); border-radius: 8px; color: #00f7ff; text-decoration: none; font-size: 0.75em; transition: all 0.3s; background: rgba(0,247,255,0.04); font-family: 'Orbitron', sans-serif; }
-    .dossier-contenu a:hover { background: #00f7ff; color: #000; box-shadow: 0 0 12px #00f7ff; }
+    .dossier { margin-bottom: 12px; width: 100%; text-align: center; }
+    .dossier-btn { padding: 10px 30px; background: rgba(255,190,152,0.03); border: 1px solid rgba(255,190,152,0.25); border-radius: 22px; color: var(--peche); font-size: 0.78em; cursor: none; transition: all 0.4s; font-family: 'Josefin Sans', sans-serif; letter-spacing: 2px; }
+    .dossier-btn:hover { background: linear-gradient(135deg, var(--peche), var(--abricot)); color: #1a0e07; box-shadow: 0 0 18px rgba(255,190,152,0.3); }
+    .dossier-contenu { display: none; margin-top: 10px; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .dossier-contenu a { padding: 7px 15px; border: 1px solid rgba(91,123,175,0.3); border-radius: 18px; color: var(--bleu-doux); text-decoration: none; font-size: 0.72em; transition: all 0.3s; background: rgba(91,123,175,0.04); font-family: 'Josefin Sans', sans-serif; letter-spacing: 1px; }
+    .dossier-contenu a:hover { background: var(--bleu-doux); color: var(--creme); box-shadow: 0 0 12px rgba(91,123,175,0.3); }
+
+    /* NOTES */
+    .notes-container { width: 100%; }
+    #notes { width: 100%; height: 210px; background: rgba(255,190,152,0.03); border: 1px solid rgba(255,190,152,0.2); border-radius: 14px; color: var(--peche); font-size: 0.9em; padding: 18px; resize: vertical; outline: none; font-family: 'Cormorant Garamond', serif; font-style: italic; cursor: text; line-height: 1.7; }
+    #notes:focus { border-color: rgba(255,190,152,0.5); box-shadow: 0 0 20px rgba(255,190,152,0.1); }
+    #notes::placeholder { color: rgba(255,190,152,0.2); }
+    .save-btn { margin-top: 12px; padding: 10px 24px; background: linear-gradient(135deg, var(--peche), var(--abricot)); border: none; border-radius: 22px; color: #1a0e07; font-size: 0.78em; cursor: none; transition: all 0.3s; font-family: 'Josefin Sans', sans-serif; font-weight: 600; letter-spacing: 2px; }
+    .save-btn:hover { transform: scale(1.04); box-shadow: 0 0 18px rgba(255,190,152,0.4); }
+    #notif-save { margin-left: 10px; font-size: 0.72em; opacity: 0.8; color: var(--bleu-doux); font-style: italic; font-family: 'Cormorant Garamond', serif; }
 
     /* TODO */
-    .todo-input-zone { display: flex; gap: 10px; margin-bottom: 12px; width: 100%; }
-    .todo-input-zone input { flex: 1; padding: 10px 16px; border-radius: 10px; border: 2px solid rgba(255,215,0,0.4); background: rgba(255,215,0,0.03); color: #ffd700; font-size: 0.8em; outline: none; cursor: text; font-family: 'Orbitron', sans-serif; }
-    .todo-input-zone input::placeholder { color: rgba(255,215,0,0.25); }
-    .todo-input-zone button { padding: 10px 18px; background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; border-radius: 10px; color: #000; font-size: 1em; cursor: none; font-weight: bold; }
-    .todo-item { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border: 1px solid rgba(255,215,0,0.2); border-radius: 9px; margin-bottom: 7px; background: rgba(255,215,0,0.02); width: 100%; }
-    .todo-item input[type=checkbox] { accent-color: #ffd700; width: 15px; height: 15px; cursor: pointer; }
-    .todo-item span { flex: 1; text-align: left; color: #ffd700; font-family: 'Orbitron', sans-serif; font-size: 0.8em; }
-    .todo-item span.done { text-decoration: line-through; opacity: 0.35; }
-    .todo-delete { background: none; border: none; color: #ff003c; cursor: none; opacity: 0.5; font-size: 1em; }
+    .todo-input-zone { display: flex; gap: 8px; margin-bottom: 14px; width: 100%; }
+    .todo-input-zone input { flex: 1; padding: 10px 18px; border-radius: 22px; border: 1px solid rgba(255,190,152,0.25); background: rgba(255,190,152,0.03); color: var(--peche); font-size: 0.8em; outline: none; cursor: text; font-family: 'Josefin Sans', sans-serif; }
+    .todo-input-zone input::placeholder { color: rgba(255,190,152,0.2); }
+    .todo-input-zone button { padding: 10px 20px; background: linear-gradient(135deg, var(--peche), var(--abricot)); border: none; border-radius: 22px; color: #1a0e07; font-size: 1em; cursor: none; font-weight: bold; }
+    .todo-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border: 1px solid rgba(255,190,152,0.12); border-radius: 22px; margin-bottom: 8px; background: rgba(255,190,152,0.02); width: 100%; }
+    .todo-item input[type=checkbox] { accent-color: var(--abricot); width: 14px; height: 14px; cursor: pointer; }
+    .todo-item span { flex: 1; text-align: left; color: var(--peche); font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.9em; }
+    .todo-item span.done { text-decoration: line-through; opacity: 0.3; }
+    .todo-delete { background: none; border: none; color: var(--abricot); cursor: none; opacity: 0.4; font-size: 1em; }
     .todo-delete:hover { opacity: 1; }
+
+    /* POST-IT */
+    .postits { display: flex; flex-wrap: wrap; gap: 15px; width: 100%; margin-top: 10px; }
+    .postit { width: 175px; min-height: 155px; padding: 14px; border-radius: 10px; position: relative; box-shadow: 3px 3px 15px rgba(0,0,0,0.4); transform: rotate(var(--rot)); transition: transform 0.3s; }
+    .postit:hover { transform: rotate(0deg) scale(1.05); z-index: 10; }
+    .postit textarea { background: transparent; border: none; width: 100%; height: 108px; resize: none; font-size: 0.85em; color: #2a1508; font-family: 'Cormorant Garamond', serif; font-style: italic; outline: none; cursor: text; line-height: 1.5; }
+    .postit-delete { position: absolute; top: 6px; right: 8px; background: none; border: none; cursor: none; opacity: 0.4; font-size: 0.9em; color: #2a1508; }
+    .postit-delete:hover { opacity: 1; }
+    .add-postit { width: 175px; min-height: 155px; border: 1px dashed rgba(255,190,152,0.25); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-size: 1.8em; color: rgba(255,190,152,0.25); cursor: none; transition: all 0.4s; }
+    .add-postit:hover { border-color: rgba(255,190,152,0.5); color: rgba(255,190,152,0.5); box-shadow: 0 0 15px rgba(255,190,152,0.1); }
+    .add-postit span { font-size: 0.38em; font-family: 'Josefin Sans', sans-serif; letter-spacing: 2px; }
 
     /* MINUTEUR */
     .minuteur { width: 100%; text-align: center; }
-    .minuteur-display { font-size: 4.5em; font-weight: bold; color: #ffd700; text-shadow: 0 0 25px #ffd700; font-family: 'Orbitron', monospace; margin: 18px 0; }
-    .minuteur-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 18px; }
-    .minuteur-btns button { padding: 9px 18px; background: transparent; border: 2px solid rgba(255,215,0,0.4); border-radius: 10px; color: #ffd700; font-size: 0.8em; cursor: none; transition: all 0.3s; font-family: 'Orbitron', sans-serif; }
-    .minuteur-btns button:hover { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; box-shadow: 0 0 12px #ffd700; }
+    .minuteur-display { font-family: 'Cormorant Garamond', serif; font-size: 5em; font-weight: 600; color: var(--peche); text-shadow: 0 0 30px rgba(255,190,152,0.3); margin: 20px 0; }
+    .minuteur-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+    .minuteur-btns button { padding: 10px 20px; background: transparent; border: 1px solid rgba(255,190,152,0.3); border-radius: 22px; color: var(--peche); font-size: 0.78em; cursor: none; transition: all 0.4s; font-family: 'Josefin Sans', sans-serif; letter-spacing: 2px; }
+    .minuteur-btns button:hover { background: linear-gradient(135deg, var(--peche), var(--abricot)); color: #1a0e07; border-color: transparent; box-shadow: 0 0 15px rgba(255,190,152,0.3); }
     .minuteur-presets { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-    .minuteur-presets button { padding: 7px 13px; background: rgba(255,215,0,0.03); border: 1px solid rgba(255,215,0,0.25); border-radius: 8px; color: #ffd700; font-size: 0.7em; cursor: none; transition: all 0.3s; font-family: 'Orbitron', sans-serif; }
-    .minuteur-presets button:hover { border-color: #ffd700; box-shadow: 0 0 8px #ffd700; }
-    .chrono-display { font-size: 2.8em; font-weight: bold; color: #00f7ff; text-shadow: 0 0 18px #00f7ff; font-family: 'Orbitron', monospace; margin: 12px 0; }
-    .separateur-outil { width: 60%; height: 1px; background: rgba(255,215,0,0.15); margin: 18px auto; }
+    .minuteur-presets button { padding: 7px 14px; background: rgba(255,190,152,0.03); border: 1px solid rgba(255,190,152,0.18); border-radius: 18px; color: var(--peche); font-size: 0.68em; cursor: none; transition: all 0.3s; font-family: 'Josefin Sans', sans-serif; letter-spacing: 1px; }
+    .minuteur-presets button:hover { border-color: rgba(255,190,152,0.5); box-shadow: 0 0 10px rgba(255,190,152,0.2); }
+    .chrono-display { font-family: 'Cormorant Garamond', serif; font-size: 3em; font-weight: 600; color: var(--bleu-doux); text-shadow: 0 0 20px rgba(91,123,175,0.3); margin: 12px 0; }
+    .separateur-outil { width: 55%; height: 1px; background: rgba(255,190,152,0.12); margin: 20px auto; }
 
     /* RAPPELS */
-    .rappel-input { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-    .rappel-input input[type=text] { flex: 2; min-width: 150px; padding: 9px 14px; border-radius: 9px; border: 2px solid rgba(255,215,0,0.4); background: rgba(255,215,0,0.03); color: #ffd700; font-size: 0.8em; outline: none; cursor: text; font-family: 'Orbitron', sans-serif; }
-    .rappel-input input[type=time] { flex: 1; min-width: 100px; padding: 9px 12px; border-radius: 9px; border: 2px solid rgba(0,247,255,0.4); background: rgba(0,247,255,0.03); color: #00f7ff; font-size: 0.8em; outline: none; cursor: text; font-family: 'Orbitron', sans-serif; }
-    .rappel-input input::placeholder { color: rgba(255,215,0,0.25); }
-    .rappel-input button { padding: 9px 18px; background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; border-radius: 9px; color: #000; font-size: 0.85em; cursor: none; font-weight: bold; font-family: 'Orbitron', sans-serif; }
-    .rappel-item { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border: 1px solid rgba(255,215,0,0.2); border-radius: 9px; margin-bottom: 7px; background: rgba(255,215,0,0.02); width: 100%; }
-    .rappel-heure { color: #00f7ff; font-size: 0.75em; min-width: 55px; }
-    .rappel-texte { flex: 1; color: #ffd700; font-size: 0.8em; font-family: 'Orbitron', sans-serif; }
-    .rappel-delete { background: none; border: none; color: #ff003c; cursor: none; opacity: 0.5; }
+    .rappel-input { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .rappel-input input[type=text] { flex: 2; min-width: 150px; padding: 10px 16px; border-radius: 22px; border: 1px solid rgba(255,190,152,0.25); background: rgba(255,190,152,0.03); color: var(--peche); font-size: 0.8em; outline: none; cursor: text; font-family: 'Josefin Sans', sans-serif; }
+    .rappel-input input[type=time] { flex: 1; min-width: 100px; padding: 10px 14px; border-radius: 22px; border: 1px solid rgba(91,123,175,0.3); background: rgba(91,123,175,0.03); color: var(--bleu-doux); font-size: 0.8em; outline: none; cursor: text; }
+    .rappel-input input::placeholder { color: rgba(255,190,152,0.2); }
+    .rappel-input button { padding: 10px 20px; background: linear-gradient(135deg, var(--peche), var(--abricot)); border: none; border-radius: 22px; color: #1a0e07; font-size: 0.85em; cursor: none; font-weight: 600; }
+    .rappel-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border: 1px solid rgba(255,190,152,0.12); border-radius: 22px; margin-bottom: 8px; background: rgba(255,190,152,0.02); width: 100%; }
+    .rappel-heure { color: var(--bleu-doux); font-size: 0.72em; min-width: 55px; font-style: italic; font-family: 'Cormorant Garamond', serif; }
+    .rappel-texte { flex: 1; color: var(--peche); font-size: 0.8em; font-family: 'Cormorant Garamond', serif; font-style: italic; }
+    .rappel-delete { background: none; border: none; color: var(--abricot); cursor: none; opacity: 0.4; }
 
-    
-    /* NEWS */
+    /* CALENDRIER */
+    .calendrier { width: 100%; }
+    .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .cal-header button { background: transparent; border: 1px solid rgba(255,190,152,0.3); color: var(--peche); border-radius: 20px; padding: 5px 14px; cursor: none; transition: all 0.3s; font-family: 'Josefin Sans', sans-serif; }
+    .cal-header button:hover { background: linear-gradient(135deg, var(--peche), var(--abricot)); color: #1a0e07; border-color: transparent; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; width: 100%; }
+    .cal-day-name { text-align: center; font-size: 0.6em; color: var(--bleu-doux); padding: 6px; opacity: 0.6; font-family: 'Josefin Sans', sans-serif; letter-spacing: 1px; }
+    .cal-day { text-align: center; padding: 8px 4px; border-radius: 10px; font-size: 0.75em; border: 1px solid transparent; transition: all 0.3s; cursor: none; font-family: 'Cormorant Garamond', serif; color: rgba(255,245,230,0.6); }
+    .cal-day:hover { border-color: rgba(255,190,152,0.3); background: rgba(255,190,152,0.06); }
+    .cal-day.today { background: rgba(255,190,152,0.15); border-color: rgba(255,190,152,0.5); font-weight: 600; color: var(--peche); box-shadow: 0 0 10px rgba(255,190,152,0.2); }
+    .cal-day.autre-mois { opacity: 0.2; }
+
+    /* METEO */
+    .meteo-widget { width: 100%; border: 1px solid rgba(255,190,152,0.12); border-radius: 16px; padding: 20px; background: rgba(255,190,152,0.02); margin-bottom: 14px; }
+    .meteo-search { display: flex; gap: 10px; margin-bottom: 20px; }
+    .meteo-search input { flex: 1; padding: 10px 18px; border-radius: 22px; border: 1px solid rgba(255,190,152,0.25); background: rgba(255,190,152,0.03); color: var(--peche); font-size: 0.8em; outline: none; cursor: text; font-family: 'Josefin Sans', sans-serif; }
+    .meteo-search input::placeholder { color: rgba(255,190,152,0.2); }
+    .meteo-search button { padding: 10px 20px; background: linear-gradient(135deg, var(--peche), var(--abricot)); border: none; border-radius: 22px; color: #1a0e07; font-size: 0.8em; cursor: none; font-weight: 600; }
+    .meteo-result { text-align: center; }
+    .meteo-icon { font-size: 3.5em; margin-bottom: 10px; }
+    .meteo-temp { font-family: 'Cormorant Garamond', serif; font-size: 2.5em; font-weight: 600; color: var(--peche); }
+    .meteo-desc { color: var(--bleu-doux); font-size: 0.9em; margin-top: 5px; font-style: italic; font-family: 'Cormorant Garamond', serif; }
+    .meteo-ville { opacity: 0.5; font-size: 0.75em; margin-top: 5px; font-family: 'Josefin Sans', sans-serif; letter-spacing: 2px; }
+
+    /* FILMS / NEWS */
     .marvel-news { width: 100%; }
-    .news-item { padding: 14px; border: 1px solid rgba(255,215,0,0.2); border-radius: 10px; margin-bottom: 10px; background: rgba(255,215,0,0.02); transition: all 0.3s; }
-    .news-item:hover { border-color: rgba(255,215,0,0.5); box-shadow: 0 0 12px rgba(255,215,0,0.15); }
-    .news-item h3 { color: #ffd700; font-size: 0.85em; margin-bottom: 5px; }
-    .news-item p { color: #00f7ff; font-size: 0.75em; opacity: 0.8; line-height: 1.5; }
-    .news-item .news-date { font-size: 0.65em; opacity: 0.45; color: #ffd700; margin-top: 5px; }
+    .news-item { padding: 16px; border: 1px solid rgba(255,190,152,0.12); border-radius: 14px; margin-bottom: 12px; background: rgba(255,190,152,0.02); transition: all 0.4s; }
+    .news-item:hover { border-color: rgba(255,190,152,0.35); box-shadow: 0 0 15px rgba(255,190,152,0.1); }
+    .news-item h3 { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--peche); font-size: 1em; margin-bottom: 6px; font-weight: 400; }
+    .news-item p { color: var(--bleu-doux); font-size: 0.78em; opacity: 0.85; line-height: 1.6; font-family: 'Cormorant Garamond', serif; font-style: italic; }
+    .news-item .news-date { font-size: 0.62em; opacity: 0.4; color: var(--peche); margin-top: 6px; letter-spacing: 2px; font-family: 'Josefin Sans', sans-serif; }
 
     /* JEUX */
-    #jeu-message { text-align:center; font-size:0.95em; color:#00f7ff; min-height:38px; margin-bottom:18px; font-style:italic; transition:all 0.5s; }
+    #jeu-message { text-align:center; font-size:0.9em; color:var(--bleu-doux); min-height:38px; margin-bottom:18px; font-style:italic; transition:all 0.5s; font-family:'Cormorant Garamond',serif; }
     .jeux-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; }
-    .jeu-card { display: flex; flex-direction: column; align-items: center; padding: 18px 12px; border: 2px solid rgba(255,215,0,0.25); border-radius: 12px; color: #ffd700; text-decoration: none; background: rgba(255,215,0,0.02); transition: all 0.4s; position: relative; overflow: hidden; }
-    .jeu-card::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255,215,0,0.12); border-radius: 50%; transform: translate(-50%,-50%); transition: width 0.5s, height 0.5s; }
+    .jeu-card { display: flex; flex-direction: column; align-items: center; padding: 18px 12px; border: 1px solid rgba(255,190,152,0.18); border-radius: 16px; color: var(--peche); text-decoration: none; background: rgba(255,190,152,0.02); transition: all 0.4s; position: relative; overflow: hidden; cursor: none; }
+    .jeu-card::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255,190,152,0.08); border-radius: 50%; transform: translate(-50%,-50%); transition: width 0.5s, height 0.5s; }
     .jeu-card:hover::before { width: 300px; height: 300px; }
-    .jeu-card:hover { border-color: #ffd700; box-shadow: 0 0 20px rgba(255,215,0,0.4); transform: translateY(-4px); }
-    .jeu-emoji { font-size: 2.5em; margin-bottom: 8px; transition: transform 0.3s; }
-    .jeu-card:hover .jeu-emoji { transform: scale(1.15) rotate(8deg); }
-    .jeu-titre { font-size: 0.8em; font-weight: bold; color: #ffd700; margin-bottom: 4px; text-align: center; }
-    .jeu-desc { font-size: 0.65em; color: #00f7ff; opacity: 0.75; }
+    .jeu-card:hover { border-color: rgba(255,190,152,0.45); box-shadow: 0 0 20px rgba(255,190,152,0.15); transform: translateY(-3px); }
+    .jeu-emoji { font-size: 2.3em; margin-bottom: 8px; transition: transform 0.3s; }
+    .jeu-card:hover .jeu-emoji { transform: scale(1.12) rotate(5deg); }
+    .jeu-titre { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.9em; color: var(--peche); margin-bottom: 4px; text-align: center; }
+    .jeu-desc { font-size: 0.62em; color: var(--bleu-doux); opacity: 0.7; font-family: 'Josefin Sans', sans-serif; letter-spacing: 1px; }
 
     /* MUSIQUE */
-    .music-player { width: 100%; border: 1px solid rgba(255,215,0,0.2); border-radius: 12px; padding: 18px; background: rgba(255,215,0,0.02); }
-    .music-search { display: flex; gap: 10px; margin-bottom: 12px; }
-    .music-search input { flex: 1; padding: 10px 16px; border-radius: 10px; border: 2px solid rgba(255,215,0,0.4); background: rgba(255,215,0,0.03); color: #ffd700; font-size: 0.8em; outline: none; cursor: text; font-family: 'Orbitron', sans-serif; }
-    .music-search input::placeholder { color: rgba(255,215,0,0.25); }
-    .music-search button { padding: 10px 18px; background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; border-radius: 10px; color: #000; font-size: 0.8em; cursor: none; font-family: 'Orbitron', sans-serif; font-weight: bold; }
-    #music-frame { width: 100%; height: 195px; border-radius: 10px; border: none; display: none; margin-top: 10px; }
-    .music-suggestions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
-    .music-tag { padding: 5px 11px; border: 1px solid rgba(255,215,0,0.3); border-radius: 18px; color: #ffd700; font-size: 0.65em; cursor: none; font-family: 'Orbitron', sans-serif; transition: all 0.3s; }
-    .music-tag:hover { background: #ffd700; color: #000; box-shadow: 0 0 8px #ffd700; }
+    .music-player { width: 100%; border: 1px solid rgba(255,190,152,0.12); border-radius: 16px; padding: 20px; background: rgba(255,190,152,0.02); }
+    .music-search { display: flex; gap: 10px; margin-bottom: 14px; }
+    .music-search input { flex: 1; padding: 10px 18px; border-radius: 22px; border: 1px solid rgba(255,190,152,0.25); background: rgba(255,190,152,0.03); color: var(--peche); font-size: 0.8em; outline: none; cursor: text; font-family: 'Josefin Sans', sans-serif; }
+    .music-search input::placeholder { color: rgba(255,190,152,0.2); }
+    .music-search button { padding: 10px 20px; background: linear-gradient(135deg, var(--peche), var(--abricot)); border: none; border-radius: 22px; color: #1a0e07; font-size: 0.8em; cursor: none; font-weight: 600; }
+    #music-frame { width: 100%; height: 195px; border-radius: 12px; border: none; display: none; margin-top: 12px; }
+    .music-suggestions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+    .music-tag { padding: 5px 14px; border: 1px solid rgba(255,190,152,0.2); border-radius: 18px; color: var(--peche); font-size: 0.62em; cursor: none; font-family: 'Josefin Sans', sans-serif; letter-spacing: 1px; transition: all 0.3s; }
+    .music-tag:hover { background: var(--peche); color: #1a0e07; box-shadow: 0 0 10px rgba(255,190,152,0.3); }
 
-    /* CARTE — RESTAURÉE */
-    #map { width: 100%; height: 420px; border-radius: 12px; border: 2px solid rgba(255,215,0,0.3); box-shadow: 0 0 20px rgba(255,215,0,0.1); z-index: 1; }
-    .leaflet-container { background: #0a0a1a !important; border-radius: 12px; }
+    /* CARTE */
+    #map { width: 100%; height: 420px; border-radius: 16px; border: 1px solid rgba(255,190,152,0.25); box-shadow: 0 0 25px rgba(255,190,152,0.08); z-index: 1; }
+    .leaflet-container { background: #1a1008 !important; border-radius: 16px; }
 
     @media (max-width: 768px) {
       .btn-v7, .btn-gold { width: 100%; margin-bottom: 8px; }
@@ -299,36 +399,32 @@
 
   <div id="curseur">
     <svg viewBox="0 0 20 20" fill="none">
-      <circle cx="10" cy="10" r="3" fill="#ffd700"/>
-      <line x1="10" y1="0" x2="10" y2="7" stroke="#ffd700" stroke-width="1"/>
-      <line x1="10" y1="13" x2="10" y2="20" stroke="#ffd700" stroke-width="1"/>
-      <line x1="0" y1="10" x2="7" y2="10" stroke="#ffd700" stroke-width="1"/>
-      <line x1="13" y1="10" x2="20" y2="10" stroke="#ffd700" stroke-width="1"/>
-      <line x1="2" y1="2" x2="6" y2="6" stroke="rgba(255,215,0,0.5)" stroke-width="0.8"/>
-      <line x1="14" y1="14" x2="18" y2="18" stroke="rgba(255,215,0,0.5)" stroke-width="0.8"/>
-      <line x1="18" y1="2" x2="14" y2="6" stroke="rgba(255,215,0,0.5)" stroke-width="0.8"/>
-      <line x1="6" y1="14" x2="2" y2="18" stroke="rgba(255,215,0,0.5)" stroke-width="0.8"/>
+      <circle cx="10" cy="10" r="2.5" fill="#FFBE98"/>
+      <line x1="10" y1="0" x2="10" y2="7" stroke="#FFBE98" stroke-width="0.8"/>
+      <line x1="10" y1="13" x2="10" y2="20" stroke="#FFBE98" stroke-width="0.8"/>
+      <line x1="0" y1="10" x2="7" y2="10" stroke="#FFBE98" stroke-width="0.8"/>
+      <line x1="13" y1="10" x2="20" y2="10" stroke="#FFBE98" stroke-width="0.8"/>
     </svg>
   </div>
   <div id="curseur-trail"></div>
   <div id="flash-overlay"></div>
   <div id="ia-bg"></div>
 
-  <!-- LOGO JARVIS -->
+  <!-- LOGO -->
   <div id="jarvis-logo">
-    <div class="logo-cercle">J.A.R.V.I.S</div>
-    <div class="logo-texte">INDUSTRY</div>
+    <div class="logo-cercle">🍑</div>
+    <div class="logo-texte">Été 1983</div>
   </div>
 
-  <!-- TERMINAL IA -->
+  <!-- TERMINAL -->
   <div id="ia-terminal">
-    <div class="terminal-titre">⬡ SYSTÈME J.A.R.V.I.S ACTIF</div>
-    <div class="barre-ia"><div class="barre-ia-fill" style="background:linear-gradient(to right,#ff003c,#ffd700)"></div></div>
-    <div class="barre-ia"><div class="barre-ia-fill" style="background:linear-gradient(to right,#00f7ff,#001aff);animation-delay:0.7s"></div></div>
-    <div class="barre-ia"><div class="barre-ia-fill" style="background:linear-gradient(to right,#ffd700,#ff8c00);animation-delay:1.4s"></div></div>
-    <div id="terminal-ligne1" class="terminal-ligne active">› Analyse réseau en cours...</div>
-    <div id="terminal-ligne2" class="terminal-ligne">› Scan satellites actif</div>
-    <div id="terminal-ligne3" class="terminal-ligne">› Connexion Avengers stable</div>
+    <div class="terminal-titre">✦ JOURNAL D'ELIO — CREMA</div>
+    <div class="barre-ia"><div class="barre-ia-fill" style="background:linear-gradient(to right,var(--abricot),var(--peche))"></div></div>
+    <div class="barre-ia"><div class="barre-ia-fill" style="background:linear-gradient(to right,var(--bleu-doux),var(--bleu-nuit));animation-delay:0.8s"></div></div>
+    <div class="barre-ia"><div class="barre-ia-fill" style="background:linear-gradient(to right,var(--or-chaud),var(--abricot));animation-delay:1.6s"></div></div>
+    <div id="terminal-ligne1" class="terminal-ligne active">› Le soleil se lève sur la villa...</div>
+    <div id="terminal-ligne2" class="terminal-ligne">› Sufjan Stevens dans la chambre</div>
+    <div id="terminal-ligne3" class="terminal-ligne">› Oliver est déjà dans le jardin</div>
   </div>
 
   <!-- CINEMA -->
@@ -339,10 +435,12 @@
 
   <!-- EASTER EGG -->
   <div id="easter-egg-overlay">
-    <div class="logo-cercle" style="width:75px;height:75px;font-size:0.65em;margin-bottom:15px">J.A.R.V.I.S</div>
-    <h2>ACCÈS NIVEAU 10 DÉBLOQUÉ !</h2>
-    <p>Identité confirmée : Spider-Elio 🔱<br>Tous les protocoles secrets sont accessibles.<br><span style="color:#ffd700">With great power comes great responsibility.</span></p>
-    <button id="easter-egg-close" onclick="fermerEasterEgg()">RETOUR AU SYSTÈME</button>
+    <div style="font-size:3em;margin-bottom:15px">🍑</div>
+    <h2>« Call me by your name »</h2>
+    <p>Tu as trouvé le jardin secret d'Elio 🌿<br>
+    <em style="color:var(--peche)">"Somewhere, sometime, some way, some day..."</em><br>
+    <span style="color:var(--or-chaud);font-size:0.85em;letter-spacing:2px">— Sufjan Stevens</span></p>
+    <button id="easter-egg-close" onclick="fermerEasterEgg()">RETOURNER À LA VILLA</button>
   </div>
 
   <div class="hud-bar"></div>
@@ -353,7 +451,7 @@
 
   <div id="hud-info">
     <span id="hud-heure">00:00</span>
-    <span>|</span>
+    <span>·</span>
     <span id="hud-batterie-txt">---%</span>
     <span class="batterie-bar"><div class="batterie-fill" id="batterie-fill" style="width:50%"></div></span>
   </div>
@@ -362,72 +460,69 @@
 
   <!-- CHARGEMENT -->
   <div id="loading-screen">
-    <div class="logo-cercle" style="width:75px;height:75px;font-size:0.65em;margin-bottom:18px">J.A.R.V.I.S</div>
-    <div style="font-size:1.8em;color:#ffd700;text-shadow:0 0 20px #ffd700;margin-bottom:5px;letter-spacing:3px">J.A.R.V.I.S INDUSTRY</div>
-    <div style="font-size:0.7em;color:#00f7ff;opacity:0.6;margin-bottom:15px;letter-spacing:2px">SYSTÈME DE CONTRÔLE AVANCÉ v9.0</div>
+    <div style="font-size:3.5em;margin-bottom:18px">🍑</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:2em;color:var(--peche);text-shadow:0 0 20px rgba(255,190,152,0.4);margin-bottom:6px;letter-spacing:4px">ELIO</div>
+    <div style="font-size:0.65em;color:var(--bleu-doux);opacity:0.6;margin-bottom:16px;letter-spacing:4px;font-style:italic;font-family:'Cormorant Garamond',serif">Crema, Italie du Nord — Été 1983</div>
     <div class="barre-chargement"><div class="barre-progress" id="barre-progress"></div></div>
-    <p id="loading-text">Initialisation du système...</p>
-    <div class="tech-btns" style="margin-top:15px">
-      <div class="tech-btn rouge" style="animation:clignoter 1s infinite">SCANNING...</div>
-      <div class="tech-btn">VERIFY</div>
-      <div class="tech-btn gold">BOOT</div>
+    <p id="loading-text">Les cigales chantent...</p>
+    <div class="tech-btns" style="margin-top:18px">
+      <div class="tech-btn" style="animation:clignoter 1s infinite">SOUVENIR...</div>
+      <div class="tech-btn chaud">MÉMOIRE</div>
+      <div class="tech-btn bleu">ÉTÉ</div>
     </div>
   </div>
 
-  <!-- MOT DE PASSE — FUTURISTE -->
+  <!-- MOT DE PASSE -->
   <div id="password-screen">
-    <div class="pw-logo">J.A.R.V.I.S</div>
-    <div class="pw-titre">ACCÈS RESTREINT</div>
-    <div class="pw-sous-titre">AUTHENTIFICATION REQUISE — NIVEAU ALPHA</div>
+    <div class="pw-logo">🍑</div>
+    <div class="pw-titre">Jardin Privé</div>
+    <div class="pw-sous-titre">ACCÈS RÉSERVÉ — VILLA D'ELIO</div>
     <div class="pw-scan-zone">
-      <div class="pw-scan-label">▶ SCAN BIOMÉTRIQUE EN COURS</div>
+      <div class="pw-scan-label">✦ vérification du souvenir en cours</div>
       <div class="pw-barres">
-        <div class="pw-barre"><div class="pw-barre-fill" style="background:linear-gradient(to right,#ff003c,#ffd700)"></div></div>
-        <div class="pw-barre"><div class="pw-barre-fill" style="background:linear-gradient(to right,#00f7ff,#001aff);animation-delay:0.5s"></div></div>
-        <div class="pw-barre"><div class="pw-barre-fill" style="background:linear-gradient(to right,#ffd700,#ff8c00);animation-delay:1s"></div></div>
+        <div class="pw-barre"><div class="pw-barre-fill" style="background:linear-gradient(to right,var(--abricot),var(--peche))"></div></div>
+        <div class="pw-barre"><div class="pw-barre-fill" style="background:linear-gradient(to right,var(--bleu-doux),var(--bleu-nuit));animation-delay:0.6s"></div></div>
+        <div class="pw-barre"><div class="pw-barre-fill" style="background:linear-gradient(to right,var(--or-chaud),var(--abricot));animation-delay:1.2s"></div></div>
       </div>
       <div class="pw-btns-tech">
-        <div class="pw-btn-tech">ACCESS</div>
-        <div class="pw-btn-tech" style="animation-delay:0.3s">SCAN</div>
-        <div class="pw-btn-tech" style="animation-delay:0.6s">VERIFY</div>
+        <div class="pw-btn-tech">SOUVENIR</div>
+        <div class="pw-btn-tech" style="animation-delay:0.4s">MÉMOIRE</div>
+        <div class="pw-btn-tech" style="animation-delay:0.8s">ACCÈS</div>
       </div>
       <input type="password" id="password-input" placeholder="· · · · · · · ·">
-      <button id="password-btn" onclick="verifierMdp()">AUTHENTIFIER</button>
+      <button id="password-btn" onclick="verifierMdp()">ENTRER DANS LA VILLA</button>
     </div>
-    <p id="password-error" style="opacity:0;margin-top:8px;font-size:0.75em;letter-spacing:1px">❌ CODE D'ACCÈS INVALIDE</p>
+    <p id="password-error" style="opacity:0;margin-top:8px;font-size:0.75em;letter-spacing:1px;font-style:italic;font-family:'Cormorant Garamond',serif">Ce souvenir ne correspond pas...</p>
     <div class="pw-acces-btns">
-      <div class="tech-btn rouge">SCAN</div>
-      <div class="tech-btn">TARGET LOCK</div>
-      <div class="tech-btn gold">SYSTEM CHECK</div>
+      <div class="tech-btn">MÉMOIRE</div>
+      <div class="tech-btn chaud">NOSTALGIE</div>
+      <div class="tech-btn bleu">ITALIE</div>
     </div>
   </div>
 
   <!-- BIENVENUE -->
   <div id="welcome-screen">
-    <div class="logo-cercle" style="width:85px;height:85px;font-size:0.65em;margin-bottom:18px;animation:logoGlow 1s infinite">J.A.R.V.I.S</div>
-    <h1>J.A.R.V.I.S INDUSTRY</h1>
-    <p class="sub">Système opérationnel ✅<br>Bienvenue, Spider-Elio 🔱<br>Tous les protocoles sont en ligne.</p>
-    <div style="margin-top:20px;opacity:0.5;font-size:0.7em;color:#ffd700;letter-spacing:2px">CHARGEMENT DU QUARTIER GÉNÉRAL...</div>
+    <div style="font-size:3em;margin-bottom:16px">🍑</div>
+    <h1>Benvenuto, Elio.</h1>
+    <p class="sub">La villa est prête 🌿<br>Le soleil est haut sur Crema.<br><em>Oliver t'attend au bord de la piscine.</em></p>
+    <div style="margin-top:22px;opacity:0.4;font-size:0.65em;color:var(--peche);letter-spacing:4px;font-family:'Josefin Sans',sans-serif">OUVERTURE DU JOURNAL...</div>
   </div>
 
-  <!-- AVENGERS -->
+  <!-- PANEL CONTACTS -->
   <div id="avengers-panel">
-    <h3>⚡ AVENGERS</h3>
-    <div class="contact"><div class="contact-avatar">🔨</div><div class="contact-info"><div class="contact-name">Thor</div><div class="contact-status"><span class="status-dot"></span>En ligne</div></div></div>
-    <div class="contact"><div class="contact-avatar">🛡️</div><div class="contact-info"><div class="contact-name">Cap. America</div><div class="contact-status"><span class="status-dot mission"></span>En mission</div></div></div>
-    <div class="contact"><div class="contact-avatar">🏹</div><div class="contact-info"><div class="contact-name">Hawkeye</div><div class="contact-status"><span class="status-dot"></span>En ligne</div></div></div>
-    <div class="contact"><div class="contact-avatar">💚</div><div class="contact-info"><div class="contact-name">Hulk</div><div class="contact-status"><span class="status-dot offline"></span>Hors ligne</div></div></div>
-    <div class="contact"><div class="contact-avatar">🦾</div><div class="contact-info"><div class="contact-name">Iron Man</div><div class="contact-status"><span class="status-dot mission"></span>En mission</div></div></div>
-    <div class="contact"><div class="contact-avatar">🕷️</div><div class="contact-info"><div class="contact-name">Black Widow</div><div class="contact-status"><span class="status-dot"></span>En ligne</div></div></div>
-    <div class="contact"><div class="contact-avatar">👁️</div><div class="contact-info"><div class="contact-name">Nick Fury</div><div class="contact-status"><span class="status-dot mission"></span>En mission</div></div></div>
-    <div class="contact"><div class="contact-avatar">🌟</div><div class="contact-info"><div class="contact-name">War Machine</div><div class="contact-status"><span class="status-dot"></span>En ligne</div></div></div>
-    <div class="contact"><div class="contact-avatar">🔮</div><div class="contact-info"><div class="contact-name">Dr. Strange</div><div class="contact-status"><span class="status-dot mission"></span>Autre dimension</div></div></div>
-    <div class="contact"><div class="contact-avatar">🐾</div><div class="contact-info"><div class="contact-name">Black Panther</div><div class="contact-status"><span class="status-dot"></span>Wakanda Forever</div></div></div>
-    <div class="contact"><div class="contact-avatar">🦾</div><div class="contact-info"><div class="contact-name">Winter Soldier</div><div class="contact-status"><span class="status-dot offline"></span>Reprogrammation...</div></div></div>
-    <div class="contact"><div class="contact-avatar">🌮</div><div class="contact-info"><div class="contact-name">Deadpool</div><div class="contact-status"><span class="status-dot"></span>Brise le 4ème mur</div></div></div>
+    <h3>✦ La Villa</h3>
+    <div class="contact"><div class="contact-avatar">🎹</div><div class="contact-info"><div class="contact-name">Oliver</div><div class="contact-status"><span class="status-dot"></span>Au bord de la piscine</div></div></div>
+    <div class="contact"><div class="contact-avatar">📚</div><div class="contact-info"><div class="contact-name">Le Père</div><div class="contact-status"><span class="status-dot mission"></span>Dans son bureau</div></div></div>
+    <div class="contact"><div class="contact-avatar">🍋</div><div class="contact-info"><div class="contact-name">La Mère</div><div class="contact-status"><span class="status-dot"></span>Au marché</div></div></div>
+    <div class="contact"><div class="contact-avatar">🚴</div><div class="contact-info"><div class="contact-name">Marzia</div><div class="contact-status"><span class="status-dot"></span>En ville</div></div></div>
+    <div class="contact"><div class="contact-avatar">🎵</div><div class="contact-info"><div class="contact-name">Chiara</div><div class="contact-status"><span class="status-dot mission"></span>Plage de Sirmione</div></div></div>
+    <div class="contact"><div class="contact-avatar">📖</div><div class="contact-info"><div class="contact-name">Anchise</div><div class="contact-status"><span class="status-dot"></span>Dans le jardin</div></div></div>
+    <div class="contact"><div class="contact-avatar">🌊</div><div class="contact-info"><div class="contact-name">Lac de Côme</div><div class="contact-status"><span class="status-dot"></span>À 20 min</div></div></div>
+    <div class="contact"><div class="contact-avatar">🎶</div><div class="contact-info"><div class="contact-name">Sufjan Stevens</div><div class="contact-status"><span class="status-dot"></span>Dans les oreilles</div></div></div>
+    <div class="contact"><div class="contact-avatar">🍑</div><div class="contact-info"><div class="contact-name">L'abricotier</div><div class="contact-status"><span class="status-dot"></span>En fleur</div></div></div>
     <div class="contact"><div class="contact-avatar">👨‍💼</div><div class="contact-info"><div class="contact-name">Papa</div><div class="contact-status"><span class="status-dot mission"></span>Au boulot 💪</div></div></div>
     <div class="contact"><div class="contact-avatar">👩‍🍳</div><div class="contact-info"><div class="contact-name">Maman</div><div class="contact-status"><span class="status-dot"></span>La plus forte 👑</div></div></div>
-    <div class="contact"><div class="contact-avatar">💘</div><div class="contact-info"><div class="contact-name">Mon amour</div><div class="contact-status"><span class="status-dot"></span>Dans mon coeur 💕</div></div></div>
+    <div class="contact"><div class="contact-avatar">💘</div><div class="contact-info"><div class="contact-name">Mon amour</div><div class="contact-status"><span class="status-dot"></span>Dans mon cœur 💕</div></div></div>
   </div>
 
   <!-- SIDEBAR -->
@@ -437,10 +532,14 @@
     <div class="sidebar-btn" onclick="afficherSection('devoirs',event)">📋<span class="sidebar-tooltip">Devoirs</span></div>
     <div class="sidebar-btn" onclick="afficherSection('rappels',event)">🔔<span class="sidebar-tooltip">Rappels</span></div>
     <div class="sidebar-btn" onclick="afficherSection('postits',event)">🗒️<span class="sidebar-tooltip">Post-its</span></div>
+    <div class="sidebar-btn" onclick="afficherSection('notes',event)">📝<span class="sidebar-tooltip">Journal</span></div>
     <div class="sidebar-btn" onclick="afficherSection('minuteur',event)">⏱️<span class="sidebar-tooltip">Minuteur</span></div>
+    <div class="sidebar-btn" onclick="afficherSection('calendrier',event)">🗓️<span class="sidebar-tooltip">Calendrier</span></div>
+    <div class="sidebar-btn" onclick="afficherSection('meteo',event)">🌦️<span class="sidebar-tooltip">Météo</span></div>
+    <div class="sidebar-btn" onclick="afficherSection('carte',event)">🗺️<span class="sidebar-tooltip">Carte</span></div>
     <div class="sidebar-btn" onclick="afficherSection('musique',event)">🎵<span class="sidebar-tooltip">Musique</span></div>
     <div class="sidebar-btn" onclick="afficherSection('jeux',event)">🎮<span class="sidebar-tooltip">Jeux</span></div>
-    <div class="sidebar-btn" onclick="afficherSection('marvel',event)">⚡<span class="sidebar-tooltip">News Marvel</span></div>
+    <div class="sidebar-btn" onclick="afficherSection('films',event)">🎬<span class="sidebar-tooltip">Cinéma</span></div>
   </div>
 
   <canvas id="bg-canvas"></canvas>
@@ -450,114 +549,61 @@
     <!-- ACCUEIL -->
     <div class="section active" id="section-accueil">
       <div class="header">
-        <div class="logo-cercle" style="width:60px;height:60px;font-size:0.55em;margin:0 auto 12px">J.A.R.V.I.S</div>
-        <h1>J.A.R.V.I.S INDUSTRY</h1>
-        <p class="subtitle">Système opérationnel — Tous protocoles en ligne</p>
+        <div style="font-size:2.5em;margin-bottom:14px">🍑</div>
+        <h1>Elio — Été 1983</h1>
+        <p class="subtitle">Villa Perlman, Crema — Italie du Nord</p>
       </div>
       <div class="horloge" id="horloge"></div>
 
-      <!-- BARRES MASSIVES ACCUEIL -->
       <div class="barres-massives">
-        <div class="barre-massive-ligne">
-          <div class="barre-massive-label">AI PROCESSING</div>
-          <div class="barre-massive-piste"><div class="barre-massive-fill" style="width:87%;background:linear-gradient(to right,#ff003c,#ffd700)"></div></div>
-          <div class="barre-massive-val">87%</div>
-        </div>
-        <div class="barre-massive-ligne">
-          <div class="barre-massive-label">DATA SYNC</div>
-          <div class="barre-massive-piste"><div class="barre-massive-fill" style="width:64%;background:linear-gradient(to right,#00f7ff,#001aff);animation-delay:0.5s"></div></div>
-          <div class="barre-massive-val">64%</div>
-        </div>
-        <div class="barre-massive-ligne">
-          <div class="barre-massive-label">AVENGERS NETWORK</div>
-          <div class="barre-massive-piste"><div class="barre-massive-fill" style="width:100%;background:linear-gradient(to right,#00ff88,#00f7ff);animation-delay:1s"></div></div>
-          <div class="barre-massive-val">OK</div>
-        </div>
-        <div class="barre-massive-ligne">
-          <div class="barre-massive-label">SHIELD PROTOCOL</div>
-          <div class="barre-massive-piste"><div class="barre-massive-fill" style="width:42%;background:linear-gradient(to right,#ffd700,#ff8c00);animation-delay:1.5s"></div></div>
-          <div class="barre-massive-val">42%</div>
-        </div>
+        <div class="barre-massive-ligne"><div class="barre-massive-label">MÉMOIRE</div><div class="barre-massive-piste"><div class="barre-massive-fill" style="width:92%;background:linear-gradient(to right,var(--abricot),var(--peche))"></div></div><div class="barre-massive-val">92%</div></div>
+        <div class="barre-massive-ligne"><div class="barre-massive-label">NOSTALGIE</div><div class="barre-massive-piste"><div class="barre-massive-fill" style="width:78%;background:linear-gradient(to right,var(--bleu-doux),var(--bleu-nuit));animation-delay:0.6s"></div></div><div class="barre-massive-val">78%</div></div>
+        <div class="barre-massive-ligne"><div class="barre-massive-label">CHALEUR</div><div class="barre-massive-piste"><div class="barre-massive-fill" style="width:100%;background:linear-gradient(to right,var(--or-chaud),var(--peche));animation-delay:1.2s"></div></div><div class="barre-massive-val">∞</div></div>
+        <div class="barre-massive-ligne"><div class="barre-massive-label">SUFJAN STEVENS</div><div class="barre-massive-piste"><div class="barre-massive-fill" style="width:55%;background:linear-gradient(to right,var(--bleu-nuit),var(--bleu-doux));animation-delay:1.8s"></div></div><div class="barre-massive-val">🎵</div></div>
       </div>
 
-      <!-- CERCLES STATS -->
       <div class="cercles-row">
-        <div class="cercle-stat">
-          <svg viewBox="0 0 70 70">
-            <circle class="cercle-bg" cx="35" cy="35" r="28"/>
-            <circle class="cercle-fill" cx="35" cy="35" r="28" stroke="#ff003c" stroke-dasharray="132 176"/>
-          </svg>
-          <div class="cercle-val">75%</div>
-          <div class="cercle-label">POWER</div>
-        </div>
-        <div class="cercle-stat">
-          <svg viewBox="0 0 70 70">
-            <circle class="cercle-bg" cx="35" cy="35" r="28"/>
-            <circle class="cercle-fill" cx="35" cy="35" r="28" stroke="#ffd700" stroke-dasharray="158 176"/>
-          </svg>
-          <div class="cercle-val">90%</div>
-          <div class="cercle-label">SHIELD</div>
-        </div>
-        <div class="cercle-stat">
-          <svg viewBox="0 0 70 70">
-            <circle class="cercle-bg" cx="35" cy="35" r="28"/>
-            <circle class="cercle-fill" cx="35" cy="35" r="28" stroke="#00f7ff" stroke-dasharray="105 176"/>
-          </svg>
-          <div class="cercle-val">60%</div>
-          <div class="cercle-label">AI CORE</div>
-        </div>
-        <div class="cercle-stat">
-          <svg viewBox="0 0 70 70">
-            <circle class="cercle-bg" cx="35" cy="35" r="28"/>
-            <circle class="cercle-fill" cx="35" cy="35" r="28" stroke="#00ff88" stroke-dasharray="176 176"/>
-          </svg>
-          <div class="cercle-val">100%</div>
-          <div class="cercle-label">NETWORK</div>
-        </div>
+        <div class="cercle-stat"><svg viewBox="0 0 70 70"><circle class="cercle-bg" cx="35" cy="35" r="28"/><circle class="cercle-fill" cx="35" cy="35" r="28" stroke="#FFBE98" stroke-dasharray="148 176"/></svg><div class="cercle-val">84%</div><div class="cercle-label">ÉTÉ</div></div>
+        <div class="cercle-stat"><svg viewBox="0 0 70 70"><circle class="cercle-bg" cx="35" cy="35" r="28"/><circle class="cercle-fill" cx="35" cy="35" r="28" stroke="#F4845F" stroke-dasharray="158 176"/></svg><div class="cercle-val">90%</div><div class="cercle-label">CHALEUR</div></div>
+        <div class="cercle-stat"><svg viewBox="0 0 70 70"><circle class="cercle-bg" cx="35" cy="35" r="28"/><circle class="cercle-fill" cx="35" cy="35" r="28" stroke="#5B7BAF" stroke-dasharray="105 176"/></svg><div class="cercle-val">60%</div><div class="cercle-label">MÉLANCOLIE</div></div>
+        <div class="cercle-stat"><svg viewBox="0 0 70 70"><circle class="cercle-bg" cx="35" cy="35" r="28"/><circle class="cercle-fill" cx="35" cy="35" r="28" stroke="#E8A857" stroke-dasharray="176 176"/></svg><div class="cercle-val">∞</div><div class="cercle-label">SOUVENIR</div></div>
       </div>
 
       <div class="separateur"></div>
 
       <div class="jarvis-section">
         <div class="jarvis-btn" onclick="activerJarvis(event)">
-          <div class="jarvis-ring"></div>
-          <div class="jarvis-ring2"></div>
-          <span class="jarvis-icon">⚙️</span>
-          <span class="jarvis-text">ACTIVER JARVIS</span>
+          <div class="jarvis-ring"></div><div class="jarvis-ring2"></div>
+          <span class="jarvis-icon">🎹</span>
+          <span class="jarvis-text">OUVRIR LE JOURNAL</span>
         </div>
-        <p class="jarvis-status" id="jarvis-status">En attente d'activation...</p>
+        <p class="jarvis-status" id="jarvis-status"><em>En attente d'un souvenir...</em></p>
       </div>
 
-      <!-- FAUX BOUTONS TECH -->
       <div class="tech-btns">
-        <div class="tech-btn rouge">SCAN</div>
-        <div class="tech-btn">TARGET LOCK</div>
-        <div class="tech-btn gold">SYSTEM CHECK</div>
-        <div class="tech-btn">UPLOAD DATA</div>
-        <div class="tech-btn rouge">ALERT MODE</div>
+        <div class="tech-btn">CREMA</div>
+        <div class="tech-btn chaud">ABRICOT</div>
+        <div class="tech-btn bleu">LAC DE CÔME</div>
+        <div class="tech-btn">PIANO</div>
+        <div class="tech-btn chaud">1983</div>
       </div>
 
       <div class="separateur"></div>
-      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:12px">
-        <button class="btn-gold" onclick="ouvrirCinema()">🎬 MODE CINÉMA</button>
-        <button class="btn-v7" onclick="activerEasterEgg()">🔱 ???</button>
-        <button class="btn-v7" onclick="demanderNotifications()">🔔 Activer Notifs</button>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:14px">
+        <button class="btn-gold" onclick="ouvrirCinema()">🎬 CINÉMA</button>
+        <button class="btn-v7" onclick="activerEasterEgg()">🌿 Secret</button>
+        <button class="btn-v7" onclick="demanderNotifications()">🔔 Rappels</button>
       </div>
       <div class="recherche">
         <form action="https://www.google.com/search" target="_blank">
-          <input type="text" name="q" placeholder="🔍 Rechercher...">
+          <input type="text" name="q" placeholder="🔍 Chercher...">
           <button type="submit">GO</button>
         </form>
       </div>
       <div class="separateur"></div>
-      <div style="text-align:center">
-        <h2>📧 Mes mails</h2>
-        <div class="grille">
-          <a href="https://mail.google.com" target="_blank" onclick="flashLancement()">📧 Gmail</a>
-        </div>
-      </div>
+      <h2>📧 Mes mails</h2>
+      <div class="grille"><a href="https://mail.google.com" target="_blank" onclick="flashLancement()">📧 Gmail</a></div>
     </div>
-    
 
     <!-- DOSSIERS -->
     <div class="section" id="section-dossiers">
@@ -573,35 +619,34 @@
         </div>
       </div>
       <div class="dossier">
-        <button class="dossier-btn" onclick="toggleDossier('loisirs')">🎮 divertissement</button>
+        <button class="dossier-btn" onclick="toggleDossier('loisirs')">🎮 Divertissement</button>
         <div class="dossier-contenu" id="loisirs">
           <a href="https://www.twitch.tv" target="_blank" onclick="flashLancement()">🎥 Twitch</a>
           <a href="https://www.reddit.com" target="_blank" onclick="flashLancement()">💬 Reddit</a>
           <a href="https://www.youtube.com" target="_blank" onclick="flashLancement()">▶ YouTube</a>
-        <a href="https://music.youtube.com" target="_blank" onclick="flashLancement()">🎵 YouTube Music</a>
-        <a href="https://character.ai" target="_blank" onclick="flashLancement()">🤖 C.ai</a>
-        <a href="https://purstream.cx" target="_blank" onclick="flashLancement()">🎥 Film</a>
-           <a href="https://science.nasa.gov/eyes/" target="_blank" onclick="flashLancement()">🌙 Nasa</a>
-           <a href="https://www.europe2.fr/webradios" target="_blank" onclick="flashLancement()">📻radio</a>
-        <a href="https://zzz.zoomquilt.org/" target="_blank" onclick="flashLancement()">🎨zoom infini</a>
-        <a href="https://www.tiktok.com/fr/" target="_blank" onclick="flashLancement()">🎦tiktok</a>
-          <a href="https://fr.pinterest.com/homefeed/" target="_blank" onclick="flashLancement()">🔴Pinterest</a>
-          <a href="https://empire-streamings.online/" target="_blank" onlik="flashLanement()">🎦series</a>
+          <a href="https://music.youtube.com" target="_blank" onclick="flashLancement()">🎵 YouTube Music</a>
+          <a href="https://character.ai" target="_blank" onclick="flashLancement()">🤖 C.ai</a>
+          <a href="https://purstream.cx" target="_blank" onclick="flashLancement()">🎥 Films</a>
+          <a href="https://science.nasa.gov/eyes/" target="_blank" onclick="flashLancement()">🌙 NASA</a>
+          <a href="https://www.europe2.fr/webradios" target="_blank" onclick="flashLancement()">📻 Radio</a>
+          <a href="https://zzz.zoomquilt.org/" target="_blank" onclick="flashLancement()">🎨 Zoom infini</a>
+          <a href="https://www.tiktok.com/fr/" target="_blank" onclick="flashLancement()">🎦 TikTok</a>
+          <a href="https://fr.pinterest.com/homefeed/" target="_blank" onclick="flashLancement()">🔴 Pinterest</a>
+          <a href="https://empire-streamings.online/" target="_blank" onclick="flashLancement()">🎦 Séries</a>
         </div>
       </div>
       <div class="dossier">
         <button class="dossier-btn" onclick="toggleDossier('outils')">🔧 Outils</button>
         <div class="dossier-contenu" id="outils">
-          <a href="https://www.google.com/maps" target="_blank" onclick="flashLancement()">🗺️ Google Maps</a>
+          <a href="https://www.google.com/maps" target="_blank" onclick="flashLancement()">🗺️ Maps</a>
           <a href="https://translate.google.com" target="_blank" onclick="flashLancement()">🌍 Traducteur</a>
-           <a href="https://mail.google.com" target="_blank" onclick="flashLancement()">📧 Gmail</a>
-        <a href="https://chatgpt.com/" target="_blank" onclick="flashLancement()">🤖 ChatGPT</a>
-        <a href="https://calendar.google.com/calendar/u/0/r/week?pli=1" target="_blank" onclick="flashLancement()">📆calendrier</a>
-        <a href="https://notepad-online.com/v2/fr" target="_blank" onclick="flashLancement()">🗒️ bloc note</a>
-            <a href="https://www.noisli.com/playlists" target="_blank" onclick="flashLancement()">🔉bruit de fond</a>
-        <a href="https://app.lumosity.com/fr/onboard" target="_blank" onclick="flashLancement()">🧠lumosity</a>
-           <a href="https://web.whatsapp.com/" target="_blank" onclick="flashLancement()">📨whatsapp</a>
-          
+          <a href="https://mail.google.com" target="_blank" onclick="flashLancement()">📧 Gmail</a>
+          <a href="https://chatgpt.com/" target="_blank" onclick="flashLancement()">🤖 ChatGPT</a>
+          <a href="https://calendar.google.com" target="_blank" onclick="flashLancement()">📆 Calendrier</a>
+          <a href="https://notepad-online.com/v2/fr" target="_blank" onclick="flashLancement()">🗒️ Bloc-note</a>
+          <a href="https://www.noisli.com/playlists" target="_blank" onclick="flashLancement()">🔉 Ambiances</a>
+          <a href="https://app.lumosity.com/fr/onboard" target="_blank" onclick="flashLancement()">🧠 Lumosity</a>
+          <a href="https://web.whatsapp.com/" target="_blank" onclick="flashLancement()">📨 WhatsApp</a>
         </div>
       </div>
     </div>
@@ -621,29 +666,29 @@
     <div class="section" id="section-rappels">
       <h2>🔔 Rappels</h2>
       <div class="separateur"></div>
-      <p style="color:#00f7ff;font-size:0.75em;margin-bottom:15px;text-align:center;opacity:0.65;line-height:1.5">J.A.R.V.I.S te notifiera à l'heure exacte, même si l'onglet est en arrière-plan.</p>
+      <p style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--bleu-doux);font-size:0.85em;margin-bottom:15px;text-align:center;opacity:0.7">Je te rappellerai à l'heure exacte, même si tu es au bord du lac.</p>
       <div class="rappel-input" style="width:100%">
-        <input type="text" id="rappel-texte" placeholder="Ex: Machine à laver...">
+        <input type="text" id="rappel-texte" placeholder="Ex: Appeler Oliver à 17h...">
         <input type="time" id="rappel-heure">
         <button onclick="ajouterRappel()">＋</button>
       </div>
       <div id="rappel-list" style="width:100%"></div>
     </div>
 
-    <!-- NOTES — RESTAURÉ -->
+    <!-- NOTES / JOURNAL -->
     <div class="section" id="section-notes">
-      <h2>📝 Bloc-notes</h2>
+      <h2>📝 Journal d'Elio</h2>
       <div class="separateur"></div>
       <div class="notes-container" style="width:100%">
-        <textarea id="notes" placeholder="Écris tes notes ici... Sauvegarde automatique active."></textarea>
-        <div style="margin-top:10px;display:flex;align-items:center">
+        <textarea id="notes" placeholder="Cher journal, aujourd'hui j'ai..."></textarea>
+        <div style="margin-top:12px;display:flex;align-items:center">
           <button class="save-btn" onclick="sauvegarderNotes()">💾 Sauvegarder</button>
           <span id="notif-save"></span>
         </div>
       </div>
     </div>
 
-    <!-- POST-ITS — RESTAURÉ -->
+    <!-- POST-ITS -->
     <div class="section" id="section-postits">
       <h2>🗒️ Post-its</h2>
       <div class="separateur"></div>
@@ -657,7 +702,7 @@
       <div class="minuteur">
         <div class="minuteur-display" id="minuteur-display">00:00</div>
         <div class="minuteur-btns">
-          <button onclick="demarrerMinuteur()">▶ Start</button>
+          <button onclick="demarrerMinuteur()">▶ Commencer</button>
           <button onclick="pauseMinuteur()">⏸ Pause</button>
           <button onclick="resetMinuteur()">↺ Reset</button>
         </div>
@@ -666,11 +711,11 @@
           <button onclick="setMinuteur(10)">10 min</button>
           <button onclick="setMinuteur(15)">15 min</button>
           <button onclick="setMinuteur(20)">20 min</button>
-          <button onclick="setMinuteur(25)">25 min 🍅</button>
+          <button onclick="setMinuteur(25)">25 🍅</button>
           <button onclick="setMinuteur(30)">30 min</button>
         </div>
         <div class="separateur-outil"></div>
-        <h2 style="color:#00f7ff;text-shadow:0 0 10px #00f7ff">⏱️ Chronomètre</h2>
+        <h2 style="color:var(--bleu-doux)">⏱️ Chronomètre</h2>
         <div class="chrono-display" id="chrono-display">00:00:00</div>
         <div class="minuteur-btns">
           <button onclick="demarrerChrono()">▶ Start</button>
@@ -680,7 +725,7 @@
       </div>
     </div>
 
-    <!-- CALENDRIER — RESTAURÉ -->
+    <!-- CALENDRIER -->
     <div class="section" id="section-calendrier">
       <h2>🗓️ Calendrier</h2>
       <div class="separateur"></div>
@@ -700,20 +745,20 @@
       <div class="separateur"></div>
       <div class="meteo-widget">
         <div class="meteo-search">
-          <input type="text" id="meteo-input" placeholder="Entrez une ville...">
+          <input type="text" id="meteo-input" placeholder="Une ville...">
           <button onclick="chercherMeteo()">Chercher</button>
         </div>
         <div class="meteo-result" id="meteo-result">
-          <p style="color:#00f7ff;opacity:0.5;font-size:0.85em">Entrez une ville pour voir la météo</p>
+          <p style="color:var(--bleu-doux);opacity:0.5;font-size:0.85em;font-style:italic;font-family:'Cormorant Garamond',serif">Entrez une ville pour voir la météo</p>
         </div>
       </div>
     </div>
 
-    <!-- CARTE — RESTAURÉE -->
+    <!-- CARTE -->
     <div class="section" id="section-carte">
       <h2>🗺️ Carte du Monde</h2>
       <div class="separateur"></div>
-      <p style="color:#00f7ff;font-size:0.75em;margin-bottom:12px;opacity:0.6">Zoomez et déplacez la carte librement.</p>
+      <p style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--bleu-doux);font-size:0.8em;margin-bottom:14px;opacity:0.6">Explore librement. Crema t'attend toujours.</p>
       <div id="map"></div>
     </div>
 
@@ -724,15 +769,15 @@
       <div class="music-player">
         <div class="music-search">
           <input type="text" id="music-input" placeholder="Colle un lien YouTube...">
-          <button onclick="lancerMusique()">▶ Lancer</button>
+          <button onclick="lancerMusique()">▶ Écouter</button>
         </div>
         <iframe id="music-frame" allowfullscreen allow="autoplay"></iframe>
-        <div style="margin-top:12px">
-          <p style="color:#00f7ff;font-size:0.7em;margin-bottom:8px;opacity:0.7">Suggestions :</p>
+        <div style="margin-top:14px">
+          <p style="color:var(--bleu-doux);font-size:0.68em;margin-bottom:8px;opacity:0.6;font-style:italic;font-family:'Cormorant Garamond',serif">Bande originale de l'été :</p>
           <div class="music-suggestions">
-            <div class="music-tag" onclick="lancerMusiqueDirecte('https://www.youtube.com/embed/Z0GFRcFm-aY')">🕷️ Spider-Man</div>
-            <div class="music-tag" onclick="lancerMusiqueDirecte('https://www.youtube.com/embed/JGwWNGJdvx8')">🎸 Epic</div>
+            <div class="music-tag" onclick="lancerMusiqueDirecte('https://www.youtube.com/embed/K2OuTEYHqEA')">🍑 Mystery of Love</div>
             <div class="music-tag" onclick="lancerMusiqueDirecte('https://www.youtube.com/embed/60ItHLz5WEA')">🌙 LoFi</div>
+            <div class="music-tag" onclick="lancerMusiqueDirecte('https://www.youtube.com/embed/JGwWNGJdvx8')">🎸 Été</div>
             <div class="music-tag" onclick="lancerMusiqueDirecte('https://www.youtube.com/embed/dQw4w9WgXcQ')">🎵 Classic</div>
           </div>
         </div>
@@ -741,142 +786,78 @@
 
     <!-- JEUX -->
     <div class="section" id="section-jeux">
-      <h2>🎮 Arcade J.A.R.V.I.S</h2>
+      <h2>🎮 Arcade</h2>
       <div class="separateur"></div>
       <div id="jeu-message"></div>
       <div class="jeux-grid">
-        <a href="https://poki.com/fr/g/subway-surfers" target="_blank" onclick="afficherMessageJeu('🏃 MISSION LANCÉE — Cours Spider-Man, cours !')" class="jeu-card"><div class="jeu-emoji">🏃</div><div class="jeu-titre">Subway Surfers</div><div class="jeu-desc">Course infinie</div></a>
-        <a href="https://poki.com/fr/g/dinosaur-game" target="_blank" onclick="afficherMessageJeu('🦖 Saute petit dino!')" class="jeu-card"><div class="jeu-emoji">🦖</div><div class="jeu-titre">Dino Run</div><div class="jeu-desc">Saute les cactus</div></a>
-        <a href="https://poki.com/fr/g/retro-rex" target="_blank" onclick="afficherMessageJeu('🦕 Détruис tout!')" class="jeu-card"><div class="jeu-emoji">🦕</div><div class="jeu-titre">Dino Retro</div><div class="jeu-desc">Détruис tout</div></a>
-        <a href="https://poki.com/fr/g/ping-pong-go" target="_blank" onclick="afficherMessageJeu('🏓 Marty Supreme!')" class="jeu-card"><div class="jeu-emoji">🏓</div><div class="jeu-titre">Ping Pong</div><div class="jeu-desc">MARTY SUPREME ERA</div></a>
-        <a href="https://poki.com/fr/g/stickman-hook" target="_blank" onclick="afficherMessageJeu('🕸️ Spider-Man ERA!')" class="jeu-card"><div class="jeu-emoji">🕸️</div><div class="jeu-titre">Stickman Hook</div><div class="jeu-desc">Spider-Man ERA</div></a>
-        <a href="https://poki.com/fr/g/monkey-mart" target="_blank" onclick="afficherMessageJeu('🐵 À toi de jouer!')" class="jeu-card"><div class="jeu-emoji">🐵</div><div class="jeu-titre">Monkey Market</div><div class="jeu-desc">Crée ton supermarché</div></a>
-        <a href="https://poki.com/fr/g/crossy-road" target="_blank" onclick="afficherMessageJeu('🐔 Te fais pas écraser!')" class="jeu-card"><div class="jeu-emoji">🐔</div><div class="jeu-titre">Chicken Run</div><div class="jeu-desc">Évite les voitures</div></a>
-        <a href="https://poki.com/fr/g/blocky-blast-puzzle" target="_blank" onclick="afficherMessageJeu('🟦 Quel score?')" class="jeu-card"><div class="jeu-emoji">🟦</div><div class="jeu-titre">Block Blast</div><div class="jeu-desc">Quel score feras-tu?</div></a>
-        <!-- 🔴 BOUTON ROBLOX -->
-<div class="jarvis-game-card" onclick="launchRoblox()">
-  <div class="glow-circle"></div>
-  <div class="game-content">
-    <h2>J.A.R.V.I.S</h2>
-    <p>Initialize Roblox System</p>
-  </div>
-</div>
-
-<style>
-.jarvis-game-card {
-  position: relative;
-  width: 220px;
-  height: 120px;
-  border-radius: 20px;
-  background: rgba(0,0,0,0.7);
-  border: 2px solid rgba(255, 0, 0, 0.4);
-  color: #fff;
-  cursor: pointer;
-  overflow: hidden;
-  transition: 0.3s;
-  backdrop-filter: blur(10px);
-}
-
-.jarvis-game-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 25px red;
-}
-
-.glow-circle {
-  position: absolute;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(255,0,0,0.6), transparent);
-  top: -50px;
-  left: -50px;
-  animation: rotate 6s linear infinite;
-}
-
-@keyframes rotate {
-  0% {transform: rotate(0deg);}
-  100% {transform: rotate(360deg);}
-}
-
-.game-content {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  top: 25px;
-}
-
-.game-content h2 {
-  margin: 0;
-  font-size: 18px;
-  letter-spacing: 2px;
-}
-
-.game-content p {
-  margin-top: 5px;
-  font-size: 12px;
-  color: #aaa;
-}
-</style>
-
-<script>
-function launchRoblox() {
-  // effet "IA processing"
-  document.body.style.cursor = "wait";
-
-  // petit délai pour effet stylé
-  setTimeout(() => {
-    window.location.href = "https://www.roblox.com/home";
-  }, 800);
-}
-</script>
+        <a href="https://poki.com/fr/g/subway-surfers" target="_blank" onclick="afficherMessageJeu('🏃 Cours comme Elio dans les rues de Crema !')" class="jeu-card"><div class="jeu-emoji">🏃</div><div class="jeu-titre">Subway Surfers</div><div class="jeu-desc">Course infinie</div></a>
+        <a href="https://poki.com/fr/g/dinosaur-game" target="_blank" onclick="afficherMessageJeu('🦖 Saute !')" class="jeu-card"><div class="jeu-emoji">🦖</div><div class="jeu-titre">Dino Run</div><div class="jeu-desc">Saute les cactus</div></a>
+        <a href="https://poki.com/fr/g/retro-rex" target="_blank" onclick="afficherMessageJeu('🦕 Détruис tout !')" class="jeu-card"><div class="jeu-emoji">🦕</div><div class="jeu-titre">Dino Retro</div><div class="jeu-desc">Destroy</div></a>
+        <a href="https://poki.com/fr/g/ping-pong-go" target="_blank" onclick="afficherMessageJeu('🏓 Comme au bord de la piscine !')" class="jeu-card"><div class="jeu-emoji">🏓</div><div class="jeu-titre">Ping Pong</div><div class="jeu-desc">Rallye estival</div></a>
+        <a href="https://poki.com/fr/g/stickman-hook" target="_blank" onclick="afficherMessageJeu('🌿 Swing dans le jardin !')" class="jeu-card"><div class="jeu-emoji">🌿</div><div class="jeu-titre">Stickman Hook</div><div class="jeu-desc">Virevolte</div></a>
+        <a href="https://poki.com/fr/g/monkey-mart" target="_blank" onclick="afficherMessageJeu('🐵 Marché de Crema !')" class="jeu-card"><div class="jeu-emoji">🐵</div><div class="jeu-titre">Monkey Market</div><div class="jeu-desc">Crée ton étal</div></a>
+        <a href="https://poki.com/fr/g/crossy-road" target="_blank" onclick="afficherMessageJeu('🚴 Traverse Crema !')" class="jeu-card"><div class="jeu-emoji">🚴</div><div class="jeu-titre">Crossy Road</div><div class="jeu-desc">Évite les voitures</div></a>
+        <a href="https://poki.com/fr/g/blocky-blast-puzzle" target="_blank" onclick="afficherMessageJeu('🍋 Quel score !')" class="jeu-card"><div class="jeu-emoji">🍋</div><div class="jeu-titre">Block Blast</div><div class="jeu-desc">Quel score?</div></a>
+        <a href="https://www.roblox.com/home" target="_blank" onclick="afficherMessageJeu('🎮 Bonne session !')" class="jeu-card"><div class="jeu-emoji">🎮</div><div class="jeu-titre">Roblox</div><div class="jeu-desc">Monde infini</div></a>
       </div>
     </div>
 
-    <!-- MARVEL -->
-    <div class="section" id="section-marvel">
-      <h2>⚡ News Marvel</h2>
+    <!-- FILMS (remplace Marvel) -->
+    <div class="section" id="section-films">
+      <h2>🎬 Cinéma & Inspirations</h2>
       <div class="separateur"></div>
       <div class="marvel-news">
-        <div class="news-item"><h3>🕷️ Spider-Man : Nouveau costume confirmé</h3><p>Marvel Studios a confirmé l'apparition d'un nouveau costume pour Peter Parker dans le prochain film.</p><div class="news-date">Marvel Universe</div></div>
-        <div class="news-item"><h3>🔨 Thor : Love and Thunder 2 en développement</h3><p>Taika Waititi aurait été approché pour réaliser une suite de Thor Love and Thunder.</p><div class="news-date">Marvel Studios</div></div>
-        <div class="news-item"><h3>💚 World War Hulk : Le projet avance</h3><p>Des sources confirment que Marvel travaille activement sur l'adaptation de World War Hulk.</p><div class="news-date">Marvel News</div></div>
-        <div class="news-item"><h3>🌮 Deadpool rejoint les Avengers ?</h3><p>Après Deadpool & Wolverine, le Mercenaire bavard pourrait apparaître dans Avengers : Doomsday.</p><div class="news-date">Marvel Rumeurs</div></div>
-        <div class="news-item"><h3>🔮 Doctor Strange 3 officiellement annoncé</h3><p>Marvel a confirmé le développement d'un troisième volet pour le Sorcier Suprême.</p><div class="news-date">Marvel Studios</div></div>
-        <div class="news-item"><h3>⚡ Avengers : Doomsday — ce qu'on sait</h3><p>Le casting, l'histoire et les connections avec le multivers : tout ce qu'on sait sur le prochain Avengers.</p><div class="news-date">Marvel Universe</div></div>
+        <div class="news-item"><h3>🍑 Call Me By Your Name — Luca Guadagnino (2017)</h3><p>Elio, 17 ans, passe l'été dans la villa familiale en Italie du Nord. L'arrivée d'Oliver, stagiaire de son père, va bouleverser son été pour toujours.</p><div class="news-date">Film fondateur · Sufjan Stevens · Timothée Chalamet</div></div>
+        <div class="news-item"><h3>🌊 Bones and All — Luca Guadagnino (2022)</h3><p>Un road trip mélancolique et sensoriel à travers l'Amérique des années 80. Timothée Chalamet retrouve Guadagnino dans un film bouleversant.</p><div class="news-date">Luca Guadagnino · Timothée Chalamet</div></div>
+        <div class="news-item"><h3>🎹 The Dreamers — Bernardo Bertolucci (2003)</h3><p>Paris, mai 1968. Un étudiant américain se lie d'amitié avec deux jumeaux français. Une ode au cinéma, à la jeunesse et à la liberté.</p><div class="news-date">Bernardo Bertolucci · Paris · Cinéma</div></div>
+        <div class="news-item"><h3>🌅 Lido di Ostia — Estie (2021)</h3><p>Court-métrage évocateur d'un été méditerranéen. La lumière rasante, le sel sur la peau, la beauté de l'instant présent capturée avec poésie.</p><div class="news-date">Cinéma italien · Court-métrage</div></div>
+        <div class="news-item"><h3>🎶 Sufjan Stevens — Mystery of Love</h3><p>La chanson emblématique du film. Stevens a composé trois titres originaux pour Call Me By Your Name, dont cette ballade mélancolique et lumineuse.</p><div class="news-date">Bande originale · Oscar 2018</div></div>
+        <div class="news-item"><h3>📖 André Aciman — Appelle-moi par ton nom</h3><p>Le roman original d'André Aciman, publié en 2007, dont est adapté le film. Une prose sensorielle et introspective sur la mémoire et le désir.</p><div class="news-date">Roman · André Aciman · 2007</div></div>
       </div>
     </div>
 
   </div>
 
   <script>
-    const MDP = "spiderman";
+    const MDP = "crema1983";
 
-    // ===== CURSEUR =====
+    // CURSEUR
     const curseur = document.getElementById('curseur');
     const trail = document.getElementById('curseur-trail');
     document.addEventListener('mousemove', (e) => {
-      curseur.style.left = e.clientX + 'px';
-      curseur.style.top = e.clientY + 'px';
+      curseur.style.left = e.clientX + 'px'; curseur.style.top = e.clientY + 'px';
       setTimeout(() => { trail.style.left = e.clientX + 'px'; trail.style.top = e.clientY + 'px'; }, 80);
     });
 
-    // ===== FOND IA =====
+    // ÉTOILES FILANTES
+    function creerEtoile() {
+      const e = document.createElement('div');
+      e.className = 'etoile-filante';
+      e.style.left = Math.random() * 100 + 'vw';
+      e.style.top = Math.random() * 60 + 'vh';
+      e.style.animationDuration = (1 + Math.random() * 2) + 's';
+      e.style.opacity = Math.random() * 0.6 + 0.2;
+      document.body.appendChild(e);
+      setTimeout(() => e.remove(), 3000);
+    }
+    setInterval(creerEtoile, 3000);
+
+    // FOND
     const iaBg = document.getElementById('ia-bg');
     const textesIA = [
-      'Analyse réseau en cours...','SYSTEM SCAN ACTIVE','Mission Avengers détectée',
-      'Connexion serveurs sécurisée','SURVEILLANCE PÉRIMÈTRE','Données cryptées OK',
-      'AI PROCESSING DATA...','Protocole défense initialisé','IA quantique opérationnelle',
-      'THREAT LEVEL: ZERO','Arc Reactor stable','SYSTEMS ONLINE: 100%',
-      'INITIALIZING SYSTEM...','DATA SYNC 78%','AVENGERS NETWORK LINKED'
+      'souvenir d\'un été...', 'Oliver est dans le jardin', 'les cigales chantent',
+      'la villa baigne dans la chaleur', 'Crema, 1983', 'Mystery of Love...',
+      'le lac de Côme scintille', 'l\'abricotier est en fleur', 'Elio joue du piano',
+      'appelle-moi par ton nom', 'la lumière rasante de 17h', 'un été qu\'on n\'oublie pas'
     ];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 8; i++) {
       const barre = document.createElement('div');
       barre.className = 'ia-barre';
-      barre.style.top = (5 + i * 9.5) + '%';
-      barre.style.width = (25 + Math.random() * 50) + '%';
-      const couleurs = ['#ff003c','#00f7ff','#ffd700','#001aff'];
-      barre.style.background = couleurs[i % couleurs.length];
-      barre.style.animationDuration = (5 + Math.random() * 8) + 's';
-      barre.style.animationDelay = (Math.random() * 5) + 's';
+      barre.style.top = (5 + i * 11) + '%';
+      barre.style.width = (20 + Math.random() * 40) + '%';
+      barre.style.background = ['#FFBE98','#F4845F','#5B7BAF','#E8A857'][i % 4];
+      barre.style.animationDuration = (6 + Math.random() * 10) + 's';
+      barre.style.animationDelay = (Math.random() * 6) + 's';
       iaBg.appendChild(barre);
     }
     function creerTexteIA() {
@@ -885,51 +866,48 @@ function launchRoblox() {
       el.textContent = textesIA[Math.floor(Math.random() * textesIA.length)];
       el.style.left = Math.random() * 85 + 'vw';
       el.style.top = '105vh';
-      el.style.color = Math.random() > 0.5 ? '#00f7ff' : '#ffd700';
-      el.style.animationDuration = (10 + Math.random() * 12) + 's';
+      el.style.color = Math.random() > 0.5 ? '#FFBE98' : '#5B7BAF';
+      el.style.animationDuration = (12 + Math.random() * 14) + 's';
       iaBg.appendChild(el);
-      setTimeout(() => el.remove(), 22000);
+      setTimeout(() => el.remove(), 26000);
     }
-    setInterval(creerTexteIA, 1800);
+    setInterval(creerTexteIA, 2500);
 
-    // TERMINAL ROTATION
+    // TERMINAL
     const lignesTerminal = [
-      'Analyse réseau en cours...','Scan satellites actif','Mission Avengers détectée',
-      'Connexion sécurisée OK','Surveillance périmètre active','IA quantique opérationnelle',
-      'Arc Reactor stable','Protocole défense initialisé','Menace détectée : 0',
-      'DATA SYNC EN COURS...','SYSTEM CHECK PASSED','UPLOAD DATA 100%'
+      'Le soleil se lève sur la villa...', 'Sufjan Stevens dans la chambre',
+      'Oliver est déjà dans le jardin', 'Les cigales chantent fort ce matin',
+      'Crema baigne dans la chaleur', 'L\'abricotier fleurit encore',
+      'La piscine attend...', 'Elio joue du piano au 1er étage',
+      'Le lac de Côme scintille au loin', 'Un souvenir qui ne s\'oublie pas',
+      'Appelle-moi par ton nom...', 'L\'été dure encore un peu'
     ];
     let terminalIdx = 0;
     function rotationTerminal() {
       const ids = ['terminal-ligne1','terminal-ligne2','terminal-ligne3'];
       ids.forEach(id => document.getElementById(id).classList.remove('active'));
-      const activeId = ids[terminalIdx % 3];
-      const el = document.getElementById(activeId);
+      const el = document.getElementById(ids[terminalIdx % 3]);
       el.textContent = '› ' + lignesTerminal[terminalIdx % lignesTerminal.length];
       el.classList.add('active');
       terminalIdx++;
     }
-    setInterval(rotationTerminal, 1800);
+    setInterval(rotationTerminal, 2200);
 
-    // ===== CHARGEMENT =====
+    // CHARGEMENT
     window.addEventListener('load', () => {
       const barre = document.getElementById('barre-progress');
       const texte = document.getElementById('loading-text');
       const eclair = document.getElementById('eclair');
-      const msgs = ['INITIALIZING SYSTEM...','Connexion satellites...','AI PROCESSING...','DATA SYNC 100%'];
+      const msgs = ['Les cigales chantent...', 'La villa s\'éveille...', 'Oliver arrive...', 'L\'été commence.'];
       let i = 0;
       eclair.style.height = '100vh';
       setTimeout(() => { eclair.style.opacity = '0'; }, 900);
       barre.style.width = '100%';
       const iv = setInterval(() => { if (i < msgs.length) { texte.textContent = msgs[i]; i++; } }, 400);
-      setTimeout(() => {
-        clearInterval(iv);
-        document.getElementById('loading-screen').style.display = 'none';
-        document.getElementById('password-screen').style.display = 'flex';
-      }, 1800);
+      setTimeout(() => { clearInterval(iv); document.getElementById('loading-screen').style.display = 'none'; document.getElementById('password-screen').style.display = 'flex'; }, 1800);
     });
 
-    // ===== MOT DE PASSE =====
+    // MOT DE PASSE
     function verifierMdp() {
       const input = document.getElementById('password-input').value;
       const error = document.getElementById('password-error');
@@ -949,13 +927,13 @@ function launchRoblox() {
         }, 3000);
       } else {
         error.style.opacity = '1';
-        setTimeout(() => { error.style.opacity = '0'; }, 2000);
+        setTimeout(() => { error.style.opacity = '0'; }, 2500);
         document.getElementById('password-input').value = '';
       }
     }
     document.addEventListener('keypress', (e) => { if (e.key === 'Enter') verifierMdp(); });
 
-    // ===== SECTIONS =====
+    // SECTIONS
     function afficherSection(nom, e) {
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active','visible'));
       document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
@@ -967,28 +945,21 @@ function launchRoblox() {
       if (nom === 'carte') setTimeout(rafraichirCarte, 250);
     }
 
-    // ===== FLASH =====
     function flashLancement() {
       const flash = document.getElementById('flash-overlay');
       flash.style.opacity = '1';
       setTimeout(() => { flash.style.opacity = '0'; }, 300);
     }
 
-    // ===== MODE CINEMA =====
+    // CINEMA
     function ouvrirCinema() {
       flashLancement();
-      const overlay = document.getElementById('cinema-overlay');
-      overlay.style.display = 'flex';
+      document.getElementById('cinema-overlay').style.display = 'flex';
       const frame = document.getElementById('cinema-frame');
       frame.src = 'https://purstream.art';
-      // Si iframe bloqué après 4s, ouvre dans nouvel onglet
       setTimeout(() => {
-        try {
-          if (frame.contentDocument === null) throw new Error('blocked');
-        } catch(err) {
-          window.open('https://purstream.art', '_blank');
-          fermerCinema();
-        }
+        try { if (frame.contentDocument === null) throw new Error(); }
+        catch(err) { window.open('https://purstream.art', '_blank'); fermerCinema(); }
       }, 4000);
     }
     function fermerCinema() {
@@ -996,399 +967,267 @@ function launchRoblox() {
       document.getElementById('cinema-frame').src = '';
     }
 
-    // ===== EASTER EGG =====
+    // EASTER EGG — "elio" à taper
     let easterCode = '';
     document.addEventListener('keydown', (e) => {
       easterCode += e.key;
-      if (easterCode.includes('spidey')) { activerEasterEgg(); easterCode = ''; }
-      if (easterCode.length > 25) easterCode = '';
+      if (easterCode.includes('elio')) { activerEasterEgg(); easterCode = ''; }
+      if (easterCode.length > 20) easterCode = '';
     });
     function activerEasterEgg() {
       flashLancement();
       document.getElementById('easter-egg-overlay').style.display = 'flex';
-      for (let i = 0; i < 60; i++) {
+      const couleurs = ['#FFBE98','#F4845F','#E8A857','#5B7BAF','#FFF5E6'];
+      for (let i = 0; i < 50; i++) {
         setTimeout(() => {
           const p = document.createElement('div');
           p.className = 'particule-explosion';
-          const angle = Math.random() * 360;
-          const dist = 120 + Math.random() * 250;
+          const angle = Math.random() * 360, dist = 100 + Math.random() * 220;
           const dx = Math.cos(angle * Math.PI/180) * dist + 'px';
           const dy = Math.sin(angle * Math.PI/180) * dist + 'px';
-          const c = ['#ffd700','#ff003c','#00f7ff','#ff8c00','#fff'];
-          p.style.cssText = 'left:50vw;top:50vh;background:' + c[Math.floor(Math.random()*c.length)] + ';--dx:' + dx + ';--dy:' + dy + ';box-shadow:0 0 8px currentColor;';
-          document.body.appendChild(p);
-          setTimeout(() => p.remove(), 800);
-        }, i * 20);
+          p.style.cssText = 'left:50vw;top:50vh;background:' + couleurs[Math.floor(Math.random()*couleurs.length)] + ';--dx:' + dx + ';--dy:' + dy + ';box-shadow:0 0 6px currentColor;';
+          document.body.appendChild(p); setTimeout(() => p.remove(), 900);
+        }, i * 25);
       }
     }
     function fermerEasterEgg() { document.getElementById('easter-egg-overlay').style.display = 'none'; }
 
-    // ===== CANVAS =====
+    // CANVAS PARTICULES
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
     window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
     const pArr = [];
-    for (let i = 0; i < 80; i++) {
-      pArr.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*2+0.5, dx: (Math.random()-0.5)*0.5, dy: (Math.random()-0.5)*0.5, alpha: Math.random() });
+    for (let i = 0; i < 60; i++) {
+      pArr.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*1.5+0.3, dx: (Math.random()-0.5)*0.3, dy: (Math.random()-0.5)*0.3, alpha: Math.random()*0.4+0.1 });
     }
     function animerParticules() {
       ctx.clearRect(0,0,canvas.width,canvas.height);
       pArr.forEach((p,i) => {
-        p.x += p.dx; p.y += p.dy;
+        p.x+=p.dx; p.y+=p.dy;
         if (p.x<0||p.x>canvas.width) p.dx*=-1;
         if (p.y<0||p.y>canvas.height) p.dy*=-1;
         pArr.forEach((p2,j) => {
           if (i===j) return;
           const d = Math.sqrt((p.x-p2.x)**2+(p.y-p2.y)**2);
-          if (d<120) {
-            ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p2.x,p2.y);
-            ctx.strokeStyle='rgba(255,215,0,'+(1-d/120)*0.15+')';
-            ctx.lineWidth=0.5; ctx.stroke();
-          }
+          if (d<100) { ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p2.x,p2.y); ctx.strokeStyle='rgba(255,190,152,'+(1-d/100)*0.08+')'; ctx.lineWidth=0.5; ctx.stroke(); }
         });
         ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-        ctx.fillStyle=(i%3===0?'rgba(255,215,0,':'rgba(0,247,255,')+p.alpha+')'; ctx.fill();
+        ctx.fillStyle = (i%3===0?'rgba(255,190,152,':'rgba(91,123,175,') + p.alpha + ')';
+        ctx.fill();
       });
       requestAnimationFrame(animerParticules);
     }
     animerParticules();
 
-    // ===== HORLOGE =====
+    // HORLOGE
     function majHorloge() {
       const n = new Date();
-      const h = String(n.getHours()).padStart(2,'0');
-      const m = String(n.getMinutes()).padStart(2,'0');
-      const s = String(n.getSeconds()).padStart(2,'0');
+      const h = String(n.getHours()).padStart(2,'0'), m = String(n.getMinutes()).padStart(2,'0'), s = String(n.getSeconds()).padStart(2,'0');
       const j = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
-      const mo = ['Jan','Fev','Mar','Avr','Mai','Jun','Jul','Aou','Sep','Oct','Nov','Dec'];
+      const mo = ['Jan','Fev','Mar','Avr','Mai','Jun','Jul','Aou','Sep','Oct','Nov','Déc'];
       const el = document.getElementById('horloge');
       if (el) el.innerHTML = h+':'+m+':'+s+'<br><span>'+j[n.getDay()]+' '+n.getDate()+' '+mo[n.getMonth()]+' '+n.getFullYear()+'</span>';
       const hh = document.getElementById('hud-heure');
       if (hh) hh.textContent = h+':'+m;
       verifierRappels(h, m);
     }
-    setInterval(majHorloge, 1000);
-    majHorloge();
+    setInterval(majHorloge, 1000); majHorloge();
 
-    // ===== BATTERIE =====
+    // BATTERIE
     async function majBatterie() {
       try {
         const bat = await navigator.getBattery();
         const pct = Math.round(bat.level*100);
         document.getElementById('hud-batterie-txt').textContent = pct+'%';
         document.getElementById('batterie-fill').style.width = pct+'%';
-        document.getElementById('batterie-fill').style.background = pct<20?'#ff0000':pct<50?'#ffaa00':'#ffd700';
+        document.getElementById('batterie-fill').style.background = pct<20?'#F4845F':pct<50?'#E8A857':'#FFBE98';
       } catch(e) { document.getElementById('hud-batterie-txt').textContent = 'N/A'; }
     }
-    majBatterie();
-    setInterval(majBatterie, 30000);
+    majBatterie(); setInterval(majBatterie, 30000);
 
-    // ===== NOTIFICATIONS =====
+    // NOTIFICATIONS
     function demanderNotifications() {
       if ('Notification' in window) {
-        Notification.requestPermission().then(p => {
-          if (p === 'granted') new Notification('J.A.R.V.I.S INDUSTRY', { body: 'Notifications activées ! Rappels opérationnels.' });
-        });
-      } else { alert('Les notifications ne sont pas supportées sur ce navigateur.'); }
+        Notification.requestPermission().then(p => { if (p==='granted') new Notification('Elio — Été 1983', { body: 'Je te préviendrai à l\'heure exacte. 🍑' }); });
+      }
     }
 
-    // ===== RAPPELS =====
+    // RAPPELS
     let rappels = JSON.parse(localStorage.getItem('rappels') || '[]');
     let rappelsDeclenchés = JSON.parse(localStorage.getItem('rappelsDeclenchés') || '[]');
-
     function afficherRappels() {
       const list = document.getElementById('rappel-list');
       if (!list) return;
-      list.innerHTML = '';
-      if (rappels.length === 0) {
-        list.innerHTML = '<p style="color:rgba(255,215,0,0.3);font-size:0.75em;text-align:center;margin-top:10px">Aucun rappel configuré.</p>';
-        return;
-      }
-      rappels.forEach((r, i) => {
-        list.innerHTML += '<div class="rappel-item"><div class="rappel-heure">⏰ '+r.heure+'</div><div class="rappel-texte">'+r.texte+'</div><button class="rappel-delete" onclick="supprimerRappel('+i+')">🗑️</button></div>';
-      });
+      list.innerHTML = rappels.length === 0 ? '<p style="color:rgba(255,190,152,0.25);font-size:0.78em;text-align:center;margin-top:12px;font-style:italic;font-family:Cormorant Garamond,serif">Aucun rappel pour l\'instant...</p>' : '';
+      rappels.forEach((r,i) => { list.innerHTML += '<div class="rappel-item"><div class="rappel-heure">⏰ '+r.heure+'</div><div class="rappel-texte">'+r.texte+'</div><button class="rappel-delete" onclick="supprimerRappel('+i+')">🗑️</button></div>'; });
     }
     function ajouterRappel() {
-      const texte = document.getElementById('rappel-texte').value.trim();
-      const heure = document.getElementById('rappel-heure').value;
-      if (!texte || !heure) return;
-      rappels.push({ texte, heure });
-      localStorage.setItem('rappels', JSON.stringify(rappels));
-      document.getElementById('rappel-texte').value = '';
-      document.getElementById('rappel-heure').value = '';
+      const t = document.getElementById('rappel-texte').value.trim(), h = document.getElementById('rappel-heure').value;
+      if (!t||!h) return;
+      rappels.push({texte:t,heure:h}); localStorage.setItem('rappels',JSON.stringify(rappels));
+      document.getElementById('rappel-texte').value = ''; document.getElementById('rappel-heure').value = '';
       afficherRappels();
     }
-    function supprimerRappel(i) {
-      rappels.splice(i, 1);
-      localStorage.setItem('rappels', JSON.stringify(rappels));
-      afficherRappels();
-    }
-    function verifierRappels(h, m) {
-      const now = h + ':' + m;
+    function supprimerRappel(i) { rappels.splice(i,1); localStorage.setItem('rappels',JSON.stringify(rappels)); afficherRappels(); }
+    function verifierRappels(h,m) {
+      const now = h+':'+m;
       rappels.forEach(r => {
-        const cle = r.heure + '_' + r.texte;
-        if (r.heure === now && !rappelsDeclenchés.includes(cle)) {
-          rappelsDeclenchés.push(cle);
-          localStorage.setItem('rappelsDeclenchés', JSON.stringify(rappelsDeclenchés));
-          if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification('⏰ J.A.R.V.I.S RAPPEL', { body: r.texte + ' — ' + r.heure });
-          }
-          flashLancement();
-          setTimeout(() => alert('⏰ RAPPEL J.A.R.V.I.S : ' + r.texte), 100);
+        const cle = r.heure+'_'+r.texte;
+        if (r.heure===now&&!rappelsDeclenchés.includes(cle)) {
+          rappelsDeclenchés.push(cle); localStorage.setItem('rappelsDeclenchés',JSON.stringify(rappelsDeclenchés));
+          if ('Notification' in window&&Notification.permission==='granted') new Notification('🍑 Rappel', {body:r.texte+' — '+r.heure});
+          flashLancement(); setTimeout(()=>alert('🍑 RAPPEL : '+r.texte),100);
         }
       });
-      if (h === '00' && m === '00') { rappelsDeclenchés = []; localStorage.setItem('rappelsDeclenchés', '[]'); }
+      if (h==='00'&&m==='00') { rappelsDeclenchés=[]; localStorage.setItem('rappelsDeclenchés','[]'); }
     }
     afficherRappels();
 
-    // ===== DOSSIERS =====
-    function toggleDossier(id) {
-      const c = document.getElementById(id);
-      c.style.display = (c.style.display === 'flex') ? 'none' : 'flex';
-    }
+    // DOSSIERS
+    function toggleDossier(id) { const c=document.getElementById(id); c.style.display=(c.style.display==='flex')?'none':'flex'; }
 
-    // ===== JARVIS =====
+    // BOUTON CENTRAL
     function activerJarvis(e) {
       const status = document.getElementById('jarvis-status');
-      status.innerHTML = '⚡ Connexion J.A.R.V.I.S en cours...';
-      const couleurs = ['#ffd700','#ff8c00','#ff003c','#00f7ff','#fff'];
-      for (let i = 0; i < 45; i++) {
-        const p = document.createElement('div');
-        p.className = 'particule-explosion';
-        const angle = Math.random()*360;
-        const dist = 80 + Math.random()*160;
-        const dx = Math.cos(angle*Math.PI/180)*dist + 'px';
-        const dy = Math.sin(angle*Math.PI/180)*dist + 'px';
-        p.style.cssText = 'left:'+e.clientX+'px;top:'+e.clientY+'px;background:'+couleurs[Math.floor(Math.random()*couleurs.length)]+';--dx:'+dx+';--dy:'+dy+';box-shadow:0 0 6px currentColor;';
-        document.body.appendChild(p);
-        setTimeout(() => p.remove(), 800);
+      status.innerHTML = '<em>Ouverture du journal...</em>';
+      const couleurs = ['#FFBE98','#F4845F','#E8A857','#5B7BAF','#FFF5E6'];
+      for (let i=0;i<35;i++) {
+        const p = document.createElement('div'); p.className = 'particule-explosion';
+        const angle=Math.random()*360, dist=60+Math.random()*130;
+        const dx=Math.cos(angle*Math.PI/180)*dist+'px', dy=Math.sin(angle*Math.PI/180)*dist+'px';
+        p.style.cssText='left:'+e.clientX+'px;top:'+e.clientY+'px;background:'+couleurs[Math.floor(Math.random()*couleurs.length)]+';--dx:'+dx+';--dy:'+dy+';box-shadow:0 0 5px currentColor;';
+        document.body.appendChild(p); setTimeout(()=>p.remove(),900);
       }
       flashLancement();
-      setTimeout(() => {
-        status.innerHTML = '✅ J.A.R.V.I.S en ligne !';
-        setTimeout(() => { window.open('https://chatgpt.com/', '_blank'); status.innerHTML = "En attente d'activation..."; }, 1000);
-      }, 1500);
+      setTimeout(()=>{status.innerHTML='<em>ChatGPT ouvert 🍑</em>'; setTimeout(()=>{window.open('https://chatgpt.com/','_blank');status.innerHTML='<em>En attente d\'un souvenir...</em>';},1000);},1500);
     }
 
-    // ===== NOTES — RESTAURÉ =====
+    // NOTES
     const notesEl = document.getElementById('notes');
-    // Charger depuis localStorage
     if (notesEl) {
-      const savedNotes = localStorage.getItem('notes_jarvis');
-      if (savedNotes) notesEl.value = savedNotes;
-      // Sauvegarde auto à chaque frappe
-      notesEl.addEventListener('input', () => {
-        localStorage.setItem('notes_jarvis', notesEl.value);
-      });
+      const saved = localStorage.getItem('notes_jarvis');
+      if (saved) notesEl.value = saved;
+      notesEl.addEventListener('input', () => { localStorage.setItem('notes_jarvis', notesEl.value); });
     }
     function sauvegarderNotes() {
       if (!notesEl) return;
       localStorage.setItem('notes_jarvis', notesEl.value);
       const notif = document.getElementById('notif-save');
-      notif.innerHTML = '✅ Sauvegardé !';
+      notif.innerHTML = '<em>✅ Sauvegardé...</em>';
       setTimeout(() => { notif.innerHTML = ''; }, 2000);
     }
 
-    // ===== TODO =====
+    // TODO
     let todos = JSON.parse(localStorage.getItem('todos_jarvis') || '[]');
     function afficherTodos() {
       const list = document.getElementById('todo-list');
       if (!list) return;
       list.innerHTML = '';
-      if (todos.length === 0) { list.innerHTML = '<p style="color:rgba(255,215,0,0.3);font-size:0.75em;text-align:center;margin-top:10px">Aucun devoir pour le moment.</p>'; return; }
-      todos.forEach((t, i) => {
-        list.innerHTML += '<div class="todo-item"><input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTodo('+i+')"><span class="'+(t.done?'done':'')+'">' + t.text + '</span><button class="todo-delete" onclick="supprimerTodo('+i+')">🗑️</button></div>';
-      });
+      if (todos.length===0) { list.innerHTML='<p style="color:rgba(255,190,152,0.25);font-size:0.78em;text-align:center;margin-top:12px;font-style:italic;font-family:Cormorant Garamond,serif">Aucun devoir pour l\'instant...</p>'; return; }
+      todos.forEach((t,i) => { list.innerHTML+='<div class="todo-item"><input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTodo('+i+')"><span class="'+(t.done?'done':'')+'">' +t.text+'</span><button class="todo-delete" onclick="supprimerTodo('+i+')">🗑️</button></div>'; });
     }
-    function ajouterTodo() {
-      const input = document.getElementById('todo-input');
-      if (!input.value.trim()) return;
-      todos.push({ text: input.value.trim(), done: false });
-      localStorage.setItem('todos_jarvis', JSON.stringify(todos));
-      input.value = ''; afficherTodos();
-    }
-    function toggleTodo(i) { todos[i].done = !todos[i].done; localStorage.setItem('todos_jarvis', JSON.stringify(todos)); afficherTodos(); }
-    function supprimerTodo(i) { todos.splice(i,1); localStorage.setItem('todos_jarvis', JSON.stringify(todos)); afficherTodos(); }
-    document.getElementById('todo-input').addEventListener('keypress', (e) => { if (e.key==='Enter') ajouterTodo(); });
+    function ajouterTodo() { const input=document.getElementById('todo-input'); if(!input.value.trim())return; todos.push({text:input.value.trim(),done:false}); localStorage.setItem('todos_jarvis',JSON.stringify(todos)); input.value=''; afficherTodos(); }
+    function toggleTodo(i) { todos[i].done=!todos[i].done; localStorage.setItem('todos_jarvis',JSON.stringify(todos)); afficherTodos(); }
+    function supprimerTodo(i) { todos.splice(i,1); localStorage.setItem('todos_jarvis',JSON.stringify(todos)); afficherTodos(); }
+    document.getElementById('todo-input').addEventListener('keypress',(e)=>{if(e.key==='Enter')ajouterTodo();});
     afficherTodos();
 
-    // ===== POST-ITS — RESTAURÉ COMPLET =====
-    const couleursPostit = ['#ffeb3b','#ff8a65','#81c784','#64b5f6','#f48fb1','#ce93d8','#80cbc4','#ffcc02'];
+    // POST-ITS
+    const couleursPostit = ['#FFDAB9','#FFE4B5','#FFF0D0','#E8D5B7','#F5DEB3','#FAEBD7','#FFE8CC','#FFDDC1'];
     let postits = JSON.parse(localStorage.getItem('postits_jarvis') || '[]');
-
     function afficherPostits() {
       const container = document.getElementById('postits-container');
       if (!container) return;
       container.innerHTML = '';
-      postits.forEach((p, i) => {
-        const rot = ((i % 7) - 3) * 1.5;
-        const div = document.createElement('div');
-        div.className = 'postit';
-        div.style.background = p.couleur;
-        div.style.setProperty('--rot', rot + 'deg');
-        div.innerHTML = '<button class="postit-delete" onclick="supprimerPostit('+i+')">✕</button><textarea placeholder="Note..." onchange="sauverPostit('+i+', this.value)" oninput="sauverPostit('+i+', this.value)">'+p.texte+'</textarea>';
+      postits.forEach((p,i) => {
+        const rot=((i%7)-3)*1.5;
+        const div=document.createElement('div'); div.className='postit'; div.style.background=p.couleur; div.style.setProperty('--rot',rot+'deg');
+        div.innerHTML='<button class="postit-delete" onclick="supprimerPostit('+i+')">✕</button><textarea placeholder="Note..." onchange="sauverPostit('+i+',this.value)" oninput="sauverPostit('+i+',this.value)">'+p.texte+'</textarea>';
         container.appendChild(div);
       });
-      // Bouton ajouter
-      const addDiv = document.createElement('div');
-      addDiv.className = 'add-postit';
-      addDiv.innerHTML = '＋<span>Nouveau post-it</span>';
-      addDiv.onclick = ajouterPostit;
+      const addDiv=document.createElement('div'); addDiv.className='add-postit';
+      addDiv.innerHTML='＋<span>Nouveau post-it</span>'; addDiv.onclick=ajouterPostit;
       container.appendChild(addDiv);
     }
-    function ajouterPostit() {
-      postits.push({ texte: '', couleur: couleursPostit[Math.floor(Math.random()*couleursPostit.length)] });
-      localStorage.setItem('postits_jarvis', JSON.stringify(postits));
-      afficherPostits();
-      // Focus sur le dernier textarea
-      setTimeout(() => {
-        const textareas = document.querySelectorAll('.postit textarea');
-        if (textareas.length > 0) textareas[textareas.length-1].focus();
-      }, 100);
-    }
-    function supprimerPostit(i) {
-      postits.splice(i, 1);
-      localStorage.setItem('postits_jarvis', JSON.stringify(postits));
-      afficherPostits();
-    }
-    function sauverPostit(i, val) {
-      if (postits[i]) {
-        postits[i].texte = val;
-        localStorage.setItem('postits_jarvis', JSON.stringify(postits));
-      }
-    }
+    function ajouterPostit() { postits.push({texte:'',couleur:couleursPostit[Math.floor(Math.random()*couleursPostit.length)]}); localStorage.setItem('postits_jarvis',JSON.stringify(postits)); afficherPostits(); setTimeout(()=>{const t=document.querySelectorAll('.postit textarea');if(t.length>0)t[t.length-1].focus();},100); }
+    function supprimerPostit(i) { postits.splice(i,1); localStorage.setItem('postits_jarvis',JSON.stringify(postits)); afficherPostits(); }
+    function sauverPostit(i,val) { if(postits[i]){postits[i].texte=val;localStorage.setItem('postits_jarvis',JSON.stringify(postits));} }
     afficherPostits();
 
-    // ===== MINUTEUR =====
-    let minuteurInterval = null, minuteurSecondes = 0, minuteurEnCours = false;
-    function setMinuteur(min) { minuteurSecondes = min*60; afficherMinuteur(); }
-    function afficherMinuteur() {
-      const m = Math.floor(minuteurSecondes/60), s = minuteurSecondes%60;
-      document.getElementById('minuteur-display').textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'00');
-    }
-    function demarrerMinuteur() {
-      if (minuteurEnCours) return;
-      minuteurEnCours = true;
-      minuteurInterval = setInterval(() => {
-        if (minuteurSecondes <= 0) {
-          clearInterval(minuteurInterval); minuteurEnCours = false;
-          document.getElementById('minuteur-display').textContent = '✅ TERMINÉ !';
-          if ('Notification' in window && Notification.permission==='granted') new Notification('⏰ J.A.R.V.I.S', { body: 'Timer terminé !' });
-          flashLancement();
-          return;
-        }
-        minuteurSecondes--; afficherMinuteur();
-      }, 1000);
-    }
-    function pauseMinuteur() { clearInterval(minuteurInterval); minuteurEnCours = false; }
-    function resetMinuteur() { clearInterval(minuteurInterval); minuteurEnCours = false; minuteurSecondes = 0; afficherMinuteur(); }
+    // MINUTEUR
+    let minuteurInterval=null,minuteurSecondes=0,minuteurEnCours=false;
+    function setMinuteur(min){minuteurSecondes=min*60;afficherMinuteur();}
+    function afficherMinuteur(){const m=Math.floor(minuteurSecondes/60),s=minuteurSecondes%60;document.getElementById('minuteur-display').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'00');}
+    function demarrerMinuteur(){if(minuteurEnCours)return;minuteurEnCours=true;minuteurInterval=setInterval(()=>{if(minuteurSecondes<=0){clearInterval(minuteurInterval);minuteurEnCours=false;document.getElementById('minuteur-display').textContent='✅ Terminé !';if('Notification'in window&&Notification.permission==='granted')new Notification('🍑 Elio',{body:'Ton timer est terminé.'});flashLancement();return;}minuteurSecondes--;afficherMinuteur();},1000);}
+    function pauseMinuteur(){clearInterval(minuteurInterval);minuteurEnCours=false;}
+    function resetMinuteur(){clearInterval(minuteurInterval);minuteurEnCours=false;minuteurSecondes=0;afficherMinuteur();}
 
-    // ===== CHRONO =====
-    let chronoInterval = null, chronoMs = 0, chronoEnCours = false;
-    function afficherChrono() {
-      const h = Math.floor(chronoMs/360000), m = Math.floor((chronoMs%360000)/6000), s = Math.floor((chronoMs%6000)/100);
-      document.getElementById('chrono-display').textContent = String(h).padStart(2,'00')+':'+String(m).padStart(2,'00')+':'+String(s).padStart(2,'00');
-    }
-    function demarrerChrono() { if (chronoEnCours) return; chronoEnCours=true; chronoInterval=setInterval(()=>{chronoMs++;afficherChrono();},10); }
-    function pauseChrono() { clearInterval(chronoInterval); chronoEnCours=false; }
-    function resetChrono() { clearInterval(chronoInterval); chronoEnCours=false; chronoMs=0; afficherChrono(); }
+    // CHRONO
+    let chronoInterval=null,chronoMs=0,chronoEnCours=false;
+    function afficherChrono(){const h=Math.floor(chronoMs/360000),m=Math.floor((chronoMs%360000)/6000),s=Math.floor((chronoMs%6000)/100);document.getElementById('chrono-display').textContent=String(h).padStart(2,'00')+':'+String(m).padStart(2,'00')+':'+String(s).padStart(2,'00');}
+    function demarrerChrono(){if(chronoEnCours)return;chronoEnCours=true;chronoInterval=setInterval(()=>{chronoMs++;afficherChrono();},10);}
+    function pauseChrono(){clearInterval(chronoInterval);chronoEnCours=false;}
+    function resetChrono(){clearInterval(chronoInterval);chronoEnCours=false;chronoMs=0;afficherChrono();}
 
-    // ===== CALENDRIER — RESTAURÉ =====
-    let calDate = new Date();
-    function afficherCalendrier() {
-      const annee = calDate.getFullYear(), mois = calDate.getMonth();
-      const moisNoms = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-      const titre = document.getElementById('cal-titre');
-      if (titre) titre.textContent = moisNoms[mois] + ' ' + annee;
-      const grid = document.getElementById('cal-grid');
-      if (!grid) return;
-      grid.innerHTML = '';
-      ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].forEach(j => { grid.innerHTML += '<div class="cal-day-name">'+j+'</div>'; });
-      const premier = new Date(annee, mois, 1);
-      const dernier = new Date(annee, mois+1, 0);
-      let debut = premier.getDay()===0?6:premier.getDay()-1;
-      const today = new Date();
-      for (let i=0;i<debut;i++) {
-        const j = new Date(annee, mois, -debut+i+1);
-        grid.innerHTML += '<div class="cal-day autre-mois">'+j.getDate()+'</div>';
-      }
-      for (let d=1;d<=dernier.getDate();d++) {
-        const isToday = d===today.getDate()&&mois===today.getMonth()&&annee===today.getFullYear();
-        grid.innerHTML += '<div class="cal-day'+(isToday?' today':'')+'">' + d + '</div>';
-      }
+    // CALENDRIER
+    let calDate=new Date();
+    function afficherCalendrier(){
+      const annee=calDate.getFullYear(),mois=calDate.getMonth();
+      const moisNoms=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+      const titre=document.getElementById('cal-titre'); if(titre)titre.textContent=moisNoms[mois]+' '+annee;
+      const grid=document.getElementById('cal-grid'); if(!grid)return; grid.innerHTML='';
+      ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].forEach(j=>{grid.innerHTML+='<div class="cal-day-name">'+j+'</div>';});
+      const premier=new Date(annee,mois,1),dernier=new Date(annee,mois+1,0);
+      let debut=premier.getDay()===0?6:premier.getDay()-1;
+      const today=new Date();
+      for(let i=0;i<debut;i++){const j=new Date(annee,mois,-debut+i+1);grid.innerHTML+='<div class="cal-day autre-mois">'+j.getDate()+'</div>';}
+      for(let d=1;d<=dernier.getDate();d++){const isToday=d===today.getDate()&&mois===today.getMonth()&&annee===today.getFullYear();grid.innerHTML+='<div class="cal-day'+(isToday?' today':'')+'">'+d+'</div>';}
     }
-    function changerMois(dir) { calDate.setMonth(calDate.getMonth()+dir); afficherCalendrier(); }
+    function changerMois(dir){calDate.setMonth(calDate.getMonth()+dir);afficherCalendrier();}
     afficherCalendrier();
 
-    // ===== METEO =====
-    const meteoData = {
-      'paris':{temp:14,desc:'Nuageux',icon:'☁️'},'marseille':{temp:19,desc:'Ensoleillé',icon:'☀️'},
-      'lyon':{temp:12,desc:'Pluvieux',icon:'🌧️'},'nice':{temp:22,desc:'Beau temps',icon:'🌤️'},
-      'bordeaux':{temp:16,desc:'Partiellement nuageux',icon:'⛅'},'toulouse':{temp:17,desc:'Ensoleillé',icon:'☀️'},
-      'nantes':{temp:11,desc:'Pluvieux',icon:'🌧️'},'lille':{temp:9,desc:'Couvert',icon:'🌥️'}
-    };
-    function chercherMeteo() {
-      const ville = document.getElementById('meteo-input').value.toLowerCase().trim();
-      const result = document.getElementById('meteo-result');
-      const data = meteoData[ville];
-      if (data) result.innerHTML='<div class="meteo-icon">'+data.icon+'</div><div class="meteo-temp">'+data.temp+'°C</div><div class="meteo-desc">'+data.desc+'</div><div class="meteo-ville">📍 '+ville.charAt(0).toUpperCase()+ville.slice(1)+'</div>';
-      else result.innerHTML='<p style="color:#00f7ff;opacity:0.5;font-size:0.8em">Ville non trouvée. Essaie : Paris, Marseille, Lyon, Nice...</p>';
+    // METEO
+    const meteoData={'paris':{temp:14,desc:'Nuageux',icon:'☁️'},'marseille':{temp:22,desc:'Ensoleillé',icon:'☀️'},'lyon':{temp:12,desc:'Pluvieux',icon:'🌧️'},'nice':{temp:24,desc:'Beau temps',icon:'🌤️'},'bordeaux':{temp:18,desc:'Partiellement nuageux',icon:'⛅'},'toulouse':{temp:19,desc:'Ensoleillé',icon:'☀️'},'nantes':{temp:11,desc:'Pluvieux',icon:'🌧️'},'lille':{temp:9,desc:'Couvert',icon:'🌥️'},'crema':{temp:28,desc:'Été éternel',icon:'🍑'},'milan':{temp:26,desc:'Ensoleillé',icon:'☀️'},'rome':{temp:30,desc:'Chaud et lumineux',icon:'🌅'}};
+    function chercherMeteo(){
+      const ville=document.getElementById('meteo-input').value.toLowerCase().trim();
+      const result=document.getElementById('meteo-result');
+      const data=meteoData[ville];
+      if(data)result.innerHTML='<div class="meteo-icon">'+data.icon+'</div><div class="meteo-temp">'+data.temp+'°C</div><div class="meteo-desc">'+data.desc+'</div><div class="meteo-ville">📍 '+ville.charAt(0).toUpperCase()+ville.slice(1)+'</div>';
+      else result.innerHTML='<p style="color:var(--bleu-doux);opacity:0.5;font-size:0.8em;font-style:italic;font-family:Cormorant Garamond,serif">Ville non trouvée. Essaie : Crema, Milan, Rome, Paris...</p>';
     }
     document.getElementById('meteo-input').addEventListener('keypress',(e)=>{if(e.key==='Enter')chercherMeteo();});
 
-    // ===== CARTE LEAFLET — RESTAURÉE =====
-    let mapInstance = null;
-    function initialiserCarte() {
-      if (mapInstance) return;
-      try {
-        mapInstance = L.map('map', { zoomControl: true, scrollWheelZoom: true }).setView([20, 10], 2);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-          attribution:'© CartoDB', subdomains:'abcd', maxZoom:19
-        }).addTo(mapInstance);
-        const marqueurs = [
-          [48.8566, 2.3522, '🗼 Paris — QG France'],
-          [43.2965, 5.3698, '🌊 Marseille'],
-          [40.7128, -74.0060, '🗽 New York — Stark Tower'],
-          [35.6762, 139.6503, '🗾 Tokyo'],
-          [51.5074, -0.1278, '🎡 Londres'],
-          [-33.8688, 151.2093, '🦘 Sydney'],
-          [55.7558, 37.6176, '🏰 Moscou']
-        ];
-        marqueurs.forEach(([lat, lng, popup]) => {
-          L.marker([lat,lng]).addTo(mapInstance).bindPopup('<span style="font-family:Orbitron,sans-serif;font-size:0.8em;color:#ffd700">'+popup+'</span>');
-        });
-      } catch(e) { document.getElementById('map').innerHTML = '<p style="color:#ffd700;text-align:center;padding:20px;font-size:0.8em">Carte non disponible. Vérifiez votre connexion.</p>'; }
+    // CARTE
+    let mapInstance=null;
+    function initialiserCarte(){
+      if(mapInstance)return;
+      try{
+        mapInstance=L.map('map',{zoomControl:true,scrollWheelZoom:true}).setView([45.8,9.5],6);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© CartoDB',subdomains:'abcd',maxZoom:19}).addTo(mapInstance);
+        [[45.3658,9.6896,'🍑 Crema — Villa d\'Elio'],[45.4654,9.1859,'🏛️ Milan'],[45.9763,8.9042,'🌊 Lac de Côme'],[41.9028,12.4964,'🏛️ Rome'],[43.7696,11.2558,'🌸 Florence'],[48.8566,2.3522,'🗼 Paris'],[40.7128,-74.0060,'🗽 New York']].forEach(([lat,lng,popup])=>{L.marker([lat,lng]).addTo(mapInstance).bindPopup('<span style="font-family:Cormorant Garamond,serif;font-style:italic;font-size:0.9em;color:#FFBE98">'+popup+'</span>');});
+      }catch(e){document.getElementById('map').innerHTML='<p style="color:var(--peche);text-align:center;padding:20px;font-size:0.8em;font-style:italic">Carte non disponible.</p>';}
     }
-    function rafraichirCarte() { if (mapInstance) mapInstance.invalidateSize(); }
+    function rafraichirCarte(){if(mapInstance)mapInstance.invalidateSize();}
 
-    // ===== MUSIQUE =====
-    function lancerMusique() {
-      const input = document.getElementById('music-input').value.trim();
-      if (!input) return;
-      let videoId = '';
-      if (input.includes('youtube.com/watch?v=')) videoId = input.split('v=')[1].split('&')[0];
-      else if (input.includes('youtu.be/')) videoId = input.split('youtu.be/')[1].split('?')[0];
-      if (videoId) lancerMusiqueDirecte('https://www.youtube.com/embed/'+videoId);
-      else { const f=document.getElementById('music-frame'); f.style.display='block'; f.src='https://www.youtube.com/embed?listType=search&list='+encodeURIComponent(input); }
+    // MUSIQUE
+    function lancerMusique(){
+      const input=document.getElementById('music-input').value.trim(); if(!input)return;
+      let videoId='';
+      if(input.includes('youtube.com/watch?v='))videoId=input.split('v=')[1].split('&')[0];
+      else if(input.includes('youtu.be/'))videoId=input.split('youtu.be/')[1].split('?')[0];
+      if(videoId)lancerMusiqueDirecte('https://www.youtube.com/embed/'+videoId);
+      else{const f=document.getElementById('music-frame');f.style.display='block';f.src='https://www.youtube.com/embed?listType=search&list='+encodeURIComponent(input);}
     }
-    function lancerMusiqueDirecte(url) {
-      const f = document.getElementById('music-frame');
-      f.style.display = 'block';
-      f.src = url + '?autoplay=1';
-      flashLancement();
-    }
+    function lancerMusiqueDirecte(url){const f=document.getElementById('music-frame');f.style.display='block';f.src=url+'?autoplay=1';flashLancement();}
     document.getElementById('music-input').addEventListener('keypress',(e)=>{if(e.key==='Enter')lancerMusique();});
 
-    // ===== JEUX =====
-    function afficherMessageJeu(msg) {
+    // JEUX
+    function afficherMessageJeu(msg){
       flashLancement();
-      const el = document.getElementById('jeu-message');
-      el.textContent = msg;
-      el.style.color = '#ffd700';
-      el.style.textShadow = '0 0 12px #ffd700';
-      setTimeout(() => { el.style.color = '#00f7ff'; el.style.textShadow = 'none'; }, 2000);
+      const el=document.getElementById('jeu-message');
+      el.textContent=msg; el.style.color='var(--peche)'; el.style.fontStyle='italic';
+      setTimeout(()=>{el.style.color='var(--bleu-doux)';},2500);
     }
   </script>
 
