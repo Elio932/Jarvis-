@@ -271,37 +271,7 @@
     .dossier-contenu a { padding: 7px 15px; border: 1px solid rgba(91,123,175,0.3); border-radius: 18px; color: var(--bleu-doux); text-decoration: none; font-size: 0.72em; transition: all 0.3s; background: rgba(91,123,175,0.04); font-family: 'Josefin Sans', sans-serif; letter-spacing: 1px; }
     .dossier-contenu a:hover { background: var(--bleu-doux); color: var(--creme); box-shadow: 0 0 12px rgba(91,123,175,0.3); }
 
-    /* NOTES */
-    .notes-container { width: 100%; }
-    #notes { width: 100%; height: 210px; background: rgba(255,190,152,0.03); border: 1px solid rgba(255,190,152,0.2); border-radius: 14px; color: var(--peche); font-size: 0.9em; padding: 18px; resize: vertical; outline: none; font-family: 'Cormorant Garamond', serif; font-style: italic; cursor: text; line-height: 1.7; }
-    #notes:focus { border-color: rgba(255,190,152,0.5); box-shadow: 0 0 20px rgba(255,190,152,0.1); }
-    #notes::placeholder { color: rgba(255,190,152,0.2); }
-    .save-btn { margin-top: 12px; padding: 10px 24px; background: linear-gradient(135deg, var(--peche), var(--abricot)); border: none; border-radius: 22px; color: #1a0e07; font-size: 0.78em; cursor: none; transition: all 0.3s; font-family: 'Josefin Sans', sans-serif; font-weight: 600; letter-spacing: 2px; }
-    .save-btn:hover { transform: scale(1.04); box-shadow: 0 0 18px rgba(255,190,152,0.4); }
-    #notif-save { margin-left: 10px; font-size: 0.72em; opacity: 0.8; color: var(--bleu-doux); font-style: italic; font-family: 'Cormorant Garamond', serif; }
-
-    /* TODO */
-    .todo-input-zone { display: flex; gap: 8px; margin-bottom: 14px; width: 100%; }
-    .todo-input-zone input { flex: 1; padding: 10px 18px; border-radius: 22px; border: 1px solid rgba(255,190,152,0.25); background: rgba(255,190,152,0.03); color: var(--peche); font-size: 0.8em; outline: none; cursor: text; font-family: 'Josefin Sans', sans-serif; }
-    .todo-input-zone input::placeholder { color: rgba(255,190,152,0.2); }
-    .todo-input-zone button { padding: 10px 20px; background: linear-gradient(135deg, var(--peche), var(--abricot)); border: none; border-radius: 22px; color: #1a0e07; font-size: 1em; cursor: none; font-weight: bold; }
-    .todo-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border: 1px solid rgba(255,190,152,0.12); border-radius: 22px; margin-bottom: 8px; background: rgba(255,190,152,0.02); width: 100%; }
-    .todo-item input[type=checkbox] { accent-color: var(--abricot); width: 14px; height: 14px; cursor: pointer; }
-    .todo-item span { flex: 1; text-align: left; color: var(--peche); font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.9em; }
-    .todo-item span.done { text-decoration: line-through; opacity: 0.3; }
-    .todo-delete { background: none; border: none; color: var(--abricot); cursor: none; opacity: 0.4; font-size: 1em; }
-    .todo-delete:hover { opacity: 1; }
-
-    /* POST-IT */
-    .postits { display: flex; flex-wrap: wrap; gap: 15px; width: 100%; margin-top: 10px; }
-    .postit { width: 175px; min-height: 155px; padding: 14px; border-radius: 10px; position: relative; box-shadow: 3px 3px 15px rgba(0,0,0,0.4); transform: rotate(var(--rot)); transition: transform 0.3s; }
-    .postit:hover { transform: rotate(0deg) scale(1.05); z-index: 10; }
-    .postit textarea { background: transparent; border: none; width: 100%; height: 108px; resize: none; font-size: 0.85em; color: #2a1508; font-family: 'Cormorant Garamond', serif; font-style: italic; outline: none; cursor: text; line-height: 1.5; }
-    .postit-delete { position: absolute; top: 6px; right: 8px; background: none; border: none; cursor: none; opacity: 0.4; font-size: 0.9em; color: #2a1508; }
-    .postit-delete:hover { opacity: 1; }
-    .add-postit { width: 175px; min-height: 155px; border: 1px dashed rgba(255,190,152,0.25); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-size: 1.8em; color: rgba(255,190,152,0.25); cursor: none; transition: all 0.4s; }
-    .add-postit:hover { border-color: rgba(255,190,152,0.5); color: rgba(255,190,152,0.5); box-shadow: 0 0 15px rgba(255,190,152,0.1); }
-    .add-postit span { font-size: 0.38em; font-family: 'Josefin Sans', sans-serif; letter-spacing: 2px; }
+   
 
     /* MINUTEUR */
     .minuteur { width: 100%; text-align: center; }
@@ -315,83 +285,7 @@
     .chrono-display { font-family: 'Cormorant Garamond', serif; font-size: 3em; font-weight: 600; color: var(--bleu-doux); text-shadow: 0 0 20px rgba(91,123,175,0.3); margin: 12px 0; }
     .separateur-outil { width: 55%; height: 1px; background: rgba(255,190,152,0.12); margin: 20px auto; }
 
-    /* RAPPELS */
-    .rappel-input { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
-    .rappel-input input[type=text] { flex: 2; min-width: 150px; padding: 10px 16px; border-radius: 22px; border: 1px solid rgba(255,190,152,0.25); background: rgba(255,190,152,0.03); color: var(--peche); font-size: 0.8em; outline: none; cursor: text; font-family: 'Josefin Sans', sans-serif; }
-    .rappel-input input[type=time] { flex: 1; min-width: 100px; padding: 10px 14px; border-radius: 22px; border: 1px solid rgba(91,123,175,0.3); background: rgba(91,123,175,0.03); color: var(--bleu-doux); font-size: 0.8em; outline: none; cursor: text; }
-    .rappel-input input::placeholder { color: rgba(255,190,152,0.2); }
-    .rappel-input button { padding: 10px 20px; background: linear-gradient(135deg, var(--peche), var(--abricot)); border: none; border-radius: 22px; color: #1a0e07; font-size: 0.85em; cursor: none; font-weight: 600; }
-    .rappel-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border: 1px solid rgba(255,190,152,0.12); border-radius: 22px; margin-bottom: 8px; background: rgba(255,190,152,0.02); width: 100%; }
-    .rappel-heure { color: var(--bleu-doux); font-size: 0.72em; min-width: 55px; font-style: italic; font-family: 'Cormorant Garamond', serif; }
-    .rappel-texte { flex: 1; color: var(--peche); font-size: 0.8em; font-family: 'Cormorant Garamond', serif; font-style: italic; }
-    .rappel-delete { background: none; border: none; color: var(--abricot); cursor: none; opacity: 0.4; }
-
-    /* CALENDRIER */
-    .calendrier { width: 100%; }
-    .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .cal-header button { background: transparent; border: 1px solid rgba(255,190,152,0.3); color: var(--peche); border-radius: 20px; padding: 5px 14px; cursor: none; transition: all 0.3s; font-family: 'Josefin Sans', sans-serif; }
-    .cal-header button:hover { background: linear-gradient(135deg, var(--peche), var(--abricot)); color: #1a0e07; border-color: transparent; }
-    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; width: 100%; }
-    .cal-day-name { text-align: center; font-size: 0.6em; color: var(--bleu-doux); padding: 6px; opacity: 0.6; font-family: 'Josefin Sans', sans-serif; letter-spacing: 1px; }
-    .cal-day { text-align: center; padding: 8px 4px; border-radius: 10px; font-size: 0.75em; border: 1px solid transparent; transition: all 0.3s; cursor: none; font-family: 'Cormorant Garamond', serif; color: rgba(255,245,230,0.6); }
-    .cal-day:hover { border-color: rgba(255,190,152,0.3); background: rgba(255,190,152,0.06); }
-    .cal-day.today { background: rgba(255,190,152,0.15); border-color: rgba(255,190,152,0.5); font-weight: 600; color: var(--peche); box-shadow: 0 0 10px rgba(255,190,152,0.2); }
-    .cal-day.autre-mois { opacity: 0.2; }
-
-    /* METEO */
-    .meteo-widget { width: 100%; border: 1px solid rgba(255,190,152,0.12); border-radius: 16px; padding: 20px; background: rgba(255,190,152,0.02); margin-bottom: 14px; }
-    .meteo-search { display: flex; gap: 10px; margin-bottom: 20px; }
-    .meteo-search input { flex: 1; padding: 10px 18px; border-radius: 22px; border: 1px solid rgba(255,190,152,0.25); background: rgba(255,190,152,0.03); color: var(--peche); font-size: 0.8em; outline: none; cursor: text; font-family: 'Josefin Sans', sans-serif; }
-    .meteo-search input::placeholder { color: rgba(255,190,152,0.2); }
-    .meteo-search button { padding: 10px 20px; background: linear-gradient(135deg, var(--peche), var(--abricot)); border: none; border-radius: 22px; color: #1a0e07; font-size: 0.8em; cursor: none; font-weight: 600; }
-    .meteo-result { text-align: center; }
-    .meteo-icon { font-size: 3.5em; margin-bottom: 10px; }
-    .meteo-temp { font-family: 'Cormorant Garamond', serif; font-size: 2.5em; font-weight: 600; color: var(--peche); }
-    .meteo-desc { color: var(--bleu-doux); font-size: 0.9em; margin-top: 5px; font-style: italic; font-family: 'Cormorant Garamond', serif; }
-    .meteo-ville { opacity: 0.5; font-size: 0.75em; margin-top: 5px; font-family: 'Josefin Sans', sans-serif; letter-spacing: 2px; }
-
-    /* FILMS / NEWS */
-    .marvel-news { width: 100%; }
-    .news-item { padding: 16px; border: 1px solid rgba(255,190,152,0.12); border-radius: 14px; margin-bottom: 12px; background: rgba(255,190,152,0.02); transition: all 0.4s; }
-    .news-item:hover { border-color: rgba(255,190,152,0.35); box-shadow: 0 0 15px rgba(255,190,152,0.1); }
-    .news-item h3 { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--peche); font-size: 1em; margin-bottom: 6px; font-weight: 400; }
-    .news-item p { color: var(--bleu-doux); font-size: 0.78em; opacity: 0.85; line-height: 1.6; font-family: 'Cormorant Garamond', serif; font-style: italic; }
-    .news-item .news-date { font-size: 0.62em; opacity: 0.4; color: var(--peche); margin-top: 6px; letter-spacing: 2px; font-family: 'Josefin Sans', sans-serif; }
-
-    /* JEUX */
-    #jeu-message { text-align:center; font-size:0.9em; color:var(--bleu-doux); min-height:38px; margin-bottom:18px; font-style:italic; transition:all 0.5s; font-family:'Cormorant Garamond',serif; }
-    .jeux-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; }
-    .jeu-card { display: flex; flex-direction: column; align-items: center; padding: 18px 12px; border: 1px solid rgba(255,190,152,0.18); border-radius: 16px; color: var(--peche); text-decoration: none; background: rgba(255,190,152,0.02); transition: all 0.4s; position: relative; overflow: hidden; cursor: none; }
-    .jeu-card::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255,190,152,0.08); border-radius: 50%; transform: translate(-50%,-50%); transition: width 0.5s, height 0.5s; }
-    .jeu-card:hover::before { width: 300px; height: 300px; }
-    .jeu-card:hover { border-color: rgba(255,190,152,0.45); box-shadow: 0 0 20px rgba(255,190,152,0.15); transform: translateY(-3px); }
-    .jeu-emoji { font-size: 2.3em; margin-bottom: 8px; transition: transform 0.3s; }
-    .jeu-card:hover .jeu-emoji { transform: scale(1.12) rotate(5deg); }
-    .jeu-titre { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.9em; color: var(--peche); margin-bottom: 4px; text-align: center; }
-    .jeu-desc { font-size: 0.62em; color: var(--bleu-doux); opacity: 0.7; font-family: 'Josefin Sans', sans-serif; letter-spacing: 1px; }
-
-    /* MUSIQUE */
-    .music-player { width: 100%; border: 1px solid rgba(255,190,152,0.12); border-radius: 16px; padding: 20px; background: rgba(255,190,152,0.02); }
-    .music-search { display: flex; gap: 10px; margin-bottom: 14px; }
-    .music-search input { flex: 1; padding: 10px 18px; border-radius: 22px; border: 1px solid rgba(255,190,152,0.25); background: rgba(255,190,152,0.03); color: var(--peche); font-size: 0.8em; outline: none; cursor: text; font-family: 'Josefin Sans', sans-serif; }
-    .music-search input::placeholder { color: rgba(255,190,152,0.2); }
-    .music-search button { padding: 10px 20px; background: linear-gradient(135deg, var(--peche), var(--abricot)); border: none; border-radius: 22px; color: #1a0e07; font-size: 0.8em; cursor: none; font-weight: 600; }
-    #music-frame { width: 100%; height: 195px; border-radius: 12px; border: none; display: none; margin-top: 12px; }
-    .music-suggestions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
-    .music-tag { padding: 5px 14px; border: 1px solid rgba(255,190,152,0.2); border-radius: 18px; color: var(--peche); font-size: 0.62em; cursor: none; font-family: 'Josefin Sans', sans-serif; letter-spacing: 1px; transition: all 0.3s; }
-    .music-tag:hover { background: var(--peche); color: #1a0e07; box-shadow: 0 0 10px rgba(255,190,152,0.3); }
-
-    /* CARTE */
-    #map { width: 100%; height: 420px; border-radius: 16px; border: 1px solid rgba(255,190,152,0.25); box-shadow: 0 0 25px rgba(255,190,152,0.08); z-index: 1; }
-    .leaflet-container { background: #1a1008 !important; border-radius: 16px; }
-
-    @media (max-width: 768px) {
-      .btn-v7, .btn-gold { width: 100%; margin-bottom: 8px; }
-      #bg-canvas { display: none; }
-      #main-content { padding: 20px 20px 80px 78px; }
-      .jeux-grid { grid-template-columns: repeat(2, 1fr); }
-      #ia-terminal { display: none !important; }
-      #avengers-panel { display: none !important; }
+   
     }
   </style>
 </head>
@@ -648,47 +542,12 @@
           <a href="https://www.noisli.com/playlists" target="_blank" onclick="flashLancement()">🔉 Ambiances</a>
           <a href="https://app.lumosity.com/fr/onboard" target="_blank" onclick="flashLancement()">🧠 Lumosity</a>
           <a href="https://web.whatsapp.com/" target="_blank" onclick="flashLancement()">📨 WhatsApp</a>
-          <a href="https://discord.com/channels/@me" target="_blank" onclick="flashLancement()"> Disord</a>
-         
+          <a href="https://discord.com/channels/@me" target="_blank" onclick="flashLancement()"> disord</a>
         </div>
       </div>
     </div>
 
-   
 
-    <!-- MINUTEUR -->
-    <div class="section" id="section-minuteur">
-      <h2>⏱️ Minuteur & Chronomètre</h2>
-      <div class="separateur"></div>
-      <div class="minuteur">
-        <div class="minuteur-display" id="minuteur-display">00:00</div>
-        <div class="minuteur-btns">
-          <button onclick="demarrerMinuteur()">▶ Commencer</button>
-          <button onclick="pauseMinuteur()">⏸ Pause</button>
-          <button onclick="resetMinuteur()">↺ Reset</button>
-        </div>
-        <div class="minuteur-presets">
-          <button onclick="setMinuteur(5)">5 min</button>
-          <button onclick="setMinuteur(10)">10 min</button>
-          <button onclick="setMinuteur(15)">15 min</button>
-          <button onclick="setMinuteur(20)">20 min</button>
-          <button onclick="setMinuteur(25)">25 🍅</button>
-          <button onclick="setMinuteur(30)">30 min</button>
-        </div>
-        <div class="separateur-outil"></div>
-        <h2 style="color:var(--bleu-doux)">⏱️ Chronomètre</h2>
-        <div class="chrono-display" id="chrono-display">00:00:00</div>
-        <div class="minuteur-btns">
-          <button onclick="demarrerChrono()">▶ Start</button>
-          <button onclick="pauseChrono()">⏸ Pause</button>
-          <button onclick="resetChrono()">↺ Reset</button>
-        </div>
-      </div>
-    </div>
-
-   
-
-   
     <!-- JEUX -->
     <div class="section" id="section-jeux">
       <h2>🎮 Arcade</h2>
@@ -726,7 +585,13 @@
   <script>
     const MDP = "crema1983";
 
-    
+    // CURSEUR
+    const curseur = document.getElementById('curseur');
+    const trail = document.getElementById('curseur-trail');
+    document.addEventListener('mousemove', (e) => {
+      curseur.style.left = e.clientX + 'px'; curseur.style.top = e.clientY + 'px';
+      setTimeout(() => { trail.style.left = e.clientX + 'px'; trail.style.top = e.clientY + 'px'; }, 80);
+    });
 
     // ÉTOILES FILANTES
     function creerEtoile() {
@@ -1002,7 +867,58 @@
       setTimeout(()=>{status.innerHTML='<em>ChatGPT ouvert 🍑</em>'; setTimeout(()=>{window.open('https://chatgpt.com/','_blank');status.innerHTML='<em>En attente d\'un souvenir...</em>';},1000);},1500);
     }
 
-   
+    // NOTES
+    const notesEl = document.getElementById('notes');
+    if (notesEl) {
+      const saved = localStorage.getItem('notes_jarvis');
+      if (saved) notesEl.value = saved;
+      notesEl.addEventListener('input', () => { localStorage.setItem('notes_jarvis', notesEl.value); });
+    }
+    function sauvegarderNotes() {
+      if (!notesEl) return;
+      localStorage.setItem('notes_jarvis', notesEl.value);
+      const notif = document.getElementById('notif-save');
+      notif.innerHTML = '<em>✅ Sauvegardé...</em>';
+      setTimeout(() => { notif.innerHTML = ''; }, 2000);
+    }
+
+    // TODO
+    let todos = JSON.parse(localStorage.getItem('todos_jarvis') || '[]');
+    function afficherTodos() {
+      const list = document.getElementById('todo-list');
+      if (!list) return;
+      list.innerHTML = '';
+      if (todos.length===0) { list.innerHTML='<p style="color:rgba(255,190,152,0.25);font-size:0.78em;text-align:center;margin-top:12px;font-style:italic;font-family:Cormorant Garamond,serif">Aucun devoir pour l\'instant...</p>'; return; }
+      todos.forEach((t,i) => { list.innerHTML+='<div class="todo-item"><input type="checkbox" '+(t.done?'checked':'')+' onchange="toggleTodo('+i+')"><span class="'+(t.done?'done':'')+'">' +t.text+'</span><button class="todo-delete" onclick="supprimerTodo('+i+')">🗑️</button></div>'; });
+    }
+    function ajouterTodo() { const input=document.getElementById('todo-input'); if(!input.value.trim())return; todos.push({text:input.value.trim(),done:false}); localStorage.setItem('todos_jarvis',JSON.stringify(todos)); input.value=''; afficherTodos(); }
+    function toggleTodo(i) { todos[i].done=!todos[i].done; localStorage.setItem('todos_jarvis',JSON.stringify(todos)); afficherTodos(); }
+    function supprimerTodo(i) { todos.splice(i,1); localStorage.setItem('todos_jarvis',JSON.stringify(todos)); afficherTodos(); }
+    document.getElementById('todo-input').addEventListener('keypress',(e)=>{if(e.key==='Enter')ajouterTodo();});
+    afficherTodos();
+
+    // POST-ITS
+    const couleursPostit = ['#FFDAB9','#FFE4B5','#FFF0D0','#E8D5B7','#F5DEB3','#FAEBD7','#FFE8CC','#FFDDC1'];
+    let postits = JSON.parse(localStorage.getItem('postits_jarvis') || '[]');
+    function afficherPostits() {
+      const container = document.getElementById('postits-container');
+      if (!container) return;
+      container.innerHTML = '';
+      postits.forEach((p,i) => {
+        const rot=((i%7)-3)*1.5;
+        const div=document.createElement('div'); div.className='postit'; div.style.background=p.couleur; div.style.setProperty('--rot',rot+'deg');
+        div.innerHTML='<button class="postit-delete" onclick="supprimerPostit('+i+')">✕</button><textarea placeholder="Note..." onchange="sauverPostit('+i+',this.value)" oninput="sauverPostit('+i+',this.value)">'+p.texte+'</textarea>';
+        container.appendChild(div);
+      });
+      const addDiv=document.createElement('div'); addDiv.className='add-postit';
+      addDiv.innerHTML='＋<span>Nouveau post-it</span>'; addDiv.onclick=ajouterPostit;
+      container.appendChild(addDiv);
+    }
+    function ajouterPostit() { postits.push({texte:'',couleur:couleursPostit[Math.floor(Math.random()*couleursPostit.length)]}); localStorage.setItem('postits_jarvis',JSON.stringify(postits)); afficherPostits(); setTimeout(()=>{const t=document.querySelectorAll('.postit textarea');if(t.length>0)t[t.length-1].focus();},100); }
+    function supprimerPostit(i) { postits.splice(i,1); localStorage.setItem('postits_jarvis',JSON.stringify(postits)); afficherPostits(); }
+    function sauverPostit(i,val) { if(postits[i]){postits[i].texte=val;localStorage.setItem('postits_jarvis',JSON.stringify(postits));} }
+    afficherPostits();
+
     // MINUTEUR
     let minuteurInterval=null,minuteurSecondes=0,minuteurEnCours=false;
     function setMinuteur(min){minuteurSecondes=min*60;afficherMinuteur();}
@@ -1018,7 +934,57 @@
     function pauseChrono(){clearInterval(chronoInterval);chronoEnCours=false;}
     function resetChrono(){clearInterval(chronoInterval);chronoEnCours=false;chronoMs=0;afficherChrono();}
 
-  
+    // CALENDRIER
+    let calDate=new Date();
+    function afficherCalendrier(){
+      const annee=calDate.getFullYear(),mois=calDate.getMonth();
+      const moisNoms=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+      const titre=document.getElementById('cal-titre'); if(titre)titre.textContent=moisNoms[mois]+' '+annee;
+      const grid=document.getElementById('cal-grid'); if(!grid)return; grid.innerHTML='';
+      ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].forEach(j=>{grid.innerHTML+='<div class="cal-day-name">'+j+'</div>';});
+      const premier=new Date(annee,mois,1),dernier=new Date(annee,mois+1,0);
+      let debut=premier.getDay()===0?6:premier.getDay()-1;
+      const today=new Date();
+      for(let i=0;i<debut;i++){const j=new Date(annee,mois,-debut+i+1);grid.innerHTML+='<div class="cal-day autre-mois">'+j.getDate()+'</div>';}
+      for(let d=1;d<=dernier.getDate();d++){const isToday=d===today.getDate()&&mois===today.getMonth()&&annee===today.getFullYear();grid.innerHTML+='<div class="cal-day'+(isToday?' today':'')+'">'+d+'</div>';}
+    }
+    function changerMois(dir){calDate.setMonth(calDate.getMonth()+dir);afficherCalendrier();}
+    afficherCalendrier();
+
+    // METEO
+    const meteoData={'paris':{temp:14,desc:'Nuageux',icon:'☁️'},'marseille':{temp:22,desc:'Ensoleillé',icon:'☀️'},'lyon':{temp:12,desc:'Pluvieux',icon:'🌧️'},'nice':{temp:24,desc:'Beau temps',icon:'🌤️'},'bordeaux':{temp:18,desc:'Partiellement nuageux',icon:'⛅'},'toulouse':{temp:19,desc:'Ensoleillé',icon:'☀️'},'nantes':{temp:11,desc:'Pluvieux',icon:'🌧️'},'lille':{temp:9,desc:'Couvert',icon:'🌥️'},'crema':{temp:28,desc:'Été éternel',icon:'🍑'},'milan':{temp:26,desc:'Ensoleillé',icon:'☀️'},'rome':{temp:30,desc:'Chaud et lumineux',icon:'🌅'}};
+    function chercherMeteo(){
+      const ville=document.getElementById('meteo-input').value.toLowerCase().trim();
+      const result=document.getElementById('meteo-result');
+      const data=meteoData[ville];
+      if(data)result.innerHTML='<div class="meteo-icon">'+data.icon+'</div><div class="meteo-temp">'+data.temp+'°C</div><div class="meteo-desc">'+data.desc+'</div><div class="meteo-ville">📍 '+ville.charAt(0).toUpperCase()+ville.slice(1)+'</div>';
+      else result.innerHTML='<p style="color:var(--bleu-doux);opacity:0.5;font-size:0.8em;font-style:italic;font-family:Cormorant Garamond,serif">Ville non trouvée. Essaie : Crema, Milan, Rome, Paris...</p>';
+    }
+    document.getElementById('meteo-input').addEventListener('keypress',(e)=>{if(e.key==='Enter')chercherMeteo();});
+
+    // CARTE
+    let mapInstance=null;
+    function initialiserCarte(){
+      if(mapInstance)return;
+      try{
+        mapInstance=L.map('map',{zoomControl:true,scrollWheelZoom:true}).setView([45.8,9.5],6);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© CartoDB',subdomains:'abcd',maxZoom:19}).addTo(mapInstance);
+        [[45.3658,9.6896,'🍑 Crema — Villa d\'Elio'],[45.4654,9.1859,'🏛️ Milan'],[45.9763,8.9042,'🌊 Lac de Côme'],[41.9028,12.4964,'🏛️ Rome'],[43.7696,11.2558,'🌸 Florence'],[48.8566,2.3522,'🗼 Paris'],[40.7128,-74.0060,'🗽 New York']].forEach(([lat,lng,popup])=>{L.marker([lat,lng]).addTo(mapInstance).bindPopup('<span style="font-family:Cormorant Garamond,serif;font-style:italic;font-size:0.9em;color:#FFBE98">'+popup+'</span>');});
+      }catch(e){document.getElementById('map').innerHTML='<p style="color:var(--peche);text-align:center;padding:20px;font-size:0.8em;font-style:italic">Carte non disponible.</p>';}
+    }
+    function rafraichirCarte(){if(mapInstance)mapInstance.invalidateSize();}
+
+    // MUSIQUE
+    function lancerMusique(){
+      const input=document.getElementById('music-input').value.trim(); if(!input)return;
+      let videoId='';
+      if(input.includes('youtube.com/watch?v='))videoId=input.split('v=')[1].split('&')[0];
+      else if(input.includes('youtu.be/'))videoId=input.split('youtu.be/')[1].split('?')[0];
+      if(videoId)lancerMusiqueDirecte('https://www.youtube.com/embed/'+videoId);
+      else{const f=document.getElementById('music-frame');f.style.display='block';f.src='https://www.youtube.com/embed?listType=search&list='+encodeURIComponent(input);}
+    }
+    function lancerMusiqueDirecte(url){const f=document.getElementById('music-frame');f.style.display='block';f.src=url+'?autoplay=1';flashLancement();}
+    document.getElementById('music-input').addEventListener('keypress',(e)=>{if(e.key==='Enter')lancerMusique();});
 
     // JEUX
     function afficherMessageJeu(msg){
