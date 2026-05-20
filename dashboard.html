@@ -512,7 +512,7 @@
           <a href="https://www.youtube.com" target="_blank" onclick="flashLancement()">▶ YouTube</a>
           <a href="https://music.youtube.com" target="_blank" onclick="flashLancement()">🎵 YouTube Music</a>
           <a href="https://character.ai" target="_blank" onclick="flashLancement()">🤖 C.ai</a>
-          <a href="https://purstream.cx" target="_blank" onclick="flashLancement()">🎥 Films</a>
+          <a href="https://purstream.ac" target="_blank" onclick="flashLancement()">🎥 Films</a>
           <a href="https://science.nasa.gov/eyes/" target="_blank" onclick="flashLancement()">🌙 NASA</a>
           <a href="https://www.europe2.fr/webradios" target="_blank" onclick="flashLancement()">📻 Radio</a>
           <a href="https://zzz.zoomquilt.org/" target="_blank" onclick="flashLancement()">🎨 Zoom infini</a>
@@ -712,10 +712,10 @@
       flashLancement();
       document.getElementById('cinema-overlay').style.display = 'flex';
       const frame = document.getElementById('cinema-frame');
-      frame.src = 'https://purstream.art';
+      frame.src = 'https://purstream.ac';
       setTimeout(() => {
         try { if (frame.contentDocument === null) throw new Error(); }
-        catch(err) { window.open('https://purstream.art', '_blank'); fermerCinema(); }
+        catch(err) { window.open('https://purstream.ac', '_blank'); fermerCinema(); }
       }, 4000);
     }
     function fermerCinema() {
