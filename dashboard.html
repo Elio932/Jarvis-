@@ -580,7 +580,7 @@
           <a href="https://www.youtube.com" target="_blank" onclick="flashLancement()">▶ YouTube</a>
         <a href="https://music.youtube.com" target="_blank" onclick="flashLancement()">🎵 YouTube Music</a>
         <a href="https://character.ai" target="_blank" onclick="flashLancement()">🤖 C.ai</a>
-        <a href="https://purstream.ac" target="_blank" onclick="flashLancement()">🎥 Film</a>
+        <a href="https://purstream.ch" target="_blank" onclick="flashLancement()">🎥 Film</a>
            <a href="https://science.nasa.gov/eyes/" target="_blank" onclick="flashLancement()">🌙 Nasa</a>
            <a href="https://www.europe2.fr/webradios" target="_blank" onclick="flashLancement()">📻radio</a>
         <a href="https://zzz.zoomquilt.org/" target="_blank" onclick="flashLancement()">🎨zoom infini</a>
@@ -980,13 +980,13 @@ function launchRoblox() {
       const overlay = document.getElementById('cinema-overlay');
       overlay.style.display = 'flex';
       const frame = document.getElementById('cinema-frame');
-      frame.src = 'https://purstream.ac';
+      frame.src = 'https://purstream.ch';
       // Si iframe bloqué après 4s, ouvre dans nouvel onglet
       setTimeout(() => {
         try {
           if (frame.contentDocument === null) throw new Error('blocked');
         } catch(err) {
-          window.open('https://purstream.ac', '_blank');
+          window.open('https://purstream.ch', '_blank');
           fermerCinema();
         }
       }, 4000);
